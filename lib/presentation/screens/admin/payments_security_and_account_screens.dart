@@ -1,6 +1,7 @@
 // @source-mirror: src/views/admin/VistaConfiguracionPagos.vue, src/views/admin/VistaUsuariosYClientes.vue, src/views/admin/VistaAuditoria.vue, src/views/admin/VistaEditarCuenta.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -158,7 +159,7 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
               padding: const EdgeInsets.all(16),
               children: [
                 // CONTROL PARALELO DE INGRESOS
-                const Text('Control Paralelo de Recaudos', style: TextStyle(fontFamily: 'Montserrat', fontSize: 16, fontWeight: FontWeight.w800)),
+                Text('Control Paralelo de Recaudos', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -176,7 +177,7 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Dispersión en Cuentas Bancarias', style: TextStyle(fontFamily: 'Montserrat', fontSize: 16, fontWeight: FontWeight.w800)),
+                    Text('Dispersión en Cuentas Bancarias', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700)),
                     TextButton.icon(
                       onPressed: () => _abrirModalCuenta(),
                       icon: const Icon(Icons.add, size: 16),

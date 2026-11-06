@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/change_bus.dart';
 import '../../../data/models/product_models.dart';
@@ -228,13 +229,12 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Text(
                     'Ordenar prendas',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.w800,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: FashionColors.textoOscuro,
                     ),
@@ -547,8 +547,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                               ? 'No tienes prendas guardadas en tus favoritos'
                               : 'No encontramos prendas con los filtros aplicados',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: 'Montserrat',
+                          style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
                             color: FashionColors.textoOscuro,

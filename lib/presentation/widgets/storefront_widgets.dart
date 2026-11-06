@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/fashion_theme.dart';
 import '../../core/utils/currency_formatter.dart';
@@ -227,8 +228,7 @@ class ProductCardWidget extends ConsumerWidget {
                     producto.nombre,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
+                    style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: FashionColors.negro,
@@ -240,8 +240,7 @@ class ProductCardWidget extends ConsumerWidget {
                       subtitulo,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontFamily: 'Montserrat',
+                      style: GoogleFonts.montserrat(
                         fontSize: 11,
                         color: FashionColors.gris,
                       ),
@@ -273,8 +272,7 @@ class ProductCardWidget extends ConsumerWidget {
                           ),
                         Text(
                           CurrencyFormatter.formatearCOP(infoPrecio.precioFinal),
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
+                          style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: infoPrecio.tieneDescuento
@@ -344,10 +342,10 @@ class SizeGuideModal {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.straighten_rounded, size: 18, color: FashionColors.rosaCorporativo),
                           SizedBox(width: 6),
@@ -362,17 +360,16 @@ class SizeGuideModal {
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Medidas corporales',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'Poppins',
                           color: FashionColors.negro,
                         ),
                       ),
-                      Text(
+                      const Text(
                         'Medidas de referencia en centímetros (cm)',
                         style: TextStyle(fontSize: 12, color: FashionColors.gris),
                       ),
@@ -474,10 +471,9 @@ class SizeGuideModal {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             '¿Cómo tomar tus medidas?',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                               color: FashionColors.negro,
@@ -512,7 +508,7 @@ class SizeGuideModal {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(fontFamily: 'Montserrat', fontSize: 12, color: FashionColors.texto),
+          style: GoogleFonts.montserrat(fontSize: 12, color: FashionColors.texto),
           children: [
             TextSpan(text: '$title: ', style: const TextStyle(fontWeight: FontWeight.w700)),
             TextSpan(text: desc),
@@ -563,10 +559,9 @@ class CartDrawerWidget extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Bolsa de Compras',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
+                      style: GoogleFonts.poppins(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: FashionColors.negro,
@@ -590,25 +585,24 @@ class CartDrawerWidget extends ConsumerWidget {
           // Items List
           Expanded(
             child: items.isEmpty
-                ? const Center(
+                ? Center(
                     child: Padding(
-                      padding: EdgeInsets.all(32.0),
+                      padding: const EdgeInsets.all(32.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.shopping_bag_outlined, size: 56, color: FashionColors.borde),
-                          SizedBox(height: 14),
+                          const Icon(Icons.shopping_bag_outlined, size: 56, color: FashionColors.borde),
+                          const SizedBox(height: 14),
                           Text(
                             'Tu bolsa de compras está vacía.',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
                               color: FashionColors.texto,
                             ),
                           ),
-                          SizedBox(height: 6),
-                          Text(
+                          const SizedBox(height: 6),
+                          const Text(
                             'Explora el escaparate y añade tus piezas favoritas.',
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 12, color: FashionColors.gris),
@@ -665,8 +659,7 @@ class CartDrawerWidget extends ConsumerWidget {
                                     item.nombre,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontFamily: 'Poppins',
+                                    style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                       color: FashionColors.negro,
@@ -682,8 +675,7 @@ class CartDrawerWidget extends ConsumerWidget {
                                     children: [
                                       Text(
                                         CurrencyFormatter.formatearCOP(item.precio),
-                                        style: const TextStyle(
-                                          fontFamily: 'Poppins',
+                                        style: GoogleFonts.poppins(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 13,
                                           color: FashionColors.rosaCorporativo,
@@ -782,10 +774,9 @@ class CartDrawerWidget extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Total estimado',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
+                        style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: FashionColors.texto,
@@ -793,8 +784,7 @@ class CartDrawerWidget extends ConsumerWidget {
                       ),
                       Text(
                         CurrencyFormatter.formatearCOP(cartState.totalMonto),
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
+                        style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: FashionColors.rosaCorporativo,

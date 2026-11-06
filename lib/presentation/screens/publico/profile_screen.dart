@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/fashion_theme.dart';
@@ -93,10 +94,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                         children: [
                           Text(
                             authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Usuario Fashion Style',
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
+                            style: GoogleFonts.poppins(
                               fontSize: 18,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w700,
                               color: FashionColors.textoOscuro,
                             ),
                           ),

@@ -13,7 +13,7 @@ class FashionColors {
   static const Color pizarra = Color(0xFF56657A);
   static const Color borde = Color(0xFFE4DDD2);
   static const Color rojo = Color(0xFFD9434B);
-  static const Color rosaCorporativo = Color(0xFFE60067);
+  static const Color rosaCorporativo = Color(0xFF111111); // Alineado con la paleta de lujo neutral de la Web (#111111)
   static const Color blanco = Color(0xFFFFFFFF);
   static const Color verdeExito = Color(0xFF2E7D32);
 
@@ -25,7 +25,7 @@ class FashionColors {
   static const Color negroElegante = negro;
   static const Color peligro = rojo;
   static const Color aviso = Color(0xFFE65100);
-  static const Color rosaSuave = Color(0xFFFCE4EC);
+  static const Color rosaSuave = arenaSuave;
   static const Color rosaOscuro = rosaCorporativo;
   static const Color exito = verdeExito;
   static const Color cremaSuave = arenaSuave;
@@ -113,17 +113,16 @@ class FashionTheme {
         outline: FashionColors.borde,
       ),
       textTheme: mergedTextTheme,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: FashionColors.crema,
         foregroundColor: FashionColors.negro,
         elevation: 0,
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: TextStyle(
+        titleTextStyle: GoogleFonts.poppins(
           color: FashionColors.negro,
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          fontFamily: 'Poppins',
         ),
         iconTheme: IconThemeData(color: FashionColors.negro),
       ),

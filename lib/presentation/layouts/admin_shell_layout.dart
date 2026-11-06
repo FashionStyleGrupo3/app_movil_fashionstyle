@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/fashion_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -56,9 +57,8 @@ class AdminShellLayout extends ConsumerWidget {
         titleSpacing: 0,
         title: Text(
           titulo,
-          style: const TextStyle(
-            fontFamily: 'Montserrat',
-            fontWeight: FontWeight.w800,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w700,
             fontSize: 17,
             color: FashionColors.textoOscuro,
           ),

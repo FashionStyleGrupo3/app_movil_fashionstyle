@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/api_client.dart';
@@ -431,7 +432,10 @@ class _ModalPromocionesSheetState extends State<_ModalPromocionesSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Campañas y Promociones', style: TextStyle(fontFamily: 'Montserrat', fontSize: 18, fontWeight: FontWeight.w800)),
+              Text(
+                'Campañas y Promociones',
+                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
                 onPressed: _crearPromoModal,
@@ -591,7 +595,7 @@ class _ModalFormularioPrendaState extends State<_ModalFormularioPrenda> {
           children: [
             Text(
               widget.prenda != null ? 'Editar Prenda' : 'Nueva Prenda de Catálogo',
-              style: const TextStyle(fontFamily: 'Montserrat', fontSize: 18, fontWeight: FontWeight.w800),
+              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 16),
 
@@ -1116,7 +1120,10 @@ class _ModalNuevaVentaPosState extends State<_ModalNuevaVentaPos> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Caja Mostrador (POS)', style: TextStyle(fontFamily: 'Montserrat', fontSize: 18, fontWeight: FontWeight.w800)),
+              Text(
+                'Caja Mostrador (POS)',
+                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
               IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
             ],
           ),
@@ -1246,7 +1253,7 @@ class _ModalNuevaVentaPosState extends State<_ModalNuevaVentaPos> {
                   const Text('Total:', style: TextStyle(fontSize: 11, color: FashionColors.textoMuted)),
                   Text(
                     CurrencyFormatter.formatearCOP(_totalBolsa),
-                    style: const TextStyle(fontFamily: 'Montserrat', fontSize: 18, fontWeight: FontWeight.w800, color: FashionColors.textoOscuro),
+                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.textoOscuro),
                   ),
                 ],
               ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/api_client.dart';
@@ -161,10 +162,9 @@ class AdminDashboardScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Text(
                   '$saludo, $primerNombre',
-                  style: const TextStyle(
-                    fontFamily: 'Montserrat',
+                  style: GoogleFonts.poppins(
                     fontSize: 22,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
@@ -179,12 +179,11 @@ class AdminDashboardScreen extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          const Text(
+          Text(
             'Módulos del Sistema',
-            style: TextStyle(
-              fontFamily: 'Montserrat',
+            style: GoogleFonts.poppins(
               fontSize: 16,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               color: FashionColors.textoOscuro,
             ),
           ),
@@ -415,9 +414,9 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
+                    Text(
                       'Registrar Movimiento de Kárdex',
-                      style: TextStyle(fontFamily: 'Montserrat', fontSize: 18, fontWeight: FontWeight.w800),
+                      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
                     ),
                     const SizedBox(height: 16),
 

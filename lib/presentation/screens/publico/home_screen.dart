@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/change_bus.dart';
 import '../../../core/utils/image_url_resolver.dart';
@@ -361,8 +362,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 d.titulo,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontFamily: 'Montserrat',
+                                style: GoogleFonts.poppins(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                   color: FashionColors.textoOscuro,
@@ -456,10 +456,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Categorías destacadas',
-                style: TextStyle(
-                  fontFamily: 'Montserrat',
+                style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: FashionColors.textoOscuro,
@@ -556,20 +555,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Imprescindibles',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: FashionColors.textoOscuro,
                     ),
                   ),
-                  SizedBox(height: 2),
-                  Text(
+                  const SizedBox(height: 2),
+                  const Text(
                     'Las piezas más deseadas de la temporada',
                     style: TextStyle(fontSize: 12, color: FashionColors.textoMuted),
                   ),

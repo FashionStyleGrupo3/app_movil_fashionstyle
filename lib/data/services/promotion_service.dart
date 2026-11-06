@@ -22,14 +22,20 @@ class PromotionService {
 
     DateTime? inicio;
     if (promo.fechaInicio != null && promo.fechaInicio!.isNotEmpty) {
-      inicio = DateTime.tryParse(promo.fechaInicio!);
+      inicio = DateTime.tryParse(promo.fechaInicio!.trim().replaceAll(' ', 'T'));
     }
 
     DateTime? fin;
     if (promo.fechaFin != null && promo.fechaFin!.isNotEmpty) {
-      fin = DateTime.tryParse(promo.fechaFin!);
-      if (fin != null && promo.fechaFin!.trim().length <= 10) {
-        fin = DateTime(fin.year, fin.month, fin.day, 23, 59, 59, 999);
+      final raw = promo.fechaFin!.trim();
+      fin = DateTime.tryParse(raw.replaceAll(' ', 'T'));
+      if (fin != null) {
+        final esSoloFecha = raw.length <= 10;
+        final esMedianoche = raw.contains('00:00:00') ||
+            (fin.hour == 0 && fin.minute == 0 && fin.second == 0);
+        if (esSoloFecha || esMedianoche) {
+          fin = DateTime(fin.year, fin.month, fin.day, 23, 59, 59, 999);
+        }
       }
     }
 

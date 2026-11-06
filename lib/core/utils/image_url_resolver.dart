@@ -1,8 +1,12 @@
 // @source-mirror: src/composables/useImagenStorage.js
 
 class ImageUrlResolver {
-  static const String defaultBaseUrl = 'https://fashionstyle.api.adsocidm.com/storage';
+  static const String defaultBaseUrl = String.fromEnvironment(
+    'STORAGE_BASE_URL',
+    defaultValue: 'https://fashionstyle.api.adsocidm.com/public/storage',
+  );
   static const String placeholderAsset = 'assets/images/prenda-respaldo.png';
+  static const String loginPlaceholderAsset = 'assets/images/login-respaldo.png';
 
   static String resolve(
     dynamic value, {
@@ -32,9 +36,9 @@ class ImageUrlResolver {
       return trimmed;
     }
 
-    // Ruta relativa normalizada
+    // Ruta relativa normalizada (limpia prefijos de almacenamiento locales o relativos)
     final cleanPath = trimmed
-        .replaceFirst(RegExp(r'^/?storage/'), '')
+        .replaceFirst(RegExp(r'^/?(public/)?storage/'), '')
         .replaceFirst(RegExp(r'^/+'), '');
 
     final cleanBase = baseUrl.replaceAll(RegExp(r'/+$'), '');

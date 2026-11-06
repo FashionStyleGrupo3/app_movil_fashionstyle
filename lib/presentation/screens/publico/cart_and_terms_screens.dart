@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/theme/fashion_theme.dart';
@@ -304,10 +305,9 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                 children: [
                   Text(
                     'Bolsa de Compras (${cartState.totalPrendas})',
-                    style: const TextStyle(
-                      fontFamily: 'Montserrat',
+                    style: GoogleFonts.poppins(
                       fontSize: 20,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       color: FashionColors.textoOscuro,
                     ),
                   ),
@@ -454,12 +454,11 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
               if (_productosRelacionados.isNotEmpty) ...[
                 const Divider(),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'También te podría gustar',
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: FashionColors.textoOscuro,
                   ),
                 ),
@@ -546,9 +545,8 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                   children: [
                     Text(
                       CurrencyFormatter.formatearCOP(item.precio),
-                      style: const TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w800,
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w700,
                         fontSize: 14,
                         color: FashionColors.textoOscuro,
                       ),
@@ -637,10 +635,9 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
               const Text('Total a pagar:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               Text(
                 CurrencyFormatter.formatearCOP(cart.totalMonto),
-                style: const TextStyle(
-                  fontFamily: 'Montserrat',
+                style: GoogleFonts.poppins(
                   fontSize: 18,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   color: FashionColors.textoOscuro,
                 ),
               ),
@@ -746,11 +743,10 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
               child: const Icon(Icons.shopping_bag_outlined, size: 54, color: FashionColors.rosaOscuro),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Tu bolsa de compras está vacía',
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontWeight: FontWeight.w800,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700,
                 fontSize: 18,
                 color: FashionColors.textoOscuro,
               ),
@@ -798,12 +794,11 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
             child: const Icon(Icons.check_circle, size: 48, color: FashionColors.verdeExito),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             '¡Pago Confirmado con Éxito!',
-            style: TextStyle(
-              fontFamily: 'Montserrat',
+            style: GoogleFonts.poppins(
               fontSize: 20,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               color: FashionColors.textoOscuro,
             ),
           ),
@@ -944,10 +939,9 @@ class _TermsScreenState extends State<TermsScreen> {
                       children: [
                         Text(
                           _termino?['titulo']?.toString() ?? 'Términos y Condiciones de Uso',
-                          style: const TextStyle(
-                            fontFamily: 'Montserrat',
+                          style: GoogleFonts.poppins(
                             fontSize: 20,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                             color: FashionColors.textoOscuro,
                           ),
                         ),

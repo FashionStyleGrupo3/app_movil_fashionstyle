@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/change_bus.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -412,10 +413,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               const SizedBox(height: 6),
               Text(
                 prod.nombre,
-                style: const TextStyle(
-                  fontFamily: 'Montserrat',
+                style: GoogleFonts.poppins(
                   fontSize: 22,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                   color: FashionColors.textoOscuro,
                 ),
               ),
@@ -428,10 +428,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 children: [
                   Text(
                     CurrencyFormatter.formatearCOP(precioFinal),
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
+                    style: GoogleFonts.poppins(
                       fontSize: 24,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       color: infoPrecio.tieneDescuento ? FashionColors.rosaCorporativo : FashionColors.textoOscuro,
                     ),
                   ),
@@ -600,8 +599,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         const Text('Subtotal:', style: TextStyle(fontSize: 11, color: FashionColors.textoMuted)),
                         Text(
                           CurrencyFormatter.formatearCOP(precioFinal * _cantidad),
-                          style: const TextStyle(
-                            fontFamily: 'Montserrat',
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: FashionColors.textoOscuro,
@@ -640,10 +638,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               const SizedBox(height: 16),
 
               // DESCRIPCIÓN DEL PRODUCTO
-              const Text(
+              Text(
                 'Descripción de la prenda',
-                style: TextStyle(
-                  fontFamily: 'Montserrat',
+                style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: FashionColors.textoOscuro,

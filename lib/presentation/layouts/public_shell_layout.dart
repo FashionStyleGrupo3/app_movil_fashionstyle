@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/fashion_theme.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
@@ -86,10 +87,9 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
                 child: const Icon(Icons.style, size: 18, color: Colors.white),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'FashionStyle',
-                style: TextStyle(
-                  fontFamily: 'Montserrat',
+                style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w800,
                   fontSize: 19,
                   letterSpacing: -0.5,
