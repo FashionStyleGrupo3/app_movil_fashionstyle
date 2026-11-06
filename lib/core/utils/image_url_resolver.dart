@@ -8,6 +8,17 @@ class ImageUrlResolver {
   static const String placeholderAsset = 'assets/images/prenda-respaldo.png';
   static const String loginPlaceholderAsset = 'assets/images/login-respaldo.png';
 
+  static String normalizarDominioAdsocidm(String urlStr) {
+    if (urlStr.contains('fashionstyle.api.adsocidm.com/storage') &&
+        !urlStr.contains('fashionstyle.api.adsocidm.com/public/storage')) {
+      return urlStr.replaceFirst(
+        'fashionstyle.api.adsocidm.com/storage',
+        'fashionstyle.api.adsocidm.com/public/storage',
+      );
+    }
+    return urlStr;
+  }
+
   static String resolve(
     dynamic value, {
     String baseUrl = defaultBaseUrl,
@@ -33,7 +44,7 @@ class ImageUrlResolver {
 
     // URL completa HTTP / HTTPS
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return trimmed;
+      return normalizarDominioAdsocidm(trimmed);
     }
 
     // Ruta relativa normalizada (limpia prefijos de almacenamiento locales o relativos)
@@ -41,7 +52,7 @@ class ImageUrlResolver {
         .replaceFirst(RegExp(r'^/?(public/)?storage/'), '')
         .replaceFirst(RegExp(r'^/+'), '');
 
-    final cleanBase = baseUrl.replaceAll(RegExp(r'/+$'), '');
+    final cleanBase = normalizarDominioAdsocidm(baseUrl.replaceAll(RegExp(r'/+$'), ''));
 
     return '$cleanBase/$cleanPath';
   }
