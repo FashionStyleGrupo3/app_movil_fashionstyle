@@ -301,7 +301,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          FashionColors.cremaSuave.withOpacity(0.5),
+                          FashionColors.cremaSuave.withValues(alpha: 0.5),
                           FashionColors.fondoClaro,
                         ],
                       ),

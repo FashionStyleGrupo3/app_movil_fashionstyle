@@ -126,16 +126,40 @@ class FashionRouteScreens {
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
+class AuthRouterListenable extends ChangeNotifier {
+  AuthRouterListenable(Ref ref) {
+    ref.listen<AuthState>(
+      authProvider,
+      (previous, next) {
+        final antesAuth = previous?.estaAutenticado;
+        final ahoraAuth = next.estaAutenticado;
+        final antesPersonal = previous?.esPersonal;
+        final ahoraPersonal = next.esPersonal;
+
+        // Solo notificar al router si realmente cambió el acceso o autenticación
+        if (antesAuth != ahoraAuth || antesPersonal != ahoraPersonal) {
+          notifyListeners();
+        }
+      },
+    );
+  }
+}
+
+final authRouterListenableProvider = Provider<AuthRouterListenable>((ref) {
+  return AuthRouterListenable(ref);
+});
+
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final listenable = ref.watch(authRouterListenableProvider);
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
+    refreshListenable: listenable,
     initialLocation: '/',
     debugLogDiagnostics: false,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      final auth = authState;
+      final auth = ref.read(authProvider);
 
       // 1. Redirecciones de conveniencia
       if (loc == '/acceso' || loc == '/iniciar-sesion' || loc == '/admin/login') {
@@ -183,6 +207,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
         final tieneAcceso = auth.rolesNormalizados.any((r) => rolesRequeridos.contains(r));
         if (!tieneAcceso) {
+          if (auth.cargando) return null;
           return auth.estaAutenticado ? '/' : '/login';
         }
       }

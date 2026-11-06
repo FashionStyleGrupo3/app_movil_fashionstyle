@@ -4,13 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_response_parser.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/invoice_pdf_generator.dart';
-import '../../../core/validators/garment_and_field_validators.dart';
 import '../../../data/models/product_models.dart';
 import '../../../data/services/pos_and_payment_service.dart';
 import '../../../data/services/product_service.dart';
@@ -348,7 +346,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                         children: [
                                           Switch(
                                             value: p.activo,
-                                            activeColor: FashionColors.rosaCorporativo,
+                                            activeThumbColor: FashionColors.rosaCorporativo,
                                             onChanged: (val) => _toggleActivo(p, val),
                                           ),
                                           Row(
@@ -426,7 +424,7 @@ class _ModalPromocionesSheetState extends State<_ModalPromocionesSheet> {
                 TextField(controller: nombreCtrl, decoration: const InputDecoration(labelText: 'Nombre *')),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: tipo,
+                  initialValue: tipo,
                   decoration: const InputDecoration(labelText: 'Tipo'),
                   items: const [
                     DropdownMenuItem(value: 'porcentaje', child: Text('Porcentaje (%)')),
@@ -438,7 +436,7 @@ class _ModalPromocionesSheetState extends State<_ModalPromocionesSheet> {
                 TextField(controller: valorCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Valor del descuento *')),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<int?>(
-                  value: productoId,
+                  initialValue: productoId,
                   isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Aplicar a producto (opcional)'),
                   items: [
@@ -690,7 +688,7 @@ class _ModalFormularioPrendaState extends State<_ModalFormularioPrenda> {
             const SizedBox(height: 12),
 
             DropdownButtonFormField<int?>(
-              value: _categoriaId,
+              initialValue: _categoriaId,
               decoration: const InputDecoration(labelText: 'Categoría', border: OutlineInputBorder()),
               items: [
                 const DropdownMenuItem(value: null, child: Text('Sin categoría')),
@@ -701,7 +699,7 @@ class _ModalFormularioPrendaState extends State<_ModalFormularioPrenda> {
             const SizedBox(height: 12),
 
             DropdownButtonFormField<int?>(
-              value: _catalogoId,
+              initialValue: _catalogoId,
               decoration: const InputDecoration(labelText: 'Colección / Catálogo', border: OutlineInputBorder()),
               items: [
                 const DropdownMenuItem(value: null, child: Text('Sin colección')),
@@ -805,8 +803,7 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
   List<PosSaleModel> _ventas = [];
   Map<String, dynamic> _resumen = {};
   String _filtroMedioPago = '';
-  int _pagina = 1;
-  int _totalPaginas = 1;
+  final int _pagina = 1;
 
   @override
   void initState() {
@@ -831,7 +828,6 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
         setState(() {
           _resumen = resultados[0] as Map<String, dynamic>;
           _ventas = pag.lista;
-          _totalPaginas = pag.totalPaginas;
           _cargando = false;
         });
       }
@@ -967,7 +963,7 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: esActiva ? FashionColors.verdeExito.withOpacity(0.12) : FashionColors.peligro.withOpacity(0.12),
+                                          color: esActiva ? FashionColors.verdeExito.withValues(alpha: 0.12) : FashionColors.peligro.withValues(alpha: 0.12),
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
@@ -1036,7 +1032,7 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: col.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1311,7 +1307,7 @@ class _ModalNuevaVentaPosState extends State<_ModalNuevaVentaPos> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: _medioPago,
+                  initialValue: _medioPago,
                   decoration: const InputDecoration(labelText: 'Medio de pago', border: OutlineInputBorder()),
                   items: mediosPagoPos.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value, style: const TextStyle(fontSize: 12)))).toList(),
                   onChanged: (v) => setState(() => _medioPago = v ?? 'efectivo'),

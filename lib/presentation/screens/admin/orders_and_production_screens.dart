@@ -27,20 +27,16 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
 
   // Pedidos
   bool _cargandoPedidos = true;
-  String? _errorPedidos;
   List<OrderModel> _pedidos = [];
   String _filtroEstadoPedido = '';
   String _busquedaPedido = '';
-  int _paginaPedidos = 1;
-  int _totalPaginasPedidos = 1;
+  final int _paginaPedidos = 1;
 
   // Facturas
   bool _cargandoFacturas = true;
-  String? _errorFacturas;
   List<InvoiceModel> _facturas = [];
   String _busquedaFactura = '';
-  int _paginaFacturas = 1;
-  int _totalPaginasFacturas = 1;
+  final int _paginaFacturas = 1;
 
   @override
   void initState() {
@@ -67,14 +63,12 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
       if (mounted) {
         setState(() {
           _pedidos = res.lista;
-          _totalPaginasPedidos = res.totalPaginas;
           _cargandoPedidos = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorPedidos = 'Error al cargar pedidos: $e';
           _cargandoPedidos = false;
         });
       }
@@ -91,14 +85,12 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
       if (mounted) {
         setState(() {
           _facturas = res.lista;
-          _totalPaginasFacturas = res.totalPaginas;
           _cargandoFacturas = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorFacturas = 'Error al cargar facturas: $e';
           _cargandoFacturas = false;
         });
       }
@@ -247,7 +239,7 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: _colorEstado(p.estado).withOpacity(0.12),
+                                    color: _colorEstado(p.estado).withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
@@ -377,7 +369,7 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(color: col.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
         child: Column(
           children: [
             Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 16)),
@@ -517,14 +509,14 @@ class _ModalGestionDespachoSheetState extends State<_ModalGestionDespachoSheet> 
           Text('Gestionar Despacho (${widget.pedido.referencia})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _estado,
+            initialValue: _estado,
             decoration: const InputDecoration(labelText: 'Estado del pedido', border: OutlineInputBorder()),
             items: OrderService.estadosPedido.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
             onChanged: (v) => setState(() => _estado = v ?? _estado),
           ),
           const SizedBox(height: 10),
           DropdownButtonFormField<String>(
-            value: OrderService.transportadorasSugeridas.contains(_transportadora) ? _transportadora : OrderService.transportadorasSugeridas.first,
+            initialValue: OrderService.transportadorasSugeridas.contains(_transportadora) ? _transportadora : OrderService.transportadorasSugeridas.first,
             decoration: const InputDecoration(labelText: 'Empresa transportadora', border: OutlineInputBorder()),
             items: OrderService.transportadorasSugeridas.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
             onChanged: (v) => setState(() => _transportadora = v ?? _transportadora),
@@ -605,7 +597,7 @@ class _ModalCrearFacturaSheetState extends State<_ModalCrearFacturaSheet> {
           const Text('Emitir Factura Manual', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _origen,
+            initialValue: _origen,
             decoration: const InputDecoration(labelText: 'Origen de operación', border: OutlineInputBorder()),
             items: const [
               DropdownMenuItem(value: 'pedido', child: Text('Pedido Online')),
@@ -758,7 +750,6 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   int _cantidadProducir = 50;
   double _costoManoObra = 35000;
   double _precioVenta = 85000;
-  bool _aplicarIva = true;
 
   @override
   void initState() {
@@ -882,7 +873,7 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
       padding: const EdgeInsets.all(16),
       children: [
         DropdownButtonFormField<ProductionFormulaModel>(
-          value: f,
+          initialValue: f,
           isExpanded: true,
           decoration: const InputDecoration(labelText: 'Fórmula de prenda', border: OutlineInputBorder()),
           items: _calculadoraData!.formulas.map((form) => DropdownMenuItem(value: form, child: Text(form.nombre, overflow: TextOverflow.ellipsis))).toList(),
@@ -926,9 +917,9 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: factible ? FashionColors.verdeExito.withOpacity(0.08) : FashionColors.aviso.withOpacity(0.08),
+            color: factible ? FashionColors.verdeExito.withValues(alpha: 0.08) : FashionColors.aviso.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: factible ? FashionColors.verdeExito.withOpacity(0.3) : FashionColors.aviso.withOpacity(0.3)),
+            border: Border.all(color: factible ? FashionColors.verdeExito.withValues(alpha: 0.3) : FashionColors.aviso.withValues(alpha: 0.3)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,13 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/validators/garment_and_field_validators.dart';
 import '../../../core/validators/password_validator.dart';
 import '../../../data/models/product_models.dart';
-import '../../../data/services/favorites_and_city_service.dart';
 import '../../../data/services/order_and_invoice_service.dart';
 import '../../../data/services/product_service.dart';
 import '../../../data/services/promotion_service.dart';
@@ -852,7 +850,7 @@ class _SeccionMisPedidosState extends ConsumerState<_SeccionMisPedidos> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                           decoration: BoxDecoration(
-                                            color: _colorEstado(pedido.estado).withOpacity(0.12),
+                                            color: _colorEstado(pedido.estado).withValues(alpha: 0.12),
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Text(

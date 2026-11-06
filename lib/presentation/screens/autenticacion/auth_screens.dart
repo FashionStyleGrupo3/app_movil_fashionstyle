@@ -117,8 +117,8 @@ class _AuthBrandBanner extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.20),
-                  Colors.black.withOpacity(0.82),
+                  Colors.black.withValues(alpha: 0.20),
+                  Colors.black.withValues(alpha: 0.82),
                 ],
               ),
             ),
@@ -135,7 +135,7 @@ class _AuthBrandBanner extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.18),
+                        color: Colors.white.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Icon(Icons.style, size: 16, color: Colors.white),
@@ -253,7 +253,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: FashionColors.grisBorde),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 4)),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 4)),
                 ],
               ),
               child: Column(
@@ -287,9 +287,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             margin: const EdgeInsets.only(bottom: 16),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: FashionColors.peligro.withOpacity(0.1),
+                              color: FashionColors.peligro.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: FashionColors.peligro.withOpacity(0.3)),
+                              border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.3)),
                             ),
                             child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
                           ),
@@ -506,7 +506,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: FashionColors.grisBorde),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 4)),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 4)),
                 ],
               ),
               child: Column(
@@ -532,9 +532,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withOpacity(0.1),
+                        color: FashionColors.peligro.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: FashionColors.peligro.withOpacity(0.3)),
+                        border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.3)),
                       ),
                       child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
                     ),
@@ -829,7 +829,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withOpacity(0.1),
+                        color: FashionColors.peligro.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
@@ -840,7 +840,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.verdeExito.withOpacity(0.1),
+                        color: FashionColors.verdeExito.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(_exito!, style: const TextStyle(color: FashionColors.verdeExito, fontSize: 13)),
@@ -985,7 +985,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withOpacity(0.1),
+                        color: FashionColors.peligro.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
@@ -1164,7 +1164,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withOpacity(0.1),
+                        color: FashionColors.peligro.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),

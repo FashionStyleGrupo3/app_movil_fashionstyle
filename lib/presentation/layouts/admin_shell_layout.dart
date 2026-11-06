@@ -34,9 +34,12 @@ class AdminShellLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    // Si pierde privilegios de personal (p. ej. degradado a cliente en vivo), sale del admin inmediatamente
+    // Solo si una respuesta completada de /me confirma que el usuario perdió el rol de personal
+    // o cerró sesión, se sale del admin. NUNCA durante sondeos de fondo ni estados transitorios.
     ref.listen<AuthState>(authProvider, (previous, next) {
-      if (!next.esPersonal) {
+      final antesTeniaAcceso = previous?.esPersonal ?? true;
+      final ahoraSinAcceso = (!next.esPersonal || !next.estaAutenticado) && !next.cargando;
+      if (antesTeniaAcceso && ahoraSinAcceso) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
             context.go('/');
@@ -101,7 +104,7 @@ class AdminShellLayout extends ConsumerWidget {
             // CABECERA DEL MENÚ LATERAL
             Container(
               padding: const EdgeInsets.fromLTRB(20, 48, 20, 20),
-              color: Colors.black.withOpacity(0.18),
+              color: Colors.black.withValues(alpha: 0.18),
               child: Row(
                 children: [
                   CircleAvatar(
@@ -166,12 +169,12 @@ class AdminShellLayout extends ConsumerWidget {
                       title: Text(
                         item.titulo,
                         style: TextStyle(
-                          color: seleccionado ? Colors.white : Colors.white.withOpacity(0.85),
+                          color: seleccionado ? Colors.white : Colors.white.withValues(alpha: 0.85),
                           fontWeight: seleccionado ? FontWeight.bold : FontWeight.w500,
                           fontSize: 13,
                         ),
                       ),
-                      tileColor: seleccionado ? Colors.white.withOpacity(0.12) : null,
+                      tileColor: seleccionado ? Colors.white.withValues(alpha: 0.12) : null,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
                       onTap: () {

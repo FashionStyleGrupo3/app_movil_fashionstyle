@@ -8,7 +8,6 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/theme/fashion_theme.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_response_parser.dart';
-import '../../../data/models/product_models.dart';
 import '../../../data/services/product_service.dart';
 import '../../layouts/admin_shell_layout.dart';
 import '../../providers/auth_provider.dart';
@@ -131,7 +130,7 @@ class AdminDashboardScreen extends ConsumerWidget {
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4)),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 12, offset: const Offset(0, 4)),
               ],
             ),
             child: Column(
@@ -212,7 +211,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: FashionColors.grisBorde),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6, offset: const Offset(0, 2)),
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
                     ],
                   ),
                   child: Column(
@@ -286,7 +285,6 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
   bool _cargando = true;
   String? _error;
 
-  List<Product> _productos = [];
   List<_VarianteInventario> _todasLasVariantes = [];
 
   // Pestaña Kardex
@@ -298,7 +296,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
     'ajustes': 0,
     'anulados': 0,
   };
-  String _filtroTipoKardex = '';
+  final String _filtroTipoKardex = '';
   String _busquedaKardex = '';
 
   // Filtros Existencias
@@ -364,7 +362,6 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
 
       if (mounted) {
         setState(() {
-          _productos = prods;
           _todasLasVariantes = listaVariantes;
           _movimientos = movs;
           _resumenKardex = {
@@ -422,7 +419,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
 
                     // Selector de prenda y variante
                     DropdownButtonFormField<_VarianteInventario>(
-                      value: seleccionada,
+                      initialValue: seleccionada,
                       isExpanded: true,
                       decoration: const InputDecoration(labelText: 'Prenda y Talla', border: OutlineInputBorder()),
                       items: _todasLasVariantes.map((v) {
@@ -441,7 +438,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
 
                     // Tipo de movimiento
                     DropdownButtonFormField<String>(
-                      value: tipo,
+                      initialValue: tipo,
                       decoration: const InputDecoration(labelText: 'Tipo de movimiento', border: OutlineInputBorder()),
                       items: const [
                         DropdownMenuItem(value: 'entrada', child: Text('Entrada (+) - Abastecimiento/Producción')),
@@ -498,6 +495,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                           return;
                         }
 
+                        final messenger = ScaffoldMessenger.of(context);
                         Navigator.pop(ctx);
                         try {
                           await ApiClient.instance.dio.post('/inventarios', data: {
@@ -508,17 +506,13 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                             'cantidad': cant,
                           });
                           _cargarDatosInventario();
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Movimiento de inventario guardado con éxito')),
-                            );
-                          }
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Movimiento de inventario guardado con éxito')),
+                          );
                         } catch (e) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error al registrar movimiento: $e'), backgroundColor: FashionColors.peligro),
-                            );
-                          }
+                          messenger.showSnackBar(
+                            SnackBar(content: Text('Error al registrar movimiento: $e'), backgroundColor: FashionColors.peligro),
+                          );
                         }
                       },
                       child: const Text('Guardar Movimiento', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -687,7 +681,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: colorStock.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+                              decoration: BoxDecoration(color: colorStock.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
                               child: Text(
                                 '${v.stock} uds',
                                 style: TextStyle(color: colorStock, fontWeight: FontWeight.bold, fontSize: 12),
@@ -811,7 +805,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                       ),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: colorTipo.withOpacity(0.12),
+                          backgroundColor: colorTipo.withValues(alpha: 0.12),
                           child: Icon(
                             esEntrada ? Icons.arrow_downward : (tipo == 'salida' ? Icons.arrow_upward : Icons.tune),
                             color: colorTipo,
@@ -840,7 +834,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        decoration: BoxDecoration(color: col.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
         child: Column(
           children: [
             Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 15)),
@@ -887,7 +881,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
           margin: const EdgeInsets.only(bottom: 8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
-            side: BorderSide(color: agotado ? FashionColors.peligro.withOpacity(0.4) : FashionColors.aviso.withOpacity(0.4)),
+            side: BorderSide(color: agotado ? FashionColors.peligro.withValues(alpha: 0.4) : FashionColors.aviso.withValues(alpha: 0.4)),
           ),
           child: ListTile(
             leading: Icon(

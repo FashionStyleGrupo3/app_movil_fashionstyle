@@ -338,7 +338,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                   decoration: BoxDecoration(
                     color: FashionColors.rosaSuave,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: FashionColors.rosaCorporativo.withOpacity(0.3)),
+                    border: Border.all(color: FashionColors.rosaCorporativo.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -385,9 +385,9 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: FashionColors.peligro.withOpacity(0.1),
+                    color: FashionColors.peligro.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: FashionColors.peligro.withOpacity(0.3)),
+                    border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -781,7 +781,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: FashionColors.verdeExito.withOpacity(0.4)),
+        border: Border.all(color: FashionColors.verdeExito.withValues(alpha: 0.4)),
       ),
       child: Column(
         children: [

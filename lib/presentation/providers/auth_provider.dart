@@ -340,6 +340,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Vuelve a consultar /me para que cambios de rol aplicados por administradores
   /// se reflejen en la app móvil sin necesidad de cerrar sesión.
+  /// NUNCA activa spinners de carga en segundo plano ni emite nuevo estado
+  /// si los roles e identidad del usuario no han cambiado.
   Future<bool> refrescarSesion() async {
     if (!state.estaAutenticado) return false;
 
@@ -348,23 +350,50 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final datos = ApiResponseParser.extractData(response);
       if (datos is Map<String, dynamic>) {
         final u = datos['user'] ?? datos['usuario'] ?? datos;
-        final userMap = u is Map<String, dynamic> ? u : null;
-        final nuevosRoles = _extraerRoles(
-          datos['roles'] ?? userMap?['roles'] ?? userMap?['rol'],
-          userMap,
-        );
+        final userMap = u is Map<String, dynamic> ? Map<String, dynamic>.from(u) : state.usuario;
 
-        final rolesActuales = state.rolesNormalizados;
-        final hayCambios = jsonEncode(nuevosRoles) != jsonEncode(rolesActuales);
+        // 1. Extraer roles de múltiples orígenes posibles en la respuesta de /me
+        dynamic rawRoles = datos['roles'];
+        if (rawRoles == null && userMap != null) {
+          rawRoles = userMap['roles'] ?? userMap['rol'];
+        }
 
+        List<String> nuevosRoles = _extraerRoles(rawRoles, userMap);
+
+        // 2. Si /me omite los roles y no vinieron en la respuesta, preservar los roles previos existentes
+        if (nuevosRoles.isEmpty && rawRoles == null && state.roles.isNotEmpty) {
+          nuevosRoles = List<String>.from(state.roles);
+        }
+
+        // 3. Comparar ID de usuario, estado activo y roles ordenados para evitar rebuilds innecesarios
+        final currentUserId = state.usuario?['id_usuario'] ?? state.usuario?['id'];
+        final newUserId = userMap?['id_usuario'] ?? userMap?['id'];
+
+        final currentActivo = state.usuario?['activo'] ?? true;
+        final newActivo = userMap?['activo'] ?? true;
+
+        final currentSorted = List<String>.from(state.rolesNormalizados)..sort();
+        final newSorted = List<String>.from(nuevosRoles.map((r) => r.trim().toLowerCase()))..sort();
+
+        final rolesCambiaron = jsonEncode(currentSorted) != jsonEncode(newSorted);
+        final userCambio = (currentUserId != null && newUserId != null && currentUserId != newUserId) ||
+            (currentActivo != newActivo);
+
+        if (!rolesCambiaron && !userCambio) {
+          // No hubo cambios relevantes en roles ni en identidad: evitar emitir nuevo estado
+          return false;
+        }
+
+        // 4. Solo si cambiaron roles o estado activo se actualiza el estado (sin activar cargando)
         state = state.copyWith(
           usuario: userMap,
           roles: nuevosRoles,
           sesionHidratada: true,
+          cargando: false,
         );
 
         await _persistirEnStorage(state.token, userMap, nuevosRoles);
-        return hayCambios;
+        return true;
       }
       return false;
     } catch (_) {

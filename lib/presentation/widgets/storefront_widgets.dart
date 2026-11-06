@@ -188,7 +188,7 @@ class ProductCardWidget extends ConsumerWidget {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: FashionColors.blanco.withOpacity(0.9),
+                            color: FashionColors.blanco.withValues(alpha: 0.9),
                             shape: BoxShape.circle,
                             boxShadow: const [
                               BoxShadow(
@@ -211,7 +211,7 @@ class ProductCardWidget extends ConsumerWidget {
                   // Overlay si está deshabilitado
                   if (deshabilitado)
                     Container(
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                     ),
                 ],
               ),

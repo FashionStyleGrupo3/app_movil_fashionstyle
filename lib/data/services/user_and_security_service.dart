@@ -260,9 +260,41 @@ class AuditDescription {
     required this.datos,
     required this.soloInterno,
   });
+
+  String get titulo {
+    if (soloInterno) {
+      return '$actor actualizó campos internos de $sujeto';
+    }
+    final accionStr = verbo.isNotEmpty ? verbo : accion.etiqueta;
+    return '$actor $accionStr $sujeto'.trim();
+  }
+
+  @override
+  String toString() => titulo;
 }
 
 class AuditTextFormatter {
+  static String formatearUsuario(dynamic userRaw) {
+    if (userRaw == null) return 'Sistema';
+    if (userRaw is String) {
+      final s = userRaw.trim();
+      return s.isNotEmpty ? s : 'Sistema';
+    }
+    if (userRaw is Map) {
+      final nombre = userRaw['nombre'] ?? userRaw['name'] ?? userRaw['usuario'];
+      final correo = userRaw['correo'] ?? userRaw['email'];
+      if (nombre != null && correo != null && nombre.toString().isNotEmpty && correo.toString().isNotEmpty) {
+        return '${nombre.toString().trim()} (${correo.toString().trim()})';
+      }
+      if (nombre != null && nombre.toString().isNotEmpty) return nombre.toString().trim();
+      if (correo != null && correo.toString().isNotEmpty) return correo.toString().trim();
+      final id = userRaw['id_usuario'] ?? userRaw['id'];
+      if (id != null) return 'Usuario #$id';
+      return 'Sistema';
+    }
+    return userRaw.toString();
+  }
+
   static const Map<String, Map<String, String>> modelos = {
     'Producto': {'nombre': 'producto', 'articulo': 'el', 'plural': 'Productos'},
     'Venta': {'nombre': 'venta', 'articulo': 'la', 'plural': 'Ventas'},

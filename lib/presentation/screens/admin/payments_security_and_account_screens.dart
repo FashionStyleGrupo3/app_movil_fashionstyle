@@ -228,7 +228,7 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: col.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -324,7 +324,7 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
               TextField(controller: telCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Teléfono', border: OutlineInputBorder())),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                value: rol,
+                initialValue: rol,
                 decoration: const InputDecoration(labelText: 'Rol asignado', border: OutlineInputBorder()),
                 items: const [
                   DropdownMenuItem(value: 'empleado', child: Text('Empleado / Ventas POS')),
@@ -348,7 +348,7 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                       'rol': rol,
                     });
                     _cargarTodo();
-                    if (mounted) Navigator.pop(ctx);
+                    if (ctx.mounted) Navigator.pop(ctx);
                   } catch (_) {}
                 },
                 child: const Text('Crear Usuario'),
@@ -441,7 +441,7 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                                       subtitle: Text('${u['email'] ?? ''} · Rol: ${rol.toUpperCase()}'),
                                       trailing: Switch(
                                         value: activo,
-                                        activeColor: FashionColors.rosaCorporativo,
+                                        activeThumbColor: FashionColors.rosaCorporativo,
                                         onChanged: (val) async {
                                           try {
                                             await SecurityService.instance.actualizarUsuario(id, {'activo': val});
@@ -550,14 +550,15 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
                           final desc = AuditTextFormatter.describirAuditoria(a);
                           final dia = AuditTextFormatter.etiquetaDia(fecha);
                           final relativo = AuditTextFormatter.tiempoRelativo(fecha);
+                          final usuarioFmt = AuditTextFormatter.formatearUsuario(a['user'] ?? a['usuario']);
 
                           return Card(
                             elevation: 0.5,
                             margin: const EdgeInsets.only(bottom: 8),
                             child: ListTile(
                               leading: const Icon(Icons.history, color: FashionColors.pizarra),
-                              title: Text(desc.toString(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                              subtitle: Text('$dia · $relativo · Usuario: ${a['user']?['nombre'] ?? a['usuario'] ?? "Sistema"}', style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted)),
+                              title: Text(desc.titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              subtitle: Text('$dia · $relativo · Usuario: $usuarioFmt', style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted)),
                             ),
                           );
                         },

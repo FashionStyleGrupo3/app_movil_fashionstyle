@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
-const int kAppBuildNumber = 2;
-const String kAppVersion = '1.1.0';
+const int kAppBuildNumber = 3;
+const String kAppVersion = '1.1.1';
 
 class AppUpdaterService {
   static final AppUpdaterService _instance = AppUpdaterService._internal();

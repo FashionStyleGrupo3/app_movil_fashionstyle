@@ -72,46 +72,68 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
         elevation: 0.5,
         scrolledUnderElevation: 1,
         centerTitle: false,
-        titleSpacing: 16,
+        titleSpacing: 12,
         title: GestureDetector(
           onTap: () => context.go('/'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: FashionColors.negroElegante,
-                  borderRadius: BorderRadius.circular(8),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: Image.asset(
+                    'assets/images/logo-fashionstyle.png',
+                    height: 28,
+                    width: 28,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: FashionColors.negroElegante,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.style, size: 16, color: Colors.white),
+                    ),
+                  ),
                 ),
-                child: const Icon(Icons.style, size: 18, color: Colors.white),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'FashionStyle',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 19,
-                  letterSpacing: -0.5,
-                  color: FashionColors.textoOscuro,
+                const SizedBox(width: 8),
+                Text(
+                  'FashionStyle',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                    letterSpacing: -0.5,
+                    color: FashionColors.textoOscuro,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: FashionColors.textoOscuro),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: const Icon(Icons.search, size: 22, color: FashionColors.textoOscuro),
             tooltip: 'Buscar en catálogo',
             onPressed: () => context.go('/catalogo'),
           ),
           if (authState.tieneAccesoAdmin)
             IconButton(
-              icon: const Icon(Icons.admin_panel_settings_outlined, color: FashionColors.rosaCorporativo),
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              icon: const Icon(Icons.admin_panel_settings_outlined, size: 22, color: FashionColors.rosaCorporativo),
               tooltip: 'Panel Administrativo',
               onPressed: () => context.go('/admin'),
             ),
           IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             tooltip: 'Favoritos',
             icon: Badge(
               isLabelVisible: favsState.total > 0,
@@ -119,6 +141,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
               label: Text('${favsState.total}', style: const TextStyle(fontSize: 10, color: Colors.white)),
               child: Icon(
                 favsState.soloFavoritos ? Icons.favorite : Icons.favorite_border,
+                size: 22,
                 color: favsState.soloFavoritos ? FashionColors.rosaCorporativo : FashionColors.textoOscuro,
               ),
             ),
@@ -131,12 +154,14 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
           if (authState.estaAutenticado)
             PopupMenuButton<String>(
               tooltip: 'Mi cuenta',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               icon: CircleAvatar(
-                radius: 14,
+                radius: 13,
                 backgroundColor: FashionColors.rosaSuave,
                 child: Text(
                   authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0].toUpperCase() : 'U',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: FashionColors.rosaOscuro),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: FashionColors.rosaOscuro),
                 ),
               ),
               offset: const Offset(0, 48),
@@ -211,11 +236,17 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
             )
           else
             IconButton(
-              icon: const Icon(Icons.person_outline, color: FashionColors.textoOscuro),
+              visualDensity: VisualDensity.compact,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              icon: const Icon(Icons.person_outline, size: 22, color: FashionColors.textoOscuro),
               tooltip: 'Iniciar sesión',
               onPressed: () => context.go('/login'),
             ),
           IconButton(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             tooltip: 'Bolsa de compras',
             icon: Badge(
               isLabelVisible: cartState.totalPrendas > 0,
@@ -224,7 +255,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
                 '${cartState.totalPrendas}',
                 style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
               ),
-              child: const Icon(Icons.shopping_bag_outlined, color: FashionColors.textoOscuro),
+              child: const Icon(Icons.shopping_bag_outlined, size: 22, color: FashionColors.textoOscuro),
             ),
             onPressed: () => _scaffoldKey.currentState?.openEndDrawer(),
           ),
