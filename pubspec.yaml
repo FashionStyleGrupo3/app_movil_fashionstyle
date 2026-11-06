@@ -1,7 +1,7 @@
 name: fashion_style_mobile
 description: "Aplicación móvil oficial de Fashion Style boutique conectada al backend Laravel."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -29,6 +29,7 @@ dependencies:
   intl: ^0.20.2
 
   # Media, File Picking & Webview
+  path_provider: ^2.1.5
   webview_flutter: ^4.10.0
   image_picker: ^1.1.2
   file_picker: ^8.1.7

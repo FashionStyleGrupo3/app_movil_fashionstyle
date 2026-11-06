@@ -33,6 +33,18 @@ class AdminShellLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
+
+    // Si pierde privilegios de personal (p. ej. degradado a cliente en vivo), sale del admin inmediatamente
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      if (!next.esPersonal) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            context.go('/');
+          }
+        });
+      }
+    });
+
     final titulo = _obtenerTitulo(currentPath);
 
     final List<_AdminMenuItem> itemsMenu = [

@@ -338,6 +338,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Vuelve a consultar /me para que cambios de rol aplicados por administradores
+  /// se reflejen en la app móvil sin necesidad de cerrar sesión.
+  Future<bool> refrescarSesion() async {
+    if (!state.estaAutenticado) return false;
+
+    try {
+      final response = await ApiClient.instance.dio.get('/me');
+      final datos = ApiResponseParser.extractData(response);
+      if (datos is Map<String, dynamic>) {
+        final u = datos['user'] ?? datos['usuario'] ?? datos;
+        final userMap = u is Map<String, dynamic> ? u : null;
+        final nuevosRoles = _extraerRoles(
+          datos['roles'] ?? userMap?['roles'] ?? userMap?['rol'],
+          userMap,
+        );
+
+        final rolesActuales = state.rolesNormalizados;
+        final hayCambios = jsonEncode(nuevosRoles) != jsonEncode(rolesActuales);
+
+        state = state.copyWith(
+          usuario: userMap,
+          roles: nuevosRoles,
+          sesionHidratada: true,
+        );
+
+        await _persistirEnStorage(state.token, userMap, nuevosRoles);
+        return hayCambios;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> cerrarSesion() async {
     try {
       if (state.token != null) {

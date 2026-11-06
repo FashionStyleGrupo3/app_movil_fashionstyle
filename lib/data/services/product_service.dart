@@ -8,12 +8,16 @@ class ProductFilters {
   final int? catalogoId;
   final String? busqueda;
   final bool? activo;
+  final bool? publicado;
+  final bool esPersonal;
 
   const ProductFilters({
     this.categoriaId,
     this.catalogoId,
     this.busqueda,
     this.activo,
+    this.publicado,
+    this.esPersonal = false,
   });
 }
 
@@ -31,6 +35,7 @@ class ProductService {
       params['q'] = filtros.busqueda!.trim();
     }
     if (filtros?.activo != null) params['activo'] = filtros!.activo;
+    if (filtros?.publicado != null) params['publicado'] = filtros!.publicado;
 
     final response = await ApiClient.instance.dio.get('/productos', queryParameters: params);
     final rawData = ApiResponseParser.extractData(response);
@@ -44,8 +49,16 @@ class ProductService {
       }
     }
 
-    // 1. Filtro de seguridad: Solo productos activos
-    productos = productos.where((p) => p.activo).toList();
+    // 1. Filtro de seguridad: Activo (a menos que se soliciten explícitamente inactivos)
+    if (filtros?.activo == null || filtros!.activo == true) {
+      productos = productos.where((p) => p.activo).toList();
+    }
+
+    // 1b. Filtro de seguridad: Publicado (el público y clientes solo ven los publicados)
+    final esPersonal = filtros?.esPersonal ?? false;
+    if (!esPersonal && (filtros?.publicado == null || filtros!.publicado == true)) {
+      productos = productos.where((p) => p.publicado).toList();
+    }
 
     // 2. Filtro de seguridad en cliente: Categoría
     if (filtros?.categoriaId != null) {
@@ -84,6 +97,28 @@ class ProductService {
       return Product.fromJson(data);
     }
     return null;
+  }
+
+  Future<Product> togglePublicado(int id) async {
+    final response = await ApiClient.instance.dio.patch('/productos/$id/toggle-publicado');
+    final data = ApiResponseParser.extractData(response);
+    if (data is Map<String, dynamic>) {
+      return Product.fromJson(data);
+    }
+    final actual = await obtenerProducto(id);
+    if (actual != null) return actual;
+    throw StateError('No se pudo alternar el estado de publicación');
+  }
+
+  Future<Product> toggleActivo(int id) async {
+    final response = await ApiClient.instance.dio.patch('/productos/$id/toggle-activo');
+    final data = ApiResponseParser.extractData(response);
+    if (data is Map<String, dynamic>) {
+      return Product.fromJson(data);
+    }
+    final actual = await obtenerProducto(id);
+    if (actual != null) return actual;
+    throw StateError('No se pudo alternar el estado activo');
   }
 
   Future<List<Category>> obtenerCategorias() async {

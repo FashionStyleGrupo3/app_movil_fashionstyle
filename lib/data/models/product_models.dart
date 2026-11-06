@@ -257,6 +257,7 @@ class Product {
   final String descripcion;
   final String color;
   final bool activo;
+  final bool publicado;
   final int? categoriaId;
   final int? catalogoId;
   final Category? categoria;
@@ -272,6 +273,7 @@ class Product {
     required this.descripcion,
     required this.color,
     required this.activo,
+    this.publicado = true,
     this.categoriaId,
     this.catalogoId,
     this.categoria,
@@ -288,6 +290,7 @@ class Product {
     final descripcion = JsonParser.toStr(map['descripcion']);
     final color = JsonParser.toStr(map['color']);
     final activo = map['activo'] == null ? true : JsonParser.toBool(map['activo']);
+    final publicado = map['publicado'] == null ? true : JsonParser.toBool(map['publicado']);
 
     final catMap = map['categoria'] is Map<String, dynamic> ? map['categoria'] as Map<String, dynamic> : null;
     final rawCatId = map['id_categoria'] ?? map['categoria_id'] ?? catMap?['id_categoria'] ?? catMap?['id'];
@@ -329,6 +332,7 @@ class Product {
       descripcion: descripcion,
       color: color,
       activo: activo,
+      publicado: publicado,
       categoriaId: categoriaId != null && categoriaId > 0 ? categoriaId : null,
       catalogoId: catalogoId != null && catalogoId > 0 ? catalogoId : null,
       categoria: categoria,
@@ -380,6 +384,7 @@ class Product {
       'descripcion': descripcion,
       'color': color,
       'activo': activo,
+      'publicado': publicado,
       'id_categoria': categoriaId,
       'id_catalogo': catalogoId,
       'categoria': categoria?.toJson(),

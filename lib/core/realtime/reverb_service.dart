@@ -19,7 +19,7 @@ class ReverbService {
   bool _conectando = false;
   Timer? _reintentadorTimer;
 
-  static const String appKey = String.fromEnvironment('REVERB_APP_KEY', defaultValue: '');
+  static const String appKey = String.fromEnvironment('REVERB_APP_KEY', defaultValue: 'k4nfvk20k6kwtiw5nbpe');
   static const String host = String.fromEnvironment('REVERB_HOST', defaultValue: 'fashionstyle.api.adsocidm.com');
   static const String port = String.fromEnvironment('REVERB_PORT', defaultValue: '443');
   static const String scheme = String.fromEnvironment('REVERB_SCHEME', defaultValue: 'https');

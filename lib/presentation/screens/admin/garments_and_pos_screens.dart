@@ -50,7 +50,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
 
     try {
       final resultados = await Future.wait([
-        ProductService.instance.obtenerProductos(),
+        ProductService.instance.obtenerProductos(const ProductFilters(esPersonal: true)),
         ProductService.instance.obtenerCategorias(),
         ProductService.instance.obtenerCatalogos(),
       ]);
@@ -69,6 +69,27 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
           _error = 'Error al cargar prendas: $e';
           _cargando = false;
         });
+      }
+    }
+  }
+
+  Future<void> _togglePublicado(Product p) async {
+    try {
+      await ProductService.instance.togglePublicado(p.idProducto);
+      _cargarDatos();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(!p.publicado ? 'Prenda "${p.nombre}" publicada en la tienda' : 'Prenda "${p.nombre}" ocultada de la tienda'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al alternar publicación: $e'), backgroundColor: FashionColors.peligro),
+        );
       }
     }
   }
@@ -262,6 +283,49 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                             const SizedBox(height: 6),
                                             Row(
                                               children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                    color: p.publicado ? const Color(0xFFDEF7EC) : const Color(0xFFF3F4F6),
+                                                    borderRadius: BorderRadius.circular(4),
+                                                    border: Border.all(
+                                                      color: p.publicado ? const Color(0xFF31C48D) : const Color(0xFFD1D5DB),
+                                                      width: 0.5,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    p.publicado ? 'Publicado' : 'Oculto',
+                                                    style: TextStyle(
+                                                      color: p.publicado ? const Color(0xFF03543F) : const Color(0xFF6B7280),
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                InkWell(
+                                                  onTap: () => _togglePublicado(p),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        p.publicado ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                                        size: 14,
+                                                        color: p.publicado ? FashionColors.verdeExito : FashionColors.textoMuted,
+                                                      ),
+                                                      const SizedBox(width: 3),
+                                                      Text(
+                                                        p.publicado ? 'Ocultar' : 'Publicar',
+                                                        style: const TextStyle(fontSize: 10, decoration: TextDecoration.underline),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 6),
+                                            Row(
+                                              children: [
                                                 Text(
                                                   CurrencyFormatter.formatearCOP(p.precioMinimo),
                                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: FashionColors.textoOscuro),
@@ -394,6 +458,12 @@ class _ModalPromocionesSheetState extends State<_ModalPromocionesSheet> {
                 final nom = nombreCtrl.text.trim();
                 final val = double.tryParse(valorCtrl.text) ?? 0;
                 if (nom.isEmpty || val <= 0) return;
+                if (tipo == 'porcentaje' && val > 90) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('El descuento máximo permitido es 90%.'), backgroundColor: FashionColors.peligro),
+                  );
+                  return;
+                }
 
                 Navigator.pop(ctx);
                 try {
@@ -555,6 +625,7 @@ class _ModalFormularioPrendaState extends State<_ModalFormularioPrenda> {
         'nombre': nombre,
         'descripcion': _descCtrl.text.trim(),
         'color': _colorCtrl.text.trim(),
+        'publicado': widget.prenda?.publicado ?? false,
         'categoria_id': _categoriaId,
         'catalogo_id': _catalogoId,
         'variantes': _variantes,

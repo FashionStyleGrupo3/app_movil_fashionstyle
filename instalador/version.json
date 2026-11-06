@@ -1,0 +1,8 @@
+{
+  "version": "1.1.0",
+  "buildNumber": 2,
+  "commit": "dcf0908",
+  "updatedAt": "2026-11-06T13:10:00Z",
+  "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
+  "notes": "Sincronización de roles en vivo, estado publicado de prendas y auto-actualizador automático desde Git."
+}

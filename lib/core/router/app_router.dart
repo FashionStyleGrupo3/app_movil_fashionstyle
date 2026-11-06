@@ -124,10 +124,13 @@ class FashionRouteScreens {
   static WidgetBuilder adminAudit = (context) => const AdminAuditScreen();
 }
 
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: false,
     redirect: (context, state) {
