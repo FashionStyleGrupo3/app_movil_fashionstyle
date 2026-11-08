@@ -479,7 +479,7 @@ class _ModalGestionDespachoSheetState extends State<_ModalGestionDespachoSheet> 
       final nombreFase = OrderService.estadosPedido[_estado] ?? _estado;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No se puede retroceder el pedido a la fase "' + nombreFase + '". El seguimiento ya avanzó.'),
+          content: Text('No se puede retroceder el pedido a la fase "$nombreFase". El seguimiento ya avanzó.'),
           backgroundColor: FashionColors.peligro,
         ),
       );
