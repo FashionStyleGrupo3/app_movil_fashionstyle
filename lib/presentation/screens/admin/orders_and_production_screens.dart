@@ -424,6 +424,14 @@ class _ModalGestionDespachoSheet extends StatefulWidget {
 }
 
 class _ModalGestionDespachoSheetState extends State<_ModalGestionDespachoSheet> {
+  static const List<String> _flujoOrden = [
+    'Pendiente_Pago',
+    'Pagado',
+    'En_Preparacion',
+    'Enviado',
+    'Entregado',
+  ];
+
   late String _estado;
   late String _transportadora;
   final TextEditingController _guiaCtrl = TextEditingController();
@@ -442,6 +450,42 @@ class _ModalGestionDespachoSheetState extends State<_ModalGestionDespachoSheet> 
   }
 
   Future<void> _guardar() async {
+    final estadoActual = widget.pedido.estado;
+    final idxActual = _flujoOrden.indexOf(estadoActual);
+    final idxNuevo = _flujoOrden.indexOf(_estado);
+
+    if (estadoActual == 'Entregado' && _estado != 'Entregado') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('El pedido ya fue entregado y no puede cambiar a otra fase.'),
+          backgroundColor: FashionColors.peligro,
+        ),
+      );
+      return;
+    }
+
+    if (estadoActual == 'Enviado' &&
+        (_estado == 'Cancelado' || _estado == 'Rechazado' || _estado == 'Expirado')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('El pedido ya fue despachado y enviado, no puede cancelarse desde el seguimiento.'),
+          backgroundColor: FashionColors.peligro,
+        ),
+      );
+      return;
+    }
+
+    if (idxActual != -1 && idxNuevo != -1 && idxNuevo < idxActual) {
+      final nombreFase = OrderService.estadosPedido[_estado] ?? _estado;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se puede retroceder el pedido a la fase "' + nombreFase + '". El seguimiento ya avanzó.'),
+          backgroundColor: FashionColors.peligro,
+        ),
+      );
+      return;
+    }
+
     if ((_estado == 'Enviado' || _estado == 'Entregado')) {
       final guia = _guiaCtrl.text.trim();
       if (!RegExp(r'^[A-Za-z0-9-]{4,40}$').hasMatch(guia)) {
@@ -511,7 +555,26 @@ class _ModalGestionDespachoSheetState extends State<_ModalGestionDespachoSheet> 
           DropdownButtonFormField<String>(
             initialValue: _estado,
             decoration: const InputDecoration(labelText: 'Estado del pedido', border: OutlineInputBorder()),
-            items: OrderService.estadosPedido.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+            items: OrderService.estadosPedido.entries.map((e) {
+              final idxOpcion = _flujoOrden.indexOf(e.key);
+              final idxActual = _flujoOrden.indexOf(widget.pedido.estado);
+              final esRetroceso = idxActual != -1 && idxOpcion != -1 && idxOpcion < idxActual;
+              final bloqueadoEntregado = widget.pedido.estado == 'Entregado' && e.key != 'Entregado';
+              final bloqueadoEnviado = widget.pedido.estado == 'Enviado' &&
+                  (e.key == 'Cancelado' || e.key == 'Rechazado' || e.key == 'Expirado');
+              final deshabilitado = esRetroceso || bloqueadoEntregado || bloqueadoEnviado;
+
+              return DropdownMenuItem(
+                value: e.key,
+                enabled: !deshabilitado,
+                child: Text(
+                  deshabilitado ? '${e.value} (Bloqueado)' : e.value,
+                  style: TextStyle(
+                    color: deshabilitado ? FashionColors.textoMuted : null,
+                  ),
+                ),
+              );
+            }).toList(),
             onChanged: (v) => setState(() => _estado = v ?? _estado),
           ),
           const SizedBox(height: 10),
@@ -964,28 +1027,43 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
 
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
-          onPressed: () async {
-            try {
-              await ProductionService.instance.crearOrdenProduccion({
-                'formula_id': f.id,
-                'cantidad': _cantidadProducir,
-                'costo_mano_obra': _costoManoObra,
-                'costo_estimado': costoLoteTotal,
-                'estado': 'planificada',
-              });
-              _cargarTodo();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Orden de producción generada en estado Planificada')));
-              }
-            } catch (e) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al crear orden: $e'), backgroundColor: FashionColors.peligro));
-              }
-            }
-          },
+          onPressed: (!factible || _cantidadProducir < 1)
+              ? null
+              : () async {
+                  try {
+                    await ProductionService.instance.crearOrdenProduccion({
+                      'formula_id': f.id,
+                      'cantidad': _cantidadProducir,
+                      'costo_mano_obra': _costoManoObra,
+                      'costo_estimado': costoLoteTotal,
+                      'estado': 'planificada',
+                    });
+                    _cargarTodo();
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Orden generada: insumos requeridos reservados y descontados en bodega.'),
+                          backgroundColor: FashionColors.verdeExito,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al crear orden: $e'), backgroundColor: FashionColors.peligro));
+                    }
+                  }
+                },
           icon: const Icon(Icons.post_add),
           label: const Text('Generar Orden de Producción', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
+        if (!factible) ...[
+          const SizedBox(height: 6),
+          const Text(
+            '⚠️ Insumos insuficientes en bodega para este lote. Revisa la factibilidad arriba.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11, color: FashionColors.peligro, fontWeight: FontWeight.w600),
+          ),
+        ],
       ],
     );
   }
