@@ -6,7 +6,7 @@ Aplicación móvil oficial para la gestión integral y comercio electrónico de 
 
 Puedes descargar e instalar el archivo APK de la versión más reciente directamente desde el siguiente enlace:
 
-👉 Descargar Fashion Style APK (v1.2.1)
+👉 👉 [](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/download/v1.2.1/fashionstyle-release.apk)
 
 Requisitos e Instalación
 Sistema Operativo: Android 8.0 (Oreo) o superior.
@@ -34,4 +34,4 @@ Framework: Flutter 3.x / Dart 3.x
 Gestión de Estado: Flutter Riverpod
 Navegación: GoRouter con verificación reactiva de roles
 Consumo API: Dio (Cliente REST con interceptores de autenticación y reintentos)
-Backend API: Laravel 11 (https://fashionstyle.api.adsocidm.com/public/api)
+Backend API: Laravel 11 
