@@ -29,6 +29,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
   List<Category> _categorias = [];
   List<Catalog> _catalogos = [];
   String _busqueda = '';
+  String _filtroEstado = 'todas';
 
   @override
   void initState() {
@@ -95,10 +96,26 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     try {
       await ApiClient.instance.dio.patch('/productos/${p.idProducto}/toggle-activo');
       _cargarDatos();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(nuevoValor ? 'Prenda "${p.nombre}" activada' : 'Prenda "${p.nombre}" desactivada'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     } catch (_) {
       try {
         await ApiClient.instance.dio.put('/productos/${p.idProducto}', data: {'activo': nuevoValor});
         _cargarDatos();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(nuevoValor ? 'Prenda "${p.nombre}" activada' : 'Prenda "${p.nombre}" desactivada'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -152,6 +169,27 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     }
   }
 
+  Future<void> _duplicarPrenda(Product p) async {
+    try {
+      await ApiClient.instance.dio.post('/productos/${p.idProducto}/duplicar');
+      _cargarDatos();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Prenda "${p.nombre}" duplicada como borrador')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible duplicar la prenda.')),
+            backgroundColor: FashionColors.peligro,
+          ),
+        );
+      }
+    }
+  }
+
   void _abrirModalPromociones() {
     showModalBottomSheet(
       context: context,
@@ -177,9 +215,40 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     );
   }
 
+  Widget _chipFiltro(String valor, String etiqueta) {
+    final seleccionado = _filtroEstado == valor;
+    return ChoiceChip(
+      label: Text(
+        etiqueta,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: seleccionado ? FontWeight.bold : FontWeight.normal,
+          color: seleccionado ? Colors.white : FashionColors.textoOscuro,
+        ),
+      ),
+      selected: seleccionado,
+      selectedColor: FashionColors.negroElegante,
+      backgroundColor: FashionColors.fondoClaro,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      onSelected: (_) => setState(() => _filtroEstado = valor),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final totalActivas = _productos.where((p) => p.activo).length;
+    final totalInactivas = _productos.where((p) => !p.activo).length;
+    final totalOcultas = _productos.where((p) => !p.publicado).length;
+
     List<Product> filtrados = List.from(_productos);
+    if (_filtroEstado == 'activas') {
+      filtrados = filtrados.where((p) => p.activo).toList();
+    } else if (_filtroEstado == 'inactivas') {
+      filtrados = filtrados.where((p) => !p.activo).toList();
+    } else if (_filtroEstado == 'ocultas') {
+      filtrados = filtrados.where((p) => !p.publicado).toList();
+    }
+
     if (_busqueda.trim().isNotEmpty) {
       final q = _busqueda.trim().toLowerCase();
       filtrados = filtrados.where((p) => p.nombre.toLowerCase().contains(q) || p.descripcion.toLowerCase().contains(q)).toList();
@@ -229,6 +298,21 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                       label: const Text('Nueva', style: TextStyle(fontSize: 12)),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _chipFiltro('todas', 'Todas (${_productos.length})'),
+                      const SizedBox(width: 6),
+                      _chipFiltro('activas', 'Activas ($totalActivas)'),
+                      const SizedBox(width: 6),
+                      _chipFiltro('inactivas', 'Inactivas ($totalInactivas)'),
+                      const SizedBox(width: 6),
+                      _chipFiltro('ocultas', 'Ocultas ($totalOcultas)'),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -283,6 +367,28 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                             const SizedBox(height: 6),
                                             Row(
                                               children: [
+                                                // Estado Activa / Inactiva
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                    color: p.activo ? const Color(0xFFDEF7EC) : const Color(0xFFFDE8E8),
+                                                    borderRadius: BorderRadius.circular(4),
+                                                    border: Border.all(
+                                                      color: p.activo ? const Color(0xFF31C48D) : const Color(0xFFF98080),
+                                                      width: 0.5,
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    p.activo ? 'Activa' : 'Inactiva',
+                                                    style: TextStyle(
+                                                      color: p.activo ? const Color(0xFF03543F) : const Color(0xFF9B1C1C),
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                // Estado En tienda / Oculto
                                                 Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                   decoration: BoxDecoration(
@@ -294,7 +400,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                     ),
                                                   ),
                                                   child: Text(
-                                                    p.publicado ? 'Publicado' : 'Oculto',
+                                                    p.publicado ? 'En tienda' : 'Oculto tienda',
                                                     style: TextStyle(
                                                       color: p.publicado ? const Color(0xFF03543F) : const Color(0xFF6B7280),
                                                       fontSize: 10,
@@ -302,7 +408,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(width: 8),
+                                                const SizedBox(width: 6),
                                                 InkWell(
                                                   onTap: () => _togglePublicado(p),
                                                   child: Row(
@@ -348,18 +454,36 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                         children: [
                                           Switch(
                                             value: p.activo,
-                                            activeThumbColor: FashionColors.rosaCorporativo,
+                                            activeThumbColor: FashionColors.verdeExito,
+                                            activeTrackColor: FashionColors.verdeExito.withValues(alpha: 0.3),
+                                            inactiveThumbColor: FashionColors.textoMuted,
                                             onChanged: (val) => _toggleActivo(p, val),
                                           ),
+                                          Text(
+                                            p.activo ? 'Activa' : 'Inactiva',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              color: p.activo ? FashionColors.verdeExito : FashionColors.textoMuted,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
                                           Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               IconButton(
+                                                icon: const Icon(Icons.copy_outlined, size: 17),
+                                                tooltip: 'Duplicar prenda',
+                                                onPressed: () => _duplicarPrenda(p),
+                                              ),
+                                              IconButton(
                                                 icon: const Icon(Icons.edit_outlined, size: 18),
+                                                tooltip: 'Editar prenda',
                                                 onPressed: () => _abrirFormularioPrenda(p),
                                               ),
                                               IconButton(
                                                 icon: const Icon(Icons.delete_outline, size: 18, color: FashionColors.peligro),
+                                                tooltip: 'Eliminar prenda',
                                                 onPressed: () => _eliminarPrenda(p),
                                               ),
                                             ],

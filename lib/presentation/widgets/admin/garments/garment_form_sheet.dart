@@ -79,6 +79,7 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
         'nombre': nombre,
         'descripcion': _descCtrl.text.trim(),
         'color': _colorCtrl.text.trim(),
+        'activo': widget.prenda?.activo ?? true,
         'publicado': widget.prenda?.publicado ?? false,
         'categoria_id': _categoriaId,
         'catalogo_id': _catalogoId,

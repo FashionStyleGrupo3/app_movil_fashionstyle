@@ -34,15 +34,22 @@ class ProductService {
       }
     }
 
-    // 1. Filtro de seguridad: Activo (a menos que se soliciten explícitamente inactivos)
-    if (filtros?.activo == null || filtros!.activo == true) {
+    final esPersonal = filtros?.esPersonal ?? false;
+
+    // 1. Filtro de seguridad: Activo
+    // En catálogo público (tienda): solo prendas activas (disponibles para compra).
+    // En gestión administrativa (esPersonal = true): el admin ve TODAS las prendas (activas e inactivas) a menos que filtre explícitamente.
+    if (!esPersonal && (filtros?.activo == null || filtros!.activo == true)) {
       productos = productos.where((p) => p.activo).toList();
+    } else if (filtros?.activo != null) {
+      productos = productos.where((p) => p.activo == filtros!.activo).toList();
     }
 
     // 1b. Filtro de seguridad: Publicado (el público y clientes solo ven los publicados)
-    final esPersonal = filtros?.esPersonal ?? false;
     if (!esPersonal && (filtros?.publicado == null || filtros!.publicado == true)) {
       productos = productos.where((p) => p.publicado).toList();
+    } else if (filtros?.publicado != null) {
+      productos = productos.where((p) => p.publicado == filtros!.publicado).toList();
     }
 
     // 2. Filtro de seguridad en cliente: Categoría
