@@ -90,8 +90,34 @@ class WompiCheckoutModal {
       ),
     );
 
-    // 4. Si el usuario cerró el modal sin completar transacción
-    if (resultadoModal == null || resultadoModal.transaccionId == null) {
+    // 4. Si el usuario cerró el modal o no se extrajo directamente el transaccionId
+    final transaccionId = resultadoModal?.transaccionId;
+
+    if (transaccionId == null || transaccionId.trim().isEmpty) {
+      // ANTES DE CANCELAR: Verificar si el backend ya registró el pago (por Webhook o API)
+      try {
+        final estadoBackend = await WompiService.instance.consultarEstadoPedido(pedido.referencia);
+        final estado = estadoBackend['estado']?.toString();
+        if (estado == 'Pagado') {
+          return WompiPaymentOutcome(
+            status: 'aprobado',
+            referencia: pedido.referencia,
+            metodoPago: estadoBackend['metodo_pago']?.toString() ?? 'WOMPI',
+            monto: pedido.montoTotal,
+            mensaje: 'Pago confirmado exitosamente por el banco.',
+          );
+        } else if (estado == 'Revision_Pago') {
+          return WompiPaymentOutcome(
+            status: 'revision',
+            referencia: pedido.referencia,
+            metodoPago: estadoBackend['metodo_pago']?.toString() ?? 'WOMPI',
+            monto: pedido.montoTotal,
+            mensaje: 'Pago recibido. Está en revisión de inventario.',
+          );
+        }
+      } catch (_) {}
+
+      // Si no fue pagado y el usuario cerró explícitamente y se solicitó cancelar
       if (cancelarAlCerrar) {
         try {
           await WompiService.instance.cancelarCheckout(pedido.referencia);
@@ -107,13 +133,12 @@ class WompiCheckoutModal {
           status: 'pendiente',
           referencia: pedido.referencia,
           monto: pedido.montoTotal,
-          mensaje: 'El pago no se completó en la ventana del proveedor.',
+          mensaje: 'El pago continúa pendiente en Mis Pedidos.',
         );
       }
     }
 
     // 5. Transacción completada en el widget: confirmación contra el backend
-    final transaccionId = resultadoModal.transaccionId!;
     try {
       final confirmacion = await WompiService.instance.confirmarCheckout(
         pedido.referencia,
@@ -136,11 +161,36 @@ class WompiCheckoutModal {
         status: statusFinal,
         transaccionId: transaccionId,
         referencia: pedido.referencia,
-        metodoPago: resultadoModal.metodoPago ?? confirmacion['metodo_pago']?.toString() ?? 'WOMPI',
+        metodoPago: resultadoModal?.metodoPago ?? confirmacion['metodo_pago']?.toString() ?? 'WOMPI',
         monto: pedido.montoTotal,
         mensaje: confirmacion['mensaje']?.toString(),
       );
     } catch (e) {
+      // Re-verificación de resiliencia: si falló la confirmación pero el webhook o backend ya lo actualizó
+      try {
+        final estadoBackend = await WompiService.instance.consultarEstadoPedido(pedido.referencia);
+        final estado = estadoBackend['estado']?.toString();
+        if (estado == 'Pagado') {
+          return WompiPaymentOutcome(
+            status: 'aprobado',
+            transaccionId: transaccionId,
+            referencia: pedido.referencia,
+            metodoPago: estadoBackend['metodo_pago']?.toString() ?? 'WOMPI',
+            monto: pedido.montoTotal,
+            mensaje: 'Pago confirmado por el servidor.',
+          );
+        } else if (estado == 'Revision_Pago') {
+          return WompiPaymentOutcome(
+            status: 'revision',
+            transaccionId: transaccionId,
+            referencia: pedido.referencia,
+            metodoPago: estadoBackend['metodo_pago']?.toString() ?? 'WOMPI',
+            monto: pedido.montoTotal,
+            mensaje: 'Pago en revisión de inventario.',
+          );
+        }
+      } catch (_) {}
+
       return WompiPaymentOutcome(
         status: 'error',
         transaccionId: transaccionId,
@@ -253,6 +303,7 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
           reference: '${pedido.referencia}',
           publicKey: '${pedido.publicKey}',
           signature: { integrity: '${pedido.firmaIntegridad}' },
+          redirectUrl: 'fashionstyle://retorno-pago',
           customerData: {
             email: '${jsonEncode(emailCliente).replaceAll('"', '')}',
             fullName: '${jsonEncode(nombreCliente).replaceAll('"', '')}',
@@ -270,8 +321,24 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
           }
         });
 
+        window.addEventListener('message', function(e) {
+          try {
+            var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+            if (data && (data.event === 'wompi:transaction_completed' || data.type === 'WOMPI_TRANSACTION_UPDATED')) {
+              var t = data.data || data.transaction;
+              if (window.WompiChannel && t) {
+                window.WompiChannel.postMessage(JSON.stringify({
+                  id: t.id || null,
+                  status: t.status || 'APPROVED',
+                  payment_method_type: t.payment_method_type || null
+                }));
+              }
+            }
+          } catch (_) {}
+        });
+
         checkout.open(function ( result ) {
-          var transaction = result.transaction;
+          var transaction = result ? result.transaction : null;
           if (window.WompiChannel) {
             window.WompiChannel.postMessage(JSON.stringify({
               id: transaction ? transaction.id : null,
@@ -305,19 +372,49 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
               final id = data['id']?.toString();
               final status = data['status']?.toString();
               final metodo = data['payment_method_type']?.toString();
-              Navigator.of(context).pop(_ModalWompiResult(
-                transaccionId: id,
-                status: status,
-                metodoPago: metodo,
-              ));
+              if (id != null && id.isNotEmpty) {
+                Navigator.of(context).pop(_ModalWompiResult(
+                  transaccionId: id,
+                  status: status,
+                  metodoPago: metodo,
+                ));
+                return;
+              }
             }
-          } catch (_) {
-            Navigator.of(context).pop(const _ModalWompiResult());
-          }
+          } catch (_) {}
         },
       )
       ..setNavigationDelegate(
         NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            final url = request.url;
+            final uri = Uri.tryParse(url);
+            if (uri != null) {
+              final scheme = uri.scheme.toLowerCase();
+              final host = uri.host.toLowerCase();
+
+              // Interceptar retorno al comercio (botón de Wompi "Volver al comercio")
+              final esRetornoComercio = scheme == 'fashionstyle' ||
+                  host.contains('retorno-pago') ||
+                  url.contains('retorno-pago') ||
+                  (url.contains('id=') && (url.contains('env=') || url.contains('status=')));
+
+              if (esRetornoComercio) {
+                final id = uri.queryParameters['id'] ??
+                    uri.queryParameters['transaccion_id'] ??
+                    uri.queryParameters['transaction_id'];
+                final status = uri.queryParameters['status'] ?? uri.queryParameters['env'];
+
+                Navigator.of(context).pop(_ModalWompiResult(
+                  transaccionId: id,
+                  status: status,
+                  metodoPago: 'WOMPI',
+                ));
+                return NavigationDecision.prevent;
+              }
+            }
+            return NavigationDecision.navigate;
+          },
           onPageFinished: (_) {
             if (mounted) setState(() => _cargando = false);
           },

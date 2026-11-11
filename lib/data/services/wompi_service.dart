@@ -64,6 +64,13 @@ class WompiService {
     throw StateError('Respuesta inesperada al reanudar checkout de Wompi.');
   }
 
+  Future<Map<String, dynamic>> consultarEstadoPedido(String referencia) async {
+    final encoded = Uri.encodeComponent(referencia);
+    final response = await ApiClient.instance.dio.get('/checkout/$encoded');
+    final data = ApiResponseParser.extractData(response);
+    return data is Map<String, dynamic> ? data : {};
+  }
+
   Future<Map<String, dynamic>> cancelarCheckout(String referencia) async {
     final encoded = Uri.encodeComponent(referencia);
     final response = await ApiClient.instance.dio.post('/checkout/$encoded/cancelar');
