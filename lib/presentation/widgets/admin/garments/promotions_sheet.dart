@@ -147,17 +147,22 @@ class _ModalPromocionesSheetState extends State<ModalPromocionesSheet> {
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Campañas y Promociones',
-                style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+              Expanded(
+                child: Text(
+                  'Campañas y Promociones',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                ),
               ),
+              const SizedBox(width: 8),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: FashionColors.brandAccent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 ),
                 onPressed: _crearPromoModal,
                 icon: const Icon(Icons.add, size: 16),

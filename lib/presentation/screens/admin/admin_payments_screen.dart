@@ -172,10 +172,21 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
 
                 // DISPERSIÓN DE FONDOS
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Dispersión en Cuentas Bancarias', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
+                    Expanded(
+                      child: Text(
+                        'Dispersión en Cuentas Bancarias',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     TextButton.icon(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        visualDensity: VisualDensity.compact,
+                      ),
                       onPressed: () => _abrirModalCuenta(),
                       icon: const Icon(Icons.add, size: 16),
                       label: const Text('Agregar Cuenta'),
@@ -230,7 +241,7 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
   Widget _cardRecaudo(String titulo, String monto, String sub, Color col) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: col.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
@@ -239,11 +250,23 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(monto, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, color: col, fontSize: 13)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(monto, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, color: col, fontSize: 13)),
+            ),
             const SizedBox(height: 4),
-            Text(titulo, style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(titulo, style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
+            ),
             const SizedBox(height: 1),
-            Text(sub, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: FashionColors.inkSecondary)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(sub, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: FashionColors.inkSecondary)),
+            ),
           ],
         ),
       ),

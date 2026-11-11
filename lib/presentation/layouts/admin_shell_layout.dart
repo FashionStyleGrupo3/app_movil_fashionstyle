@@ -471,19 +471,23 @@ class AdminShellLayout extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Text(
-                  titulo,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: Colors.white,
-                    letterSpacing: -0.3,
+                Flexible(
+                  child: Text(
+                    titulo,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Colors.white,
+                      letterSpacing: -0.3,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 // Indicador Reverb/API en vivo
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
                     color: FashionColors.atelierJade,
                     borderRadius: BorderRadius.circular(4),
@@ -499,7 +503,7 @@ class AdminShellLayout extends ConsumerWidget {
                           shape: BoxShape.circle,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 3),
                       Text(
                         'EN VIVO',
                         style: GoogleFonts.spaceGrotesk(

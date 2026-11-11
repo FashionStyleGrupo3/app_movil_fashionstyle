@@ -266,40 +266,44 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Buscar prendas por nombre...',
+                    prefixIcon: Icon(Icons.search, size: 20),
+                    contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (val) => setState(() => _busqueda = val),
+                ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          hintText: 'Buscar prendas por nombre...',
-                          prefixIcon: Icon(Icons.search, size: 20),
-                          contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                          border: OutlineInputBorder(),
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: FashionColors.inkPrimary,
+                          side: const BorderSide(color: FashionColors.borderSubtle),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                         ),
-                        onChanged: (val) => setState(() => _busqueda = val),
+                        onPressed: _abrirModalPromociones,
+                        icon: const Icon(Icons.local_offer_outlined, size: 16),
+                        label: Text('Promociones', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: FashionColors.inkPrimary,
-                        side: const BorderSide(color: FashionColors.borderSubtle),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FashionColors.brandAccent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        ),
+                        onPressed: () => _abrirFormularioPrenda(),
+                        icon: const Icon(Icons.add, size: 16),
+                        label: Text('Nueva Prenda', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
                       ),
-                      onPressed: _abrirModalPromociones,
-                      icon: const Icon(Icons.local_offer_outlined, size: 16),
-                      label: Text('Promociones', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.brandAccent,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      onPressed: () => _abrirFormularioPrenda(),
-                      icon: const Icon(Icons.add, size: 16),
-                      label: Text('Nueva', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -379,7 +383,9 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                               style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
                                             ),
                                             const SizedBox(height: 6),
-                                            Row(
+                                            Wrap(
+                                              spacing: 6,
+                                              runSpacing: 4,
                                               children: [
                                                 // Estado Activa / Inactiva
                                                 Container(
@@ -401,7 +407,6 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(width: 6),
                                                 // Estado En tienda / Oculto
                                                 Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -422,7 +427,6 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(width: 6),
                                                 InkWell(
                                                   onTap: () => _togglePublicado(p),
                                                   child: Row(
@@ -444,13 +448,14 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                               ],
                                             ),
                                             const SizedBox(height: 6),
-                                            Row(
+                                            Wrap(
+                                              spacing: 12,
+                                              runSpacing: 4,
                                               children: [
                                                 Text(
                                                   CurrencyFormatter.formatearCOP(p.precioMinimo),
                                                   style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary),
                                                 ),
-                                                const SizedBox(width: 12),
                                                 Text(
                                                   'Stock: ${p.stockTotal} uds',
                                                   style: GoogleFonts.jetBrainsMono(

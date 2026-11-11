@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
@@ -141,7 +142,8 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
               labelColor: FashionColors.inkPrimary,
               unselectedLabelColor: FashionColors.inkSecondary,
               indicatorColor: FashionColors.brandAccent,
-              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13),
+              labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 12),
               tabs: const [
                 Tab(icon: Icon(Icons.local_shipping_outlined, size: 18), text: 'Pedidos Online'),
                 Tab(icon: Icon(Icons.receipt_outlined, size: 18), text: 'Facturas DIAN'),
@@ -267,7 +269,32 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
                               )),
                               const SizedBox(height: 8),
                               if (p.numeroGuia.isNotEmpty)
-                                Text('Guía: ${p.numeroGuia} (${p.empresaTransportadora})', style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.bold)),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Guía: ${p.numeroGuia} (${p.empresaTransportadora})',
+                                        style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.copy_rounded, size: 16, color: FashionColors.brandAccent),
+                                      tooltip: 'Copiar Guía',
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                                      onPressed: () {
+                                        Clipboard.setData(ClipboardData(text: p.numeroGuia));
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Número de guía "${p.numeroGuia}" copiado al portapapeles'),
+                                            duration: const Duration(seconds: 2),
+                                            backgroundColor: FashionColors.inkPrimary,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               const SizedBox(height: 10),
                               Align(
                                 alignment: Alignment.centerRight,
@@ -371,12 +398,19 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
   Widget _statBox(String label, String valor, Color col) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
         child: Column(
           children: [
-            Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 16)),
-            Text(label, style: const TextStyle(fontSize: 10, color: FashionColors.textoMuted)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 16)),
+            ),
+            const SizedBox(height: 2),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(label, style: const TextStyle(fontSize: 10, color: FashionColors.textoMuted)),
+            ),
           ],
         ),
       ),

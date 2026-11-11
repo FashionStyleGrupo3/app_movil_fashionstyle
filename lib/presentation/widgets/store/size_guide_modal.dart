@@ -39,21 +39,22 @@ class SizeGuideModal {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const AtelierMonogram(size: 28),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.straighten_rounded, size: 16, color: FashionColors.brandAccent),
-                              const SizedBox(width: 5),
-                              Text(
+                  const AtelierMonogram(size: 28),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.straighten_rounded, size: 16, color: FashionColors.brandAccent),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
                                 'GUÍA DE TALLAS ATELIER',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
@@ -61,28 +62,32 @@ class SizeGuideModal {
                                   color: FashionColors.brandAccent,
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Medidas Corporales',
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: FashionColors.inkPrimary,
-                              letterSpacing: -0.3,
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Medidas Corporales',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: FashionColors.inkPrimary,
+                            letterSpacing: -0.3,
                           ),
-                          Text(
-                            'Referencia anatómica en centímetros (cm)',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              color: FashionColors.inkSecondary,
-                            ),
+                        ),
+                        Text(
+                          'Referencia anatómica en centímetros (cm)',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: FashionColors.inkSecondary,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),

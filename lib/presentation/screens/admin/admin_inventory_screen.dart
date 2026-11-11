@@ -306,7 +306,8 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
               labelColor: FashionColors.inkPrimary,
               unselectedLabelColor: FashionColors.inkSecondary,
               indicatorColor: FashionColors.brandAccent,
-              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13),
+              labelPadding: const EdgeInsets.symmetric(horizontal: 6),
+              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 12),
               tabs: const [
                 Tab(icon: Icon(Icons.shelves, size: 18), text: 'Existencias'),
                 Tab(icon: Icon(Icons.history, size: 18), text: 'Kárdex'),
@@ -596,9 +597,15 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
         decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
         child: Column(
           children: [
-            Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 15)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 15)),
+            ),
             const SizedBox(height: 2),
-            Text(label, style: const TextStyle(fontSize: 9, color: FashionColors.textoMuted), textAlign: TextAlign.center),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(label, style: const TextStyle(fontSize: 9, color: FashionColors.textoMuted), textAlign: TextAlign.center),
+            ),
           ],
         ),
       ),

@@ -173,14 +173,22 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                             Padding(
                               padding: const EdgeInsets.all(12),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Colaboradores (${_usuarios.length})', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary)),
+                                  Expanded(
+                                    child: Text(
+                                      'Colaboradores (${_usuarios.length})',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
                                   ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: FashionColors.brandAccent,
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                     ),
                                     onPressed: _abrirModalNuevoUsuario,
                                     icon: const Icon(Icons.add, size: 16),

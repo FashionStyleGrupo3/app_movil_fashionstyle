@@ -1,6 +1,8 @@
 // @source-mirror: src/views/admin/VistaGestionPrendas.vue, src/composables/useGestionPrendas.js, src/views/admin/VistaVentasPOS.vue
 import 'package:flutter/material.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
+import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
+
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/product/catalog.dart';
 import 'package:fashion_style_mobile/data/models/product/category.dart';
@@ -34,10 +36,14 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
   int? _catalogoId;
   bool _guardando = false;
   List<Map<String, dynamic>> _variantes = [];
+  late List<Category> _categoriasLocales;
+  late List<Catalog> _catalogosLocales;
 
   @override
   void initState() {
     super.initState();
+    _categoriasLocales = List.from(widget.categorias);
+    _catalogosLocales = List.from(widget.catalogos);
     if (widget.prenda != null) {
       final p = widget.prenda!;
       _nombreCtrl.text = p.nombre;
@@ -57,6 +63,90 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
         {'talla': 'S', 'sku': '', 'precio': 50000.0, 'stock': 5},
         {'talla': 'M', 'sku': '', 'precio': 50000.0, 'stock': 5},
       ];
+    }
+  }
+
+  Future<void> _crearCategoriaModal() async {
+    final ctrl = TextEditingController();
+    final res = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nueva Categoría'),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Nombre de categoría', border: OutlineInputBorder()),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.brandAccent),
+            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+            child: const Text('Crear', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (res != null && res.isNotEmpty) {
+      try {
+        final resp = await ApiClient.instance.dio.post('/categorias', data: {'nombre': res});
+        final data = ApiResponseParser.extractData(resp);
+        final nueva = Category.fromJson(data is Map<String, dynamic> ? data : {'id': DateTime.now().millisecondsSinceEpoch, 'nombre': res, 'activo': true});
+        setState(() {
+          _categoriasLocales.add(nueva);
+          _categoriaId = nueva.idCategoria;
+        });
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Categoría "$res" creada con éxito')));
+      } catch (_) {
+        final nueva = Category(idCategoria: DateTime.now().millisecondsSinceEpoch, nombre: res, descripcion: '', activo: true);
+        setState(() {
+          _categoriasLocales.add(nueva);
+          _categoriaId = nueva.idCategoria;
+        });
+      }
+    }
+  }
+
+  Future<void> _crearColeccionModal() async {
+    final ctrl = TextEditingController();
+    final res = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nueva Colección'),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Nombre de colección', border: OutlineInputBorder()),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.brandAccent),
+            onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+            child: const Text('Crear', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (res != null && res.isNotEmpty) {
+      try {
+        final resp = await ApiClient.instance.dio.post('/catalogos', data: {'nombre': res});
+        final data = ApiResponseParser.extractData(resp);
+        final nuevo = Catalog.fromJson(data is Map<String, dynamic> ? data : {'id': DateTime.now().millisecondsSinceEpoch, 'nombre': res, 'activo': true});
+        setState(() {
+          _catalogosLocales.add(nuevo);
+          _catalogoId = nuevo.idCatalogo;
+        });
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Colección "$res" creada con éxito')));
+      } catch (_) {
+        final nuevo = Catalog(idCatalogo: DateTime.now().millisecondsSinceEpoch, nombre: res, descripcion: '', activo: true);
+        setState(() {
+          _catalogosLocales.add(nuevo);
+          _catalogoId = nuevo.idCatalogo;
+        });
+      }
     }
   }
 
@@ -162,25 +252,51 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
             ),
             const SizedBox(height: 12),
 
-            DropdownButtonFormField<int?>(
-              initialValue: _categoriaId,
-              decoration: const InputDecoration(labelText: 'Categoría', border: OutlineInputBorder()),
-              items: [
-                const DropdownMenuItem(value: null, child: Text('Sin categoría')),
-                ...widget.categorias.map((c) => DropdownMenuItem(value: c.idCategoria, child: Text(c.nombre))),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<int?>(
+                    isExpanded: true,
+                    initialValue: _categoriaId,
+                    decoration: const InputDecoration(labelText: 'Categoría', border: OutlineInputBorder()),
+                    items: [
+                      const DropdownMenuItem(value: null, child: Text('Sin categoría')),
+                      ..._categoriasLocales.map((c) => DropdownMenuItem(value: c.idCategoria, child: Text(c.nombre, overflow: TextOverflow.ellipsis))),
+                    ],
+                    onChanged: (v) => setState(() => _categoriaId = v),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  tooltip: '+ Categoría',
+                  icon: const Icon(Icons.add_circle_outline, color: FashionColors.brandAccent, size: 26),
+                  onPressed: _crearCategoriaModal,
+                ),
               ],
-              onChanged: (v) => setState(() => _categoriaId = v),
             ),
             const SizedBox(height: 12),
 
-            DropdownButtonFormField<int?>(
-              initialValue: _catalogoId,
-              decoration: const InputDecoration(labelText: 'Colección / Catálogo', border: OutlineInputBorder()),
-              items: [
-                const DropdownMenuItem(value: null, child: Text('Sin colección')),
-                ...widget.catalogos.map((c) => DropdownMenuItem(value: c.idCatalogo, child: Text(c.nombre))),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<int?>(
+                    isExpanded: true,
+                    initialValue: _catalogoId,
+                    decoration: const InputDecoration(labelText: 'Colección / Catálogo', border: OutlineInputBorder()),
+                    items: [
+                      const DropdownMenuItem(value: null, child: Text('Sin colección')),
+                      ..._catalogosLocales.map((c) => DropdownMenuItem(value: c.idCatalogo, child: Text(c.nombre, overflow: TextOverflow.ellipsis))),
+                    ],
+                    onChanged: (v) => setState(() => _catalogoId = v),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  tooltip: '+ Colección',
+                  icon: const Icon(Icons.add_circle_outline, color: FashionColors.brandAccent, size: 26),
+                  onPressed: _crearColeccionModal,
+                ),
               ],
-              onChanged: (v) => setState(() => _catalogoId = v),
             ),
             const SizedBox(height: 20),
 
@@ -188,7 +304,13 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Tallas y Precios', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const Flexible(
+                  child: Text(
+                    'Tallas y Precios',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 TextButton.icon(
                   onPressed: _agregarVariante,
                   icon: const Icon(Icons.add, size: 16),
@@ -201,38 +323,56 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
               final item = entry.value;
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
                 decoration: BoxDecoration(color: FashionColors.fondoClaro, borderRadius: BorderRadius.circular(8)),
                 child: Row(
                   children: [
                     SizedBox(
-                      width: 60,
+                      width: 48,
                       child: TextFormField(
                         initialValue: item['talla']?.toString(),
-                        decoration: const InputDecoration(labelText: 'Talla', border: OutlineInputBorder()),
+                        decoration: const InputDecoration(
+                          labelText: 'Talla',
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                          border: OutlineInputBorder(),
+                        ),
                         onChanged: (val) => item['talla'] = val,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: TextFormField(
                         initialValue: item['precio']?.toString(),
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Precio (COP)', border: OutlineInputBorder()),
+                        decoration: const InputDecoration(
+                          labelText: 'Precio',
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                          border: OutlineInputBorder(),
+                        ),
                         onChanged: (val) => item['precio'] = double.tryParse(val) ?? 0,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     SizedBox(
-                      width: 70,
+                      width: 52,
                       child: TextFormField(
                         initialValue: item['stock']?.toString(),
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Stock', border: OutlineInputBorder()),
+                        decoration: const InputDecoration(
+                          labelText: 'Stock',
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                          border: OutlineInputBorder(),
+                        ),
                         onChanged: (val) => item['stock'] = int.tryParse(val) ?? 0,
                       ),
                     ),
                     IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
                       icon: const Icon(Icons.close, size: 18, color: FashionColors.peligro),
                       onPressed: () => setState(() => _variantes.removeAt(idx)),
                     ),

@@ -211,9 +211,13 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                 children: [
                   Icon(factible ? Icons.check_circle : Icons.warning_amber_rounded, color: factible ? FashionColors.verdeExito : FashionColors.aviso, size: 20),
                   const SizedBox(width: 8),
-                  Text(
-                    factible ? 'Factibilidad en Bodega: Insumos completos' : 'Faltan insumos para este volumen',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: factible ? FashionColors.verdeExito : FashionColors.aviso),
+                  Expanded(
+                    child: Text(
+                      factible ? 'Factibilidad en Bodega: Insumos completos' : 'Faltan insumos para este volumen',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: factible ? FashionColors.verdeExito : FashionColors.aviso),
+                    ),
                   ),
                 ],
               ),

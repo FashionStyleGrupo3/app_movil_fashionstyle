@@ -281,15 +281,22 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text('Total:', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary)),
-                  Text(
-                    CurrencyFormatter.formatearCOP(_totalBolsa),
-                    style: GoogleFonts.jetBrainsMono(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
-                  ),
-                ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('Total:', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary)),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        CurrencyFormatter.formatearCOP(_totalBolsa),
+                        style: GoogleFonts.jetBrainsMono(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

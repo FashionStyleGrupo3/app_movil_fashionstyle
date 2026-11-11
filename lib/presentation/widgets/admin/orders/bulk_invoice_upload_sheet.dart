@@ -96,15 +96,23 @@ class _ModalCargaMasivaFacturasSheetState extends State<ModalCargaMasivaFacturas
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Carga Masiva de Facturas',
-                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+              Expanded(
+                child: Text(
+                  'Carga Masiva de Facturas',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary),
+                ),
               ),
+              const SizedBox(width: 8),
               TextButton.icon(
-                icon: const Icon(Icons.download, size: 16, color: FashionColors.inkPrimary),
-                label: Text('Plantilla CSV', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  visualDensity: VisualDensity.compact,
+                ),
+                icon: const Icon(Icons.download, size: 15, color: FashionColors.inkPrimary),
+                label: Text('Plantilla CSV', style: GoogleFonts.plusJakartaSans(fontSize: 11.5, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary)),
                 onPressed: () => Share.share(InvoiceService.plantillaCsvContenido, subject: 'Plantilla_Facturas.csv'),
               ),
             ],

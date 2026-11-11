@@ -342,7 +342,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 6,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -361,12 +365,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           ),
                         ),
                       ),
-                      const Spacer(),
-                      const Icon(Icons.calendar_today_outlined, color: Colors.white70, size: 13),
-                      const SizedBox(width: 5),
-                      Text(
-                        fecha,
-                        style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 11),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.calendar_today_outlined, color: Colors.white70, size: 13),
+                          const SizedBox(width: 5),
+                          Text(
+                            fecha,
+                            style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 11),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -398,63 +406,66 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: FashionColors.borderSubtle),
               ),
-              child: Row(
-                children: [
-                  Text(
-                    'Periodo:',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: FashionColors.inkSecondary,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Periodo:',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: FashionColors.inkSecondary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  for (final m in [3, 6, 12]) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          if (_mesesFiltro != m) {
-                            setState(() => _mesesFiltro = m);
-                            _cargarDashboard();
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: _mesesFiltro == m ? FashionColors.inkPrimary : FashionColors.canvasBackground,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: _mesesFiltro == m ? FashionColors.inkPrimary : FashionColors.borderSubtle,
+                    const SizedBox(width: 8),
+                    for (final m in [3, 6, 12]) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            if (_mesesFiltro != m) {
+                              setState(() => _mesesFiltro = m);
+                              _cargarDashboard();
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: _mesesFiltro == m ? FashionColors.inkPrimary : FashionColors.canvasBackground,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: _mesesFiltro == m ? FashionColors.inkPrimary : FashionColors.borderSubtle,
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            '$m meses',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: _mesesFiltro == m ? Colors.white : FashionColors.inkPrimary,
+                            child: Text(
+                              '$m meses',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: _mesesFiltro == m ? Colors.white : FashionColors.inkPrimary,
+                              ),
                             ),
                           ),
                         ),
                       ),
+                    ],
+                    IconButton(
+                      onPressed: _cargando ? null : () => _cargarDashboard(),
+                      icon: _cargando
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: FashionColors.inkPrimary),
+                            )
+                          : const Icon(Icons.refresh, size: 20, color: FashionColors.inkPrimary),
+                      tooltip: 'Actualizar indicadores',
+                      visualDensity: VisualDensity.compact,
                     ),
                   ],
-                  const Spacer(),
-                  IconButton(
-                    onPressed: _cargando ? null : () => _cargarDashboard(),
-                    icon: _cargando
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: FashionColors.inkPrimary),
-                          )
-                        : const Icon(Icons.refresh, size: 20, color: FashionColors.inkPrimary),
-                    tooltip: 'Actualizar indicadores',
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ],
+                ),
               ),
             ),
 
@@ -516,7 +527,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 crossAxisCount: 2,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: 1.35,
+                childAspectRatio: 1.15,
                 children: [
                   _construirKpiCard(
                     titulo: 'Ventas de hoy',

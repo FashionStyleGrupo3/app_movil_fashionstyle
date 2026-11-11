@@ -1,8 +1,8 @@
 {
-  "version": "1.3.0",
-  "buildNumber": 7,
-  "commit": "0d7a255",
-  "updatedAt": "2026-11-11T14:13:18Z",
+  "version": "1.4.0",
+  "buildNumber": 8,
+  "commit": "v1.4.0-sqa-editorial",
+  "updatedAt": "2026-11-11T16:30:31Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.3.0: Identidad visual Neo-Atelier Mineral & Terracotta completa en Storefront, Lookbook 3:4, Autenticacion, Perfil de Cliente, Admin Cockpit con 4 graficos CustomPainter, Punto de Venta (POS) y Gestion Integral de Taller."
+  "notes": "Lanzamiento oficial v1.4.0: Login Screen editorial de pagina completa, resolucion del 100% de desbordamientos RenderFlex en dispositivos compactos (360x780, escala 1.15), paridad con funciones web (+Categoria/+Coleccion in-modal, copia rapida de guias) y unificacion de perfil de administrador."
 }
