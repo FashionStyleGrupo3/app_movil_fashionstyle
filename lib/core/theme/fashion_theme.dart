@@ -1,5 +1,6 @@
 // @source-mirror: tailwind.config.js, src/style.css
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FashionColors {
@@ -99,6 +100,12 @@ class FashionTheme {
       brightness: Brightness.light,
       primaryColor: FashionColors.negro,
       scaffoldBackgroundColor: FashionColors.crema,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
         primary: FashionColors.negro,
@@ -124,14 +131,25 @@ class FashionTheme {
           fontSize: 18,
           fontWeight: FontWeight.w700,
         ),
-        iconTheme: IconThemeData(color: FashionColors.negro),
+        iconTheme: const IconThemeData(color: FashionColors.negro),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.white,
+        modalBackgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        showDragHandle: true,
+        dragHandleColor: FashionColors.borde,
+        dragHandleSize: Size(44, 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+        ),
       ),
       cardTheme: CardThemeData(
         color: FashionColors.blanco,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           side: const BorderSide(color: FashionColors.borde, width: 1),
         ),
       ),
@@ -144,7 +162,7 @@ class FashionTheme {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
             fontWeight: FontWeight.w600,
@@ -159,7 +177,7 @@ class FashionTheme {
           side: const BorderSide(color: FashionColors.negro, width: 1.2),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
             fontWeight: FontWeight.w600,
@@ -171,7 +189,7 @@ class FashionTheme {
         style: TextButton.styleFrom(
           foregroundColor: FashionColors.pizarra,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(12),
           ),
           textStyle: const TextStyle(
             fontWeight: FontWeight.w600,
@@ -193,23 +211,23 @@ class FashionTheme {
           fontWeight: FontWeight.w500,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: FashionColors.borde, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: FashionColors.borde, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: FashionColors.negro, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: FashionColors.rojo, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: FashionColors.rojo, width: 1.5),
         ),
       ),

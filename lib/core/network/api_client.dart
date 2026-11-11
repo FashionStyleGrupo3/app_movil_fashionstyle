@@ -1,7 +1,7 @@
 // @source-mirror: src/services/clienteApi.js
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'change_bus.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 
 final RegExp patronDatosSensibles = RegExp(
   r'(sqlstate|sql|database|query|exception|pdo|mysql|postgres|sqlite|connection:|host:|port:|trace|stack|constraint|foreign key|duplicate key|table|where|127\.0\.0\.1|localhost|3306|password_hash|secret|api_key|access_token|bearer|\b(SELECT|INSERT|UPDATE|DELETE|ALTER|DROP|FROM|LIMIT)\b)',

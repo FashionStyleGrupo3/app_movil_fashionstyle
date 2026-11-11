@@ -1,0 +1,306 @@
+// @source-mirror: src/views/admin/VistaGestionPrendas.vue, src/composables/useGestionPrendas.js, src/views/admin/VistaVentasPOS.vue
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
+import 'package:fashion_style_mobile/core/constants/payment_constants.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
+import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
+import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
+import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
+import 'package:fashion_style_mobile/data/models/payment/bank_account_config.dart';
+import 'package:fashion_style_mobile/data/models/payment/parallel_payment_control.dart';
+import 'package:fashion_style_mobile/data/models/pos/pos_sale_detail.dart';
+import 'package:fashion_style_mobile/data/models/pos/pos_sale_model.dart';
+import 'package:fashion_style_mobile/data/models/pos/pos_sales_summary.dart';
+import 'package:fashion_style_mobile/data/models/product/catalog.dart';
+import 'package:fashion_style_mobile/data/models/product/category.dart';
+import 'package:fashion_style_mobile/data/models/product/price_info.dart';
+import 'package:fashion_style_mobile/data/models/product/product.dart';
+import 'package:fashion_style_mobile/data/models/product/product_filters.dart';
+import 'package:fashion_style_mobile/data/models/product/product_image.dart';
+import 'package:fashion_style_mobile/data/models/product/product_variant.dart';
+import 'package:fashion_style_mobile/data/models/product/promotion.dart';
+import 'package:fashion_style_mobile/data/services/invoice_pdf_service.dart';
+import 'package:fashion_style_mobile/data/services/payment_config_service.dart';
+import 'package:fashion_style_mobile/data/services/pos_sale_service.dart';
+import 'package:fashion_style_mobile/data/services/product_service.dart';
+import 'package:fashion_style_mobile/data/services/promotion_service.dart';
+import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_garments_screen.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/garments/garment_form_sheet.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/garments/promotions_sheet.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/pos/new_pos_sale_sheet.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class AdminPosSalesScreen extends ConsumerStatefulWidget {
+  const AdminPosSalesScreen({super.key});
+
+  @override
+  ConsumerState<AdminPosSalesScreen> createState() => _AdminPosSalesScreenState();
+}
+
+class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
+  bool _cargando = true;
+  String? _error;
+  List<PosSaleModel> _ventas = [];
+  Map<String, dynamic> _resumen = {};
+  String _filtroMedioPago = '';
+  final int _pagina = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarVentas();
+  }
+
+  Future<void> _cargarVentas() async {
+    setState(() {
+      _cargando = true;
+      _error = null;
+    });
+
+    try {
+      final resultados = await Future.wait([
+        PosSaleService.instance.obtenerResumenVentas(),
+        PosSaleService.instance.listarVentas(pagina: _pagina, medioPago: _filtroMedioPago),
+      ]);
+
+      if (mounted) {
+        final pag = resultados[1] as PaginatedResponse<PosSaleModel>;
+        setState(() {
+          _resumen = resultados[0] as Map<String, dynamic>;
+          _ventas = pag.lista;
+          _cargando = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'Error al cargar ventas POS: $e';
+          _cargando = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _cancelarVenta(PosSaleModel v) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Anular venta POS'),
+        content: Text('¿Deseas cancelar la venta "${v.codigo}"? Las unidades volverán al inventario.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Volver')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.peligro),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Anular Venta', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      await PosSaleService.instance.cancelarVenta(v.id);
+      _cargarVentas();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Venta anulada')));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al anular: $e'), backgroundColor: FashionColors.peligro),
+        );
+      }
+    }
+  }
+
+  void _abrirModalNuevaVenta() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => ModalNuevaVentaPos(onCobrada: _cargarVentas),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AdminShellLayout(
+      currentPath: '/admin/ventas',
+      child: Column(
+        children: [
+          // RESUMEN FINANCIERO SUPERIOR
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    _cardResumen('Ventas Hoy', '${_resumen['ventasHoy'] ?? 0}', FashionColors.rosaCorporativo),
+                    const SizedBox(width: 8),
+                    _cardResumen('Ingreso Hoy', CurrencyFormatter.formatearCOP(JsonParser.toDouble(_resumen['montoHoy'])), FashionColors.verdeExito),
+                    const SizedBox(width: 8),
+                    _cardResumen('Caja Activa', CurrencyFormatter.formatearCOP(JsonParser.toDouble(_resumen['montoActivas'])), const Color(0xFF2563EB)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _chipMedio('', 'Todos'),
+                            ...mediosPagoPos.entries.map((e) => _chipMedio(e.key, e.value)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                      onPressed: _abrirModalNuevaVenta,
+                      icon: const Icon(Icons.point_of_sale, size: 16),
+                      label: const Text('Nueva Venta'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // LISTA DE VENTAS REGISTRADAS
+          Expanded(
+            child: _cargando
+                ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+                : _error != null
+                    ? Center(child: Text(_error!))
+                    : _ventas.isEmpty
+                        ? const Center(child: Text('No hay ventas registradas'))
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(12),
+                            itemCount: _ventas.length,
+                            itemBuilder: (context, index) {
+                              final v = _ventas[index];
+                              final esActiva = v.estado == 'completada' || v.estado == 'activa';
+
+                              return Card(
+                                elevation: 0.5,
+                                margin: const EdgeInsets.only(bottom: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: const BorderSide(color: FashionColors.grisBorde),
+                                ),
+                                child: ExpansionTile(
+                                  title: Row(
+                                    children: [
+                                      Text(v.codigo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: esActiva ? FashionColors.verdeExito.withValues(alpha: 0.12) : FashionColors.peligro.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          v.medioPago.toUpperCase(),
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: esActiva ? FashionColors.verdeExito : FashionColors.peligro,
+                                          ),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        CurrencyFormatter.formatearCOP(v.total),
+                                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                  subtitle: Text(
+                                    '${v.fecha ?? ''} · Cliente: ${v.clienteNombre.isNotEmpty ? v.clienteNombre : "Consumidor"}',
+                                    style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted),
+                                  ),
+                                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                                  children: [
+                                    const Divider(),
+                                    ...v.detalles.map((d) => Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text('${d.nombre} (${d.talla}) x${d.cantidad}', style: const TextStyle(fontSize: 12)),
+                                          Text(CurrencyFormatter.formatearCOP(d.subtotal), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                    )),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        ElevatedButton.icon(
+                                          style: ElevatedButton.styleFrom(backgroundColor: FashionColors.fondoClaro, foregroundColor: FashionColors.textoOscuro),
+                                          onPressed: () => InvoicePdfGenerator.generarYCompartirReciboPos(v),
+                                          icon: const Icon(Icons.print, size: 16),
+                                          label: const Text('Imprimir Recibo', style: TextStyle(fontSize: 12)),
+                                        ),
+                                        const Spacer(),
+                                        if (esActiva)
+                                          TextButton(
+                                            style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
+                                            onPressed: () => _cancelarVenta(v),
+                                            child: const Text('Anular Venta', style: TextStyle(fontSize: 12)),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cardResumen(String label, String valor, Color col) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(valor, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 14)),
+            const SizedBox(height: 2),
+            Text(label, style: const TextStyle(fontSize: 10, color: FashionColors.textoMuted)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _chipMedio(String val, String label) {
+    final sel = _filtroMedioPago == val;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6.0),
+      child: ChoiceChip(
+        label: Text(label, style: TextStyle(fontSize: 10, color: sel ? Colors.white : FashionColors.textoOscuro)),
+        selected: sel,
+        selectedColor: FashionColors.negroElegante,
+        onSelected: (_) {
+          setState(() => _filtroMedioPago = val);
+          _cargarVentas();
+        },
+      ),
+    );
+  }
+}

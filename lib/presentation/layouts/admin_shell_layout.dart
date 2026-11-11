@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme/fashion_theme.dart';
-import '../providers/auth_provider.dart';
+import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
+import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
+import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/fashion_brand_emblem.dart';
 
 class AdminShellLayout extends ConsumerWidget {
   final Widget child;
@@ -34,8 +36,6 @@ class AdminShellLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    // Solo si una respuesta completada de /me confirma que el usuario perdió el rol de personal
-    // o cerró sesión, se sale del admin. NUNCA durante sondeos de fondo ni estados transitorios.
     ref.listen<AuthState>(authProvider, (previous, next) {
       final antesTeniaAcceso = previous?.esPersonal ?? true;
       final ahoraSinAcceso = (!next.esPersonal || !next.estaAutenticado) && !next.cargando;
@@ -74,7 +74,7 @@ class AdminShellLayout extends ConsumerWidget {
           titulo,
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w700,
-            fontSize: 17,
+            fontSize: 16,
             color: FashionColors.textoOscuro,
           ),
         ),
@@ -101,60 +101,101 @@ class AdminShellLayout extends ConsumerWidget {
         backgroundColor: FashionColors.pizarra,
         child: Column(
           children: [
-            // CABECERA DEL MENÚ LATERAL
+            // CABECERA DEL MENÚ LATERAL CON EMBLEMA DE MARCA
             Container(
               padding: const EdgeInsets.fromLTRB(20, 48, 20, 20),
-              color: Colors.black.withValues(alpha: 0.18),
-              child: Row(
+              color: Colors.black.withValues(alpha: 0.20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: FashionColors.rosaSuave,
-                    child: Text(
-                      authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0].toUpperCase() : 'A',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: FashionColors.rosaOscuro),
-                    ),
+                  Row(
+                    children: [
+                      const FashionBrandEmblem(
+                        size: 38,
+                        conSombra: false,
+                        primaryColor: Colors.white,
+                        accentColor: FashionColors.arenaOscura,
+                        fillColor: Colors.transparent,
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'FASHIONSTYLE',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          Text(
+                            'PANEL DE GESTIÓN',
+                            style: GoogleFonts.montserrat(
+                              color: FashionColors.arenaOscura,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 8,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Administrador',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: FashionColors.arenaSuave,
+                        child: Text(
+                          authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0].toUpperCase() : 'A',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: FashionColors.negro),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          authState.correoUsuario,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Administrador',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            Text(
+                              authState.correoUsuario,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white70, fontSize: 11),
+                            ),
+                            const SizedBox(height: 3),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                authState.esAdmin ? 'ADMINISTRADOR' : 'STAFF',
+                                style: const TextStyle(color: FashionColors.arenaOscura, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: FashionColors.rosaCorporativo,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            authState.esAdmin ? 'ADMINISTRADOR' : 'STAFF',
-                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            // LISTA DE MÓDULOS OPERATIVOS
+            // LISTA DE MÓDULOS OPERATIVOS CON SCROLL
             Expanded(
               child: ListView(
+                physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   ...itemsMenu.map((item) {
@@ -163,7 +204,7 @@ class AdminShellLayout extends ConsumerWidget {
                       dense: true,
                       leading: Icon(
                         item.icono,
-                        color: seleccionado ? FashionColors.rosaCorporativo : Colors.white70,
+                        color: seleccionado ? Colors.white : Colors.white70,
                         size: 20,
                       ),
                       title: Text(
@@ -174,7 +215,7 @@ class AdminShellLayout extends ConsumerWidget {
                           fontSize: 13,
                         ),
                       ),
-                      tileColor: seleccionado ? Colors.white.withValues(alpha: 0.12) : null,
+                      tileColor: seleccionado ? Colors.white.withValues(alpha: 0.14) : null,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
                       onTap: () {
@@ -206,7 +247,7 @@ class AdminShellLayout extends ConsumerWidget {
                   // CERRAR SESIÓN
                   ListTile(
                     dense: true,
-                    leading: const Icon(Icons.logout, color: Color(0xFFFCA5A5), size: 20),
+                    leading: const Icon(Icons.logout_rounded, color: Color(0xFFFCA5A5), size: 20),
                     title: const Text('Cerrar Sesión', style: TextStyle(color: Color(0xFFFCA5A5), fontWeight: FontWeight.bold, fontSize: 13)),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                     onTap: () {

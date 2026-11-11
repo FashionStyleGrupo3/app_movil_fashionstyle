@@ -1,153 +1,47 @@
 // @source-mirror: src/router/index.js
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/router/auth_router_listenable.dart';
+import 'package:fashion_style_mobile/core/router/route_screens.dart';
+import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
+import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
+import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_dashboard_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_inventory_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_garments_screen.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/garments/promotions_sheet.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/garments/garment_form_sheet.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_pos_sales_screen.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/pos/new_pos_sale_sheet.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_orders_screen.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/orders/dispatch_sheet.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/orders/create_invoice_sheet.dart';
+import 'package:fashion_style_mobile/presentation/widgets/admin/orders/bulk_invoice_upload_sheet.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_production_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_payments_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_security_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_audit_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_account_screen.dart';
+import 'package:fashion_style_mobile/presentation/widgets/auth/password_requirements_widget.dart';
+import 'package:fashion_style_mobile/presentation/widgets/auth/auth_brand_banner.dart';
+import 'package:fashion_style_mobile/presentation/screens/autenticacion/login_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/autenticacion/register_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/autenticacion/verify_email_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/autenticacion/forgot_password_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/autenticacion/reset_password_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/common/placeholder_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/cart_checkout_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/terms_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/catalog_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/home_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/product_detail_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/profile_screen.dart';
+import 'package:fashion_style_mobile/presentation/widgets/profile/my_data_section.dart';
+import 'package:fashion_style_mobile/presentation/widgets/profile/my_orders_section.dart';
+import 'package:fashion_style_mobile/presentation/widgets/profile/favorites_section.dart';
 import 'package:go_router/go_router.dart';
-import '../theme/fashion_theme.dart';
-import '../../presentation/providers/auth_provider.dart';
-import '../../presentation/screens/publico/home_screen.dart';
-import '../../presentation/screens/publico/catalog_screen.dart';
-import '../../presentation/screens/publico/product_detail_screen.dart';
-import '../../presentation/screens/publico/cart_and_terms_screens.dart';
-import '../../presentation/screens/publico/profile_screen.dart';
-import '../../presentation/screens/autenticacion/auth_screens.dart';
-import '../../presentation/screens/admin/dashboard_and_inventory_screens.dart';
-import '../../presentation/screens/admin/garments_and_pos_screens.dart';
-import '../../presentation/screens/admin/orders_and_production_screens.dart';
-import '../../presentation/screens/admin/payments_security_and_account_screens.dart';
-
-class FashionPlaceholderScreen extends StatelessWidget {
-  final String title;
-  final String path;
-
-  const FashionPlaceholderScreen({
-    super.key,
-    required this.title,
-    required this.path,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.hourglass_empty_rounded,
-                size: 48,
-                color: FashionColors.pizarra,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Ruta: $path\nPantalla lista para conectarse en los siguientes pasos.',
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class FashionRouteScreens {
-  static Widget Function(BuildContext, GoRouterState) screenBuilder(String title, String path) {
-    return (context, state) => FashionPlaceholderScreen(title: title, path: path);
-  }
-
-  // Rutas públicas
-  static WidgetBuilder home = (context) => const HomeScreen();
-  static Widget Function(BuildContext, GoRouterState) productDetail =
-      (context, state) => ProductDetailScreen(
-            productId: int.tryParse(state.pathParameters['id'] ?? '') ?? 0,
-          );
-  static WidgetBuilder cart = (context) => const CartCheckoutScreen();
-  static Widget Function(BuildContext, GoRouterState) catalogWithState =
-      (context, state) {
-    final catId = int.tryParse(state.uri.queryParameters['categoria'] ?? '');
-    final colId = int.tryParse(state.uri.queryParameters['catalogo'] ?? '');
-    final search = state.uri.queryParameters['buscar'];
-    final soloFavs = state.uri.queryParameters['favoritos'] == 'true';
-    return CatalogScreen(
-      categoriaId: catId,
-      catalogoId: colId,
-      searchQuery: search,
-      soloFavoritos: soloFavs ? true : null,
-    );
-  };
-  static WidgetBuilder catalog = (context) => const CatalogScreen();
-  static WidgetBuilder terms = (context) => const TermsScreen();
-  static Widget Function(BuildContext, GoRouterState) profile =
-      (context, state) => ProfileScreen(
-            initialSection: state.uri.queryParameters['seccion'] ?? state.uri.queryParameters['tab'],
-          );
-
-  // Rutas autenticación
-  static Widget Function(BuildContext, GoRouterState) login =
-      (context, state) => LoginScreen(
-            redir: state.uri.queryParameters['redir'],
-          );
-  static WidgetBuilder register = (context) => const RegisterScreen();
-  static Widget Function(BuildContext, GoRouterState) verifyEmail =
-      (context, state) => VerifyEmailScreen(
-            correo: state.uri.queryParameters['correo'] ?? state.uri.queryParameters['email'],
-          );
-  static WidgetBuilder forgotPassword = (context) => const ForgotPasswordScreen();
-  static Widget Function(BuildContext, GoRouterState) resetPassword =
-      (context, state) => ResetPasswordScreen(
-            correo: state.uri.queryParameters['correo'] ?? state.uri.queryParameters['email'],
-            token: state.uri.queryParameters['token'] ?? state.uri.queryParameters['codigo'],
-          );
-
-  // Rutas administrativas
-  static WidgetBuilder adminDashboard = (context) => const AdminDashboardScreen();
-  static WidgetBuilder adminInventory = (context) => const AdminInventoryScreen();
-  static WidgetBuilder adminSales = (context) => const AdminPosSalesScreen();
-  static WidgetBuilder adminOrders = (context) => const AdminOrdersAndInvoicesScreen();
-  static WidgetBuilder adminProduction = (context) => const AdminProductionScreen();
-  static WidgetBuilder adminGarments = (context) => const AdminGarmentsScreen();
-  static WidgetBuilder adminAccount = (context) => const AdminAccountScreen();
-  static WidgetBuilder adminPayments = (context) => const AdminPaymentsConfigScreen();
-  static WidgetBuilder adminSecurity = (context) => const AdminSecurityAndUsersScreen();
-  static WidgetBuilder adminAudit = (context) => const AdminAuditScreen();
-}
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
-
-class AuthRouterListenable extends ChangeNotifier {
-  AuthRouterListenable(Ref ref) {
-    ref.listen<AuthState>(
-      authProvider,
-      (previous, next) {
-        final antesAuth = previous?.estaAutenticado;
-        final ahoraAuth = next.estaAutenticado;
-        final antesPersonal = previous?.esPersonal;
-        final ahoraPersonal = next.esPersonal;
-
-        // Solo notificar al router si realmente cambió el acceso o autenticación
-        if (antesAuth != ahoraAuth || antesPersonal != ahoraPersonal) {
-          notifyListeners();
-        }
-      },
-    );
-  }
-}
-
-final authRouterListenableProvider = Provider<AuthRouterListenable>((ref) {
-  return AuthRouterListenable(ref);
-});
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final listenable = ref.watch(authRouterListenableProvider);

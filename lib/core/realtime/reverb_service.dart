@@ -3,8 +3,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import '../network/api_client.dart';
-import '../network/change_bus.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 
 class ReverbService {
   static final ReverbService _instance = ReverbService._internal();
