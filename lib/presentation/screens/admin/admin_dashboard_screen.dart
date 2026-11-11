@@ -1,19 +1,12 @@
 // @source-mirror: src/views/admin/VistaPanelControl.vue, src/views/admin/VistaInventario.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:fashion_style_mobile/core/network/api_client.dart';
-import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/dashboard/dashboard_models.dart';
-import 'package:fashion_style_mobile/data/models/product/product_filters.dart';
 import 'package:fashion_style_mobile/data/services/dashboard_service.dart';
-import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
-import 'package:fashion_style_mobile/presentation/screens/admin/admin_inventory_screen.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/chart_helpers.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/stacked_bar_chart.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/payment_method_doughnut_chart.dart';
@@ -21,7 +14,6 @@ import 'package:fashion_style_mobile/presentation/widgets/admin/charts/productio
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/stock_alerts_doughnut_chart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:share_plus/share_plus.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});

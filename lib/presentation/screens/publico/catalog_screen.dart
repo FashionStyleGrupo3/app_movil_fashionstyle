@@ -5,14 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/network/change_bus.dart';
-import 'package:fashion_style_mobile/data/models/product/product_image.dart';
-import 'package:fashion_style_mobile/data/models/product/product_variant.dart';
 import 'package:fashion_style_mobile/data/models/product/category.dart';
 import 'package:fashion_style_mobile/data/models/product/catalog.dart';
 import 'package:fashion_style_mobile/data/models/product/promotion.dart';
-import 'package:fashion_style_mobile/data/models/product/price_info.dart';
 import 'package:fashion_style_mobile/data/models/product/product.dart';
-import 'package:fashion_style_mobile/data/models/product/product_filters.dart';
 import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/data/services/promotion_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
@@ -20,8 +16,6 @@ import 'package:fashion_style_mobile/presentation/providers/favorites_provider.d
 import 'package:fashion_style_mobile/presentation/providers/filters_provider.dart';
 import 'package:fashion_style_mobile/presentation/widgets/common/fashion_brand_emblem.dart';
 import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/size_guide_modal.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/cart_drawer.dart';
 class CatalogScreen extends ConsumerStatefulWidget {
   final int? categoriaId;
   final int? catalogoId;

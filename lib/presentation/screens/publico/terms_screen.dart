@@ -1,42 +1,10 @@
 // @source-mirror: src/views/publico/VistaCarrito.vue, src/views/publico/VistaTerminos.vue
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
-import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
-import 'package:fashion_style_mobile/data/models/cart/cart_item.dart';
-import 'package:fashion_style_mobile/data/models/payment/wompi_checkout_data.dart';
-import 'package:fashion_style_mobile/data/models/product/catalog.dart';
-import 'package:fashion_style_mobile/data/models/product/category.dart';
-import 'package:fashion_style_mobile/data/models/product/price_info.dart';
-import 'package:fashion_style_mobile/data/models/product/product.dart';
-import 'package:fashion_style_mobile/data/models/product/product_filters.dart';
-import 'package:fashion_style_mobile/data/models/product/product_image.dart';
-import 'package:fashion_style_mobile/data/models/product/product_variant.dart';
-import 'package:fashion_style_mobile/data/models/product/promotion.dart';
-import 'package:fashion_style_mobile/data/services/city_validation_service.dart';
-import 'package:fashion_style_mobile/data/services/favorites_service.dart';
-import 'package:fashion_style_mobile/data/services/product_service.dart';
-import 'package:fashion_style_mobile/data/services/promotion_service.dart';
-import 'package:fashion_style_mobile/data/services/wompi_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
-import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
-import 'package:fashion_style_mobile/presentation/screens/publico/cart_checkout_screen.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/size_guide_modal.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/cart_drawer.dart';
-import 'package:fashion_style_mobile/presentation/widgets/payment/wompi_checkout_modal.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TermsScreen extends StatefulWidget {
   const TermsScreen({super.key});

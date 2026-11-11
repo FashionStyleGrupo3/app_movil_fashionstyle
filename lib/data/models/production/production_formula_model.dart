@@ -1,13 +1,6 @@
 // @source-mirror: src/services/Produccionservicio.js, src/services/calculadoraApi.js
-import 'package:dio/dio.dart';
-import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/core/utils/error_message.dart';
-import 'package:fashion_style_mobile/core/utils/production_helpers.dart';
-import 'package:fashion_style_mobile/data/models/production/calculator_dataset.dart';
 import 'package:fashion_style_mobile/data/models/production/formula_consumption_model.dart';
-import 'package:fashion_style_mobile/data/models/production/raw_material_model.dart';
-import 'package:fashion_style_mobile/data/services/production_service.dart';
 
 class ProductionFormulaModel {
   final int id;

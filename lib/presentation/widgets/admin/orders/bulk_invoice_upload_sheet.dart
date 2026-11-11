@@ -1,30 +1,7 @@
 // @source-mirror: src/views/admin/VistaPedidosyFacturas.vue, src/components/pedidos/ModalGestionDespacho.vue, src/components/facturas/ModalCrearFactura.vue, src/components/facturas/ModalCargaMasivaFacturas.vue, src/views/admin/VistaProduccion.vue, src/components/produccion/CalculadoraProduccion.vue, src/components/produccion/GestorOrdenesProduccion.vue
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fashion_style_mobile/core/constants/invoice_constants.dart';
-import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
-import 'package:fashion_style_mobile/core/utils/error_message.dart';
-import 'package:fashion_style_mobile/core/utils/production_helpers.dart';
-import 'package:fashion_style_mobile/data/models/invoice/invoice_item_detail.dart';
-import 'package:fashion_style_mobile/data/models/invoice/invoice_model.dart';
-import 'package:fashion_style_mobile/data/models/order/order_item_detail.dart';
-import 'package:fashion_style_mobile/data/models/order/order_model.dart';
-import 'package:fashion_style_mobile/data/models/order/order_status.dart';
-import 'package:fashion_style_mobile/data/models/production/calculator_dataset.dart';
-import 'package:fashion_style_mobile/data/models/production/formula_consumption_model.dart';
-import 'package:fashion_style_mobile/data/models/production/production_formula_model.dart';
-import 'package:fashion_style_mobile/data/models/production/raw_material_model.dart';
-import 'package:fashion_style_mobile/data/services/invoice_pdf_service.dart';
 import 'package:fashion_style_mobile/data/services/invoice_service.dart';
-import 'package:fashion_style_mobile/data/services/order_service.dart';
-import 'package:fashion_style_mobile/data/services/production_service.dart';
-import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
-import 'package:fashion_style_mobile/presentation/screens/admin/admin_orders_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/admin/admin_production_screen.dart';
-import 'package:fashion_style_mobile/presentation/widgets/admin/orders/create_invoice_sheet.dart';
-import 'package:fashion_style_mobile/presentation/widgets/admin/orders/dispatch_sheet.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -32,7 +9,7 @@ import 'package:share_plus/share_plus.dart';
 class ModalCargaMasivaFacturasSheet extends StatefulWidget {
   final VoidCallback onCompletada;
 
-  const ModalCargaMasivaFacturasSheet({required this.onCompletada});
+  const ModalCargaMasivaFacturasSheet({super.key, required this.onCompletada});
 
   @override
   State<ModalCargaMasivaFacturasSheet> createState() => _ModalCargaMasivaFacturasSheetState();

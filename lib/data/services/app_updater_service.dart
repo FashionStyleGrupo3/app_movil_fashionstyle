@@ -122,7 +122,7 @@ class DialogoDescargaActualizacion extends StatefulWidget {
   final String notas;
   final VoidCallback onCerrar;
 
-  const DialogoDescargaActualizacion({
+  const DialogoDescargaActualizacion({super.key, 
     required this.version,
     required this.buildNumber,
     required this.apkUrl,

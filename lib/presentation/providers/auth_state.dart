@@ -1,10 +1,5 @@
 // @source-mirror: src/stores/autenticacion.js
-import 'dart:convert';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthState {
   final String? token;

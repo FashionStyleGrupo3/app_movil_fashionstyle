@@ -1,10 +1,6 @@
 // @source-mirror: src/services/promocionServicio.js, src/composables/usePromociones.js
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/data/models/product/product_image.dart';
-import 'package:fashion_style_mobile/data/models/product/product_variant.dart';
-import 'package:fashion_style_mobile/data/models/product/category.dart';
-import 'package:fashion_style_mobile/data/models/product/catalog.dart';
 import 'package:fashion_style_mobile/data/models/product/promotion.dart';
 import 'package:fashion_style_mobile/data/models/product/price_info.dart';
 import 'package:fashion_style_mobile/data/models/product/product.dart';

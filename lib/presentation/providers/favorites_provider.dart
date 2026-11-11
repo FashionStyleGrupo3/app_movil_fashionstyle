@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fashion_style_mobile/data/services/favorites_service.dart';
-import 'package:fashion_style_mobile/data/services/city_validation_service.dart';
 class FavoritesState {
   final List<int> ids;
   final bool soloFavoritos;

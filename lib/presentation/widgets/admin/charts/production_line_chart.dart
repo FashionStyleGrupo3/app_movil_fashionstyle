@@ -2,13 +2,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/dashboard/dashboard_models.dart';
-import 'package:fashion_style_mobile/data/services/dashboard_service.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/chart_helpers.dart';
-import 'package:fashion_style_mobile/presentation/widgets/admin/charts/payment_method_doughnut_chart.dart';
-import 'package:fashion_style_mobile/presentation/widgets/admin/charts/stacked_bar_chart.dart';
-import 'package:fashion_style_mobile/presentation/widgets/admin/charts/stock_alerts_doughnut_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProductionLineChartWidget extends StatelessWidget {

@@ -25,8 +25,6 @@ class PublicShellLayout extends ConsumerStatefulWidget {
 
 class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  double _swipeStartX = 0;
-  double _swipeStartY = 0;
 
   @override
   void initState() {
@@ -271,10 +269,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
       },
       // Soporte gestual táctil: deslizamiento horizontal rápido para alternar secciones principales
       body: GestureDetector(
-        onHorizontalDragStart: (details) {
-          _swipeStartX = details.globalPosition.dx;
-          _swipeStartY = details.globalPosition.dy;
-        },
+        behavior: HitTestBehavior.translucent,
         onHorizontalDragEnd: (details) {
           final deltaX = details.velocity.pixelsPerSecond.dx;
           // Si el gesto fue predominantemente horizontal con suficiente velocidad

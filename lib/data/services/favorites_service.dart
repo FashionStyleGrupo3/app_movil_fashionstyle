@@ -1,7 +1,6 @@
 // @source-mirror: src/services/favoritosServicio.js, src/utils/Validarciudad.js
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/data/services/city_validation_service.dart';
 
 class FavoritesService {
   static final FavoritesService _instance = FavoritesService._internal();

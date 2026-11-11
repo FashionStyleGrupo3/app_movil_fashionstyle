@@ -1,35 +1,12 @@
 // @source-mirror: src/views/admin/VistaConfiguracionPagos.vue, src/views/admin/VistaUsuariosYClientes.vue, src/views/admin/VistaAuditoria.vue, src/views/admin/VistaEditarCuenta.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fashion_style_mobile/core/constants/payment_constants.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/core/utils/audit_text_formatter.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
-import 'package:fashion_style_mobile/data/models/audit/audit_models.dart';
-import 'package:fashion_style_mobile/data/models/payment/bank_account_config.dart';
-import 'package:fashion_style_mobile/data/models/payment/parallel_payment_control.dart';
-import 'package:fashion_style_mobile/data/models/pos/pos_sale_detail.dart';
-import 'package:fashion_style_mobile/data/models/pos/pos_sale_model.dart';
-import 'package:fashion_style_mobile/data/models/pos/pos_sales_summary.dart';
-import 'package:fashion_style_mobile/data/services/payment_config_service.dart';
-import 'package:fashion_style_mobile/data/services/pos_sale_service.dart';
-import 'package:fashion_style_mobile/data/services/security_service.dart';
 import 'package:fashion_style_mobile/data/services/user_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
-import 'package:fashion_style_mobile/presentation/screens/admin/admin_audit_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/admin/admin_payments_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/admin/admin_security_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/autenticacion/forgot_password_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/autenticacion/login_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/autenticacion/register_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/autenticacion/reset_password_screen.dart';
-import 'package:fashion_style_mobile/presentation/screens/autenticacion/verify_email_screen.dart';
-import 'package:fashion_style_mobile/presentation/widgets/auth/auth_brand_banner.dart';
 import 'package:fashion_style_mobile/presentation/widgets/auth/password_requirements_widget.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AdminAccountScreen extends ConsumerStatefulWidget {

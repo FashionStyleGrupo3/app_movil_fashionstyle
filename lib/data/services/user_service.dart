@@ -2,11 +2,6 @@
 import 'package:dio/dio.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/core/utils/audit_text_formatter.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
-import 'package:fashion_style_mobile/data/models/audit/audit_models.dart';
-import 'package:fashion_style_mobile/data/services/security_service.dart';
-import 'package:intl/intl.dart';
 
 class UserService {
   static final UserService _instance = UserService._internal();

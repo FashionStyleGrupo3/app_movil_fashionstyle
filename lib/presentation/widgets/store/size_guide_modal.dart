@@ -1,27 +1,7 @@
 // @source-mirror: src/components/escaparate/TarjetaProducto.vue, src/components/escaparate/ModalGuiaMedidas.vue, src/components/carrito/CajonCotizacion.vue
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
-import 'package:fashion_style_mobile/data/models/cart/cart_item.dart';
-import 'package:fashion_style_mobile/data/models/product/catalog.dart';
-import 'package:fashion_style_mobile/data/models/product/category.dart';
-import 'package:fashion_style_mobile/data/models/product/price_info.dart';
-import 'package:fashion_style_mobile/data/models/product/product.dart';
-import 'package:fashion_style_mobile/data/models/product/product_image.dart';
-import 'package:fashion_style_mobile/data/models/product/product_variant.dart';
-import 'package:fashion_style_mobile/data/models/product/promotion.dart';
-import 'package:fashion_style_mobile/data/services/promotion_service.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
-import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
-import 'package:fashion_style_mobile/presentation/providers/favorites_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/cart_drawer.dart';
-import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SizeGuideModal {
   static const List<Map<String, String>> medidas = [

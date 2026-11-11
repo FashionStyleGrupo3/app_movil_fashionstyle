@@ -1,7 +1,5 @@
 // @source-mirror: src/views/admin/VistaPanelControl.vue, src/components/admin/GraficoPanel.vue
-import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/data/services/dashboard_service.dart';
 
 class DashboardKpis {
   final double ventasHoy;

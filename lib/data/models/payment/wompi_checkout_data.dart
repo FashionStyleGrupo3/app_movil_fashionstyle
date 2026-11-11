@@ -1,8 +1,5 @@
 // @source-mirror: src/services/wompiServicio.js
-import 'package:dio/dio.dart';
-import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/data/services/wompi_service.dart';
 
 class WompiCheckoutData {
   final String referencia;

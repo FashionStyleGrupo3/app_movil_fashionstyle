@@ -1,12 +1,6 @@
 // @source-mirror: src/services/usuarioServicio.js, src/services/seguridadServicio.js, src/utils/auditoriaTexto.js
-import 'package:dio/dio.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/core/utils/audit_text_formatter.dart';
-import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
-import 'package:fashion_style_mobile/data/models/audit/audit_models.dart';
-import 'package:fashion_style_mobile/data/services/user_service.dart';
-import 'package:intl/intl.dart';
 
 class SecurityService {
   static final SecurityService _instance = SecurityService._internal();

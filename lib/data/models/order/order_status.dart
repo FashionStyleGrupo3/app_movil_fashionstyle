@@ -1,15 +1,4 @@
 // @source-mirror: src/services/pedidoServicio.js, src/services/facturaServicio.js
-import 'package:dio/dio.dart';
-import 'package:fashion_style_mobile/core/constants/invoice_constants.dart';
-import 'package:fashion_style_mobile/core/network/api_client.dart';
-import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
-import 'package:fashion_style_mobile/core/utils/image_url_resolver.dart';
-import 'package:fashion_style_mobile/data/models/invoice/invoice_item_detail.dart';
-import 'package:fashion_style_mobile/data/models/invoice/invoice_model.dart';
-import 'package:fashion_style_mobile/data/models/order/order_item_detail.dart';
-import 'package:fashion_style_mobile/data/models/order/order_model.dart';
-import 'package:fashion_style_mobile/data/services/invoice_service.dart';
-import 'package:fashion_style_mobile/data/services/order_service.dart';
 
 const Map<String, String> estadosPedido = {
   'Pendiente_Pago': 'Pendiente de pago',
