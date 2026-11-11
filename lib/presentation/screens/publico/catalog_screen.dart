@@ -14,8 +14,9 @@ import 'package:fashion_style_mobile/data/services/promotion_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/favorites_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/filters_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/fashion_brand_emblem.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
+
 class CatalogScreen extends ConsumerStatefulWidget {
   final int? categoriaId;
   final int? catalogoId;
@@ -213,9 +214,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
   void _mostrarSelectorOrden(BuildContext context, FiltersState filtros) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: FashionColors.surfaceCard,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         final opciones = [
@@ -227,35 +228,39 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
 
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                   child: Text(
                     'Ordenar prendas',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.spaceGrotesk(
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: FashionColors.textoOscuro,
+                      fontSize: 18,
+                      color: FashionColors.inkPrimary,
                     ),
                   ),
                 ),
-                const Divider(),
+                const SizedBox(height: 8),
+                const Divider(color: FashionColors.borderSubtle, height: 1),
+                const SizedBox(height: 8),
                 ...opciones.map((op) {
                   final seleccionado = filtros.orden == op['clave'];
                   return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
                     leading: Icon(
                       seleccionado ? Icons.radio_button_checked : Icons.radio_button_off,
-                      color: seleccionado ? FashionColors.rosaCorporativo : FashionColors.textoMuted,
+                      color: seleccionado ? FashionColors.brandAccent : FashionColors.inkSecondary,
                     ),
                     title: Text(
                       op['label']!,
-                      style: TextStyle(
-                        fontWeight: seleccionado ? FontWeight.bold : FontWeight.normal,
-                        color: seleccionado ? FashionColors.rosaCorporativo : FashionColors.textoOscuro,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: seleccionado ? FontWeight.w700 : FontWeight.w500,
+                        color: seleccionado ? FashionColors.inkPrimary : FashionColors.inkSecondary,
+                        fontSize: 14,
                       ),
                     ),
                     onTap: () {
@@ -301,29 +306,38 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return PublicShellLayout(
       currentIndex: favs.soloFavoritos ? 2 : 1,
       child: RefreshIndicator(
-        color: FashionColors.rosaCorporativo,
+        color: FashionColors.brandAccent,
+        backgroundColor: FashionColors.surfaceCard,
         onRefresh: _cargarCatalogData,
         child: CustomScrollView(
           controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            // BARRA DE BÚSQUEDA Y CONTROL DE FILTROS SUPERIOR
+            // BARRA DE BÚSQUEDA Y CONTROL DE FILTROS SUPERIOR (ESTILO MINERAL NEO-ATELIER)
             SliverToBoxAdapter(
               child: Container(
-                color: Colors.white,
+                color: FashionColors.canvasBackground,
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Campo de búsqueda con debounce/submit
+                    // Campo de búsqueda con estilo Pill en surfaceMuted (#EBEEF3)
                     TextField(
                       controller: _searchController,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        color: FashionColors.inkPrimary,
+                      ),
                       decoration: InputDecoration(
-                        hintText: 'Buscar prendas, estilos, colecciones...',
-                        prefixIcon: const Icon(Icons.search, color: FashionColors.textoMuted, size: 20),
+                        hintText: 'Buscar prendas, estilos, atelier...',
+                        hintStyle: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
+                          color: FashionColors.inkSecondary,
+                        ),
+                        prefixIcon: const Icon(Icons.search, color: FashionColors.inkSecondary, size: 20),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(Icons.clear, size: 18),
+                                icon: const Icon(Icons.clear, size: 18, color: FashionColors.inkSecondary),
                                 onPressed: () {
                                   _searchController.clear();
                                   ref.read(filtersProvider.notifier).establecerBusqueda('');
@@ -331,20 +345,20 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                                 },
                               )
                             : null,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 18),
                         filled: true,
-                        fillColor: FashionColors.fondoClaro,
+                        fillColor: FashionColors.surfaceMuted,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: FashionColors.grisBorde),
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: FashionColors.grisBorde),
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: FashionColors.rosaCorporativo),
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: FashionColors.brandAccent, width: 1.2),
                         ),
                       ),
                       onChanged: (val) {
@@ -355,10 +369,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
 
                     const SizedBox(height: 12),
 
-                    // Fila de chips de categorías horizontales
+                    // Fila de chips de categorías horizontales (#14161F activo, #FFFFFF inactivo)
                     if (_categorias.isNotEmpty)
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
                         child: Row(
                           children: [
                             Padding(
@@ -366,12 +381,15 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                               child: ChoiceChip(
                                 label: const Text('Todo'),
                                 selected: filtros.categoriaId == null,
-                                selectedColor: FashionColors.negroElegante,
-                                backgroundColor: FashionColors.fondoClaro,
-                                labelStyle: TextStyle(
+                                selectedColor: FashionColors.inkPrimary,
+                                backgroundColor: FashionColors.surfaceCard,
+                                side: BorderSide(
+                                  color: filtros.categoriaId == null ? FashionColors.inkPrimary : FashionColors.borderSubtle,
+                                ),
+                                labelStyle: GoogleFonts.plusJakartaSans(
                                   fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: filtros.categoriaId == null ? Colors.white : FashionColors.textoOscuro,
+                                  fontWeight: FontWeight.w700,
+                                  color: filtros.categoriaId == null ? Colors.white : FashionColors.inkPrimary,
                                 ),
                                 onSelected: (_) {
                                   ref.read(filtersProvider.notifier).establecerCategoria(null);
@@ -386,12 +404,15 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                                 child: ChoiceChip(
                                   label: Text(cat.nombre),
                                   selected: sel,
-                                  selectedColor: FashionColors.negroElegante,
-                                  backgroundColor: FashionColors.fondoClaro,
-                                  labelStyle: TextStyle(
+                                  selectedColor: FashionColors.inkPrimary,
+                                  backgroundColor: FashionColors.surfaceCard,
+                                  side: BorderSide(
+                                    color: sel ? FashionColors.inkPrimary : FashionColors.borderSubtle,
+                                  ),
+                                  labelStyle: GoogleFonts.plusJakartaSans(
                                     fontSize: 12,
-                                    fontWeight: sel ? FontWeight.bold : FontWeight.normal,
-                                    color: sel ? Colors.white : FashionColors.textoOscuro,
+                                    fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                                    color: sel ? Colors.white : FashionColors.inkPrimary,
                                   ),
                                   onSelected: (val) {
                                     ref.read(filtersProvider.notifier).establecerCategoria(val ? cat.idCategoria : null);
@@ -404,7 +425,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         ),
                       ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
 
                     // Barra de estado de filtros y botones de orden / stock
                     Row(
@@ -413,19 +434,30 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                           favs.soloFavoritos
                               ? 'Mis favoritos ($totalProductos)'
                               : '$totalProductos prenda${totalProductos == 1 ? '' : 's'}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: FashionColors.textoOscuro),
+                          style: GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: FashionColors.inkPrimary,
+                          ),
                         ),
                         const Spacer(),
                         // Interruptor de solo disponibles
                         FilterChip(
-                          label: const Text('En stock', style: TextStyle(fontSize: 11)),
-                          selected: _soloDisponibles,
-                          selectedColor: FashionColors.rosaSuave,
-                          checkmarkColor: FashionColors.rosaOscuro,
-                          labelStyle: TextStyle(
-                            fontSize: 11,
-                            color: _soloDisponibles ? FashionColors.rosaOscuro : FashionColors.textoOscuro,
+                          label: Text(
+                            'En stock',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11.5,
+                              fontWeight: _soloDisponibles ? FontWeight.w700 : FontWeight.w500,
+                              color: _soloDisponibles ? FashionColors.atelierJade : FashionColors.inkSecondary,
+                            ),
                           ),
+                          selected: _soloDisponibles,
+                          selectedColor: FashionColors.atelierJade.withValues(alpha: 0.12),
+                          backgroundColor: FashionColors.surfaceCard,
+                          side: BorderSide(
+                            color: _soloDisponibles ? FashionColors.atelierJade : FashionColors.borderSubtle,
+                          ),
+                          checkmarkColor: FashionColors.atelierJade,
                           onSelected: (val) {
                             setState(() {
                               _soloDisponibles = val;
@@ -437,58 +469,68 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         // Botón de ordenar
                         OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            side: const BorderSide(color: FashionColors.grisBorde),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            backgroundColor: FashionColors.surfaceCard,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            side: const BorderSide(color: FashionColors.borderSubtle),
                           ),
                           onPressed: () => _mostrarSelectorOrden(context, filtros),
-                          icon: const Icon(Icons.sort, size: 16, color: FashionColors.textoOscuro),
-                          label: const Text('Ordenar', style: TextStyle(fontSize: 12, color: FashionColors.textoOscuro)),
+                          icon: const Icon(Icons.sort_rounded, size: 16, color: FashionColors.inkPrimary),
+                          label: Text(
+                            'Ordenar',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: FashionColors.inkPrimary,
+                            ),
+                          ),
                         ),
                       ],
                     ),
 
                     // Chips de filtros activos eliminables
                     if (tieneFiltrosActivos) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Wrap(
                         spacing: 6,
-                        runSpacing: 4,
+                        runSpacing: 6,
                         children: [
                           if (favs.soloFavoritos)
                             Chip(
                               avatar: const Icon(Icons.favorite, size: 14, color: Colors.white),
-                              backgroundColor: FashionColors.rosaCorporativo,
+                              backgroundColor: FashionColors.brandAccent,
                               label: const Text('Favoritos', style: TextStyle(color: Colors.white, fontSize: 11)),
                               deleteIcon: const Icon(Icons.close, size: 14, color: Colors.white),
                               onDeleted: () => ref.read(favoritesProvider.notifier).setSoloFavoritos(false),
                             ),
                           if (categoriaActiva != null)
                             Chip(
-                              backgroundColor: FashionColors.rosaSuave,
-                              label: Text('Cat: ${categoriaActiva.nombre}', style: const TextStyle(fontSize: 11, color: FashionColors.rosaOscuro)),
-                              deleteIcon: const Icon(Icons.close, size: 14, color: FashionColors.rosaOscuro),
+                              backgroundColor: FashionColors.surfaceMuted,
+                              label: Text('Cat: ${categoriaActiva.nombre}', style: const TextStyle(fontSize: 11, color: FashionColors.inkPrimary)),
+                              deleteIcon: const Icon(Icons.close, size: 14, color: FashionColors.inkSecondary),
                               onDeleted: () => ref.read(filtersProvider.notifier).establecerCategoria(null),
                             ),
                           if (catalogoActivo != null)
                             Chip(
-                              backgroundColor: FashionColors.rosaSuave,
-                              label: Text('Col: ${catalogoActivo.nombre}', style: const TextStyle(fontSize: 11, color: FashionColors.rosaOscuro)),
-                              deleteIcon: const Icon(Icons.close, size: 14, color: FashionColors.rosaOscuro),
+                              backgroundColor: FashionColors.surfaceMuted,
+                              label: Text('Col: ${catalogoActivo.nombre}', style: const TextStyle(fontSize: 11, color: FashionColors.inkPrimary)),
+                              deleteIcon: const Icon(Icons.close, size: 14, color: FashionColors.inkSecondary),
                               onDeleted: () => ref.read(filtersProvider.notifier).establecerCatalogo(null),
                             ),
                           if (filtros.busqueda.trim().isNotEmpty)
                             Chip(
-                              backgroundColor: FashionColors.fondoClaro,
-                              label: Text('"${filtros.busqueda}"', style: const TextStyle(fontSize: 11)),
-                              deleteIcon: const Icon(Icons.close, size: 14),
+                              backgroundColor: FashionColors.surfaceMuted,
+                              label: Text('"${filtros.busqueda}"', style: const TextStyle(fontSize: 11, color: FashionColors.inkPrimary)),
+                              deleteIcon: const Icon(Icons.close, size: 14, color: FashionColors.inkSecondary),
                               onDeleted: () {
                                 _searchController.clear();
                                 ref.read(filtersProvider.notifier).establecerBusqueda('');
                               },
                             ),
                           ActionChip(
-                            label: const Text('Limpiar todo', style: TextStyle(fontSize: 11, color: FashionColors.peligro)),
+                            label: const Text('Limpiar todo', style: TextStyle(fontSize: 11, color: FashionColors.statusDanger, fontWeight: FontWeight.w600)),
+                            backgroundColor: FashionColors.surfaceCard,
+                            side: const BorderSide(color: FashionColors.borderSubtle),
                             onPressed: _limpiarTodosLosFiltros,
                           ),
                         ],
@@ -503,25 +545,33 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
             if (_cargando)
               const SliverFillRemaining(
                 child: Center(
-                  child: CircularProgressIndicator(color: FashionColors.rosaCorporativo),
+                  child: CircularProgressIndicator(color: FashionColors.inkPrimary),
                 ),
               )
             else if (_error != null)
               SliverFillRemaining(
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(28.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: FashionColors.peligro),
+                        const Icon(Icons.cloud_off_rounded, size: 52, color: FashionColors.statusDanger),
                         const SizedBox(height: 12),
-                        Text(_error!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15)),
+                        Text(
+                          _error!,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 15, color: FashionColors.inkPrimary),
+                        ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FashionColors.inkPrimary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           onPressed: _cargarCatalogData,
-                          child: const Text('Reintentar', style: TextStyle(color: Colors.white)),
+                          child: const Text('Reintentar conexión'),
                         )
                       ],
                     ),
@@ -536,32 +586,35 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const FashionBrandEmblem(size: 64, conSombra: true),
-                        const SizedBox(height: 16),
+                        const AtelierEmptyStateIllustration(
+                          type: AtelierEmptyStateType.emptySearch,
+                          size: 130,
+                        ),
+                        const SizedBox(height: 20),
                         Text(
                           favs.soloFavoritos
                               ? 'No tienes prendas guardadas en tus favoritos'
                               : 'No encontramos prendas con los filtros aplicados',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.spaceGrotesk(
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
-                            color: FashionColors.textoOscuro,
+                            color: FashionColors.inkPrimary,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Prueba buscando con otros términos o ajustando los filtros seleccionados.',
+                        Text(
+                          'Prueba buscando con otros términos o restableciendo los filtros seleccionados.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 13, color: FashionColors.textoMuted),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: FashionColors.negroElegante,
+                            backgroundColor: FashionColors.inkPrimary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
                           ),
                           onPressed: _limpiarTodosLosFiltros,
                           icon: const Icon(Icons.refresh, size: 18),
@@ -573,15 +626,15 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 ),
               )
             else ...[
-              // CUADRÍCULA DE PRENDAS
+              // CUADRÍCULA DE PRENDAS LOOKBOOK
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 sliver: SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 16,
+                    mainAxisSpacing: 14,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 0.62,
+                    childAspectRatio: 0.63,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -599,13 +652,13 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               if (totalPaginas > 1)
                 SliverToBoxAdapter(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
                     alignment: Alignment.center,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.chevron_left),
+                          icon: const Icon(Icons.chevron_left, color: FashionColors.inkPrimary),
                           onPressed: _paginaActual > 1
                               ? () {
                                   setState(() => _paginaActual--);
@@ -620,15 +673,15 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         const SizedBox(width: 8),
                         Text(
                           'Página $_paginaActual de $totalPaginas',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.w700,
                             fontSize: 13,
-                            color: FashionColors.textoOscuro,
+                            color: FashionColors.inkPrimary,
                           ),
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: const Icon(Icons.chevron_right),
+                          icon: const Icon(Icons.chevron_right, color: FashionColors.inkPrimary),
                           onPressed: _paginaActual < totalPaginas
                               ? () {
                                   setState(() => _paginaActual++);
@@ -645,8 +698,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                   ),
                 ),
 
+              // Clearance inferior para el Floating Pill Dock
               const SliverToBoxAdapter(
-                child: SizedBox(height: 32),
+                child: SizedBox(height: 96),
               ),
             ],
           ],

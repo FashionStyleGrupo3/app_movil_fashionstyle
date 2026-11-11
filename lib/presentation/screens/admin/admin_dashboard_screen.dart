@@ -7,7 +7,6 @@ import 'package:fashion_style_mobile/data/models/dashboard/dashboard_models.dart
 import 'package:fashion_style_mobile/data/services/dashboard_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/admin/charts/chart_helpers.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/stacked_bar_chart.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/payment_method_doughnut_chart.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/production_line_chart.dart';
@@ -90,10 +89,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: esAlerta ? AdminPalette.rojo.withValues(alpha: 0.5) : FashionColors.borde,
+          color: esAlerta ? FashionColors.statusDanger.withValues(alpha: 0.5) : FashionColors.borderSubtle,
           width: esAlerta ? 1.5 : 1,
         ),
         boxShadow: [
@@ -111,17 +110,25 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                icono,
-                size: 22,
-                color: esAlerta ? AdminPalette.rojo : AdminPalette.pizarra,
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: esAlerta ? FashionColors.statusDanger.withValues(alpha: 0.1) : FashionColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icono,
+                  size: 19,
+                  color: esAlerta ? FashionColors.statusDanger : FashionColors.inkPrimary,
+                ),
               ),
               if (esAlerta)
                 Container(
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: AdminPalette.rojo,
+                    color: FashionColors.statusDanger,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -135,11 +142,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 titulo.toUpperCase(),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.montserrat(
+                style: GoogleFonts.spaceGrotesk(
                   fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: FashionColors.gris,
-                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w700,
+                  color: FashionColors.inkSecondary,
+                  letterSpacing: 0.6,
                 ),
               ),
               const SizedBox(height: 2),
@@ -147,10 +154,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 valor,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.jetBrainsMono(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: AdminPalette.negro,
+                  color: FashionColors.inkPrimary,
                 ),
               ),
               if (detalle != null && detalle.isNotEmpty) ...[
@@ -159,9 +166,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   detalle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 10,
-                    color: FashionColors.gris,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10.5,
+                    color: FashionColors.inkSecondary,
                   ),
                 ),
               ],
@@ -181,9 +188,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: FashionColors.surfaceCard,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: FashionColors.borde),
+        border: Border.all(color: FashionColors.borderSubtle),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -205,18 +212,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   children: [
                     Text(
                       titulo,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.spaceGrotesk(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: AdminPalette.negro,
+                        color: FashionColors.inkPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitulo,
-                      style: GoogleFonts.montserrat(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
-                        color: FashionColors.gris,
+                        color: FashionColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -255,15 +262,15 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         descripcion: 'Caja de mostrador rápida, cobro multimedio y emisión de comprobantes PDF.',
         ruta: '/admin/ventas',
         icono: Icons.receipt_long_outlined,
-        color: FashionColors.rosaCorporativo,
-        fondo: FashionColors.rosaSuave,
+        color: FashionColors.brandAccent,
+        fondo: FashionColors.surfaceMuted,
       ),
       _ModuloItem(
         titulo: 'Pedidos y Facturas',
         descripcion: 'Despacho de pedidos online, asignación de guías y facturación DIAN.',
         ruta: '/admin/pedidos',
         icono: Icons.local_shipping_outlined,
-        color: const Color(0xFF0D9488),
+        color: FashionColors.atelierJade,
         fondo: const Color(0xFFF0FDFA),
       ),
       _ModuloItem(
@@ -271,7 +278,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         descripcion: 'Creación de prendas, variantes por talla, precios y campañas de promoción.',
         ruta: '/admin/prendas',
         icono: Icons.checkroom_outlined,
-        color: const Color(0xFFD97706),
+        color: FashionColors.editorialOchre,
         fondo: const Color(0xFFFFFBEB),
       ),
       _ModuloItem(
@@ -284,10 +291,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       ),
       _ModuloItem(
         titulo: 'Control de Pagos',
-        descripcion: 'Pasarela Wompi, concilación bancaria y dispersión a cuentas de ahorro.',
+        descripcion: 'Pasarela Wompi, conciliación bancaria y dispersión a cuentas de ahorro.',
         ruta: '/admin/pagos',
         icono: Icons.account_balance_outlined,
-        color: const Color(0xFF059669),
+        color: FashionColors.statusSuccess,
         fondo: const Color(0xFFECFDF5),
       ),
       _ModuloItem(
@@ -295,7 +302,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         descripcion: 'Administración de usuarios staff, directores y directorio de clientes.',
         ruta: '/admin/seguridad',
         icono: Icons.people_outline,
-        color: const Color(0xFF475569),
+        color: FashionColors.inkSecondary,
         fondo: const Color(0xFFF8FAFC),
       ),
       _ModuloItem(
@@ -303,8 +310,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         descripcion: 'Navega como cliente en el escaparate y verifica los productos publicados.',
         ruta: '/',
         icono: Icons.storefront_outlined,
-        color: FashionColors.negroElegante,
-        fondo: const Color(0xFFF3F4F6),
+        color: FashionColors.inkPrimary,
+        fondo: FashionColors.surfaceMuted,
       ),
     ];
 
@@ -314,16 +321,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       currentPath: '/admin',
       child: RefreshIndicator(
         onRefresh: () => _cargarDashboard(silencioso: true),
-        color: AdminPalette.negro,
+        color: FashionColors.inkPrimary,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // BANNER DE BIENVENIDA
+            // BANNER DE BIENVENIDA NEO-ATELIER
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AdminPalette.negro,
-                borderRadius: BorderRadius.circular(20),
+                color: FashionColors.inkPrimary,
+                borderRadius: BorderRadius.circular(22),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.12),
@@ -338,7 +345,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(20),
@@ -346,10 +353,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                         ),
                         child: Text(
                           authState.esAdmin ? 'ADMINISTRADOR GENERAL' : 'COLABORADOR STAFF',
-                          style: GoogleFonts.montserrat(
+                          style: GoogleFonts.spaceGrotesk(
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -358,14 +366,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       const SizedBox(width: 5),
                       Text(
                         fecha,
-                        style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 11),
+                        style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 11),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
                   Text(
                     '$saludo, $primerNombre',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -374,7 +382,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   const SizedBox(height: 4),
                   Text(
                     'Ventas, producción e inventario de FashionStyle en un solo lugar.',
-                    style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 13),
+                    style: GoogleFonts.plusJakartaSans(color: Colors.white70, fontSize: 13),
                   ),
                 ],
               ),
@@ -386,18 +394,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: FashionColors.surfaceCard,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: FashionColors.borde),
+                border: Border.all(color: FashionColors.borderSubtle),
               ),
               child: Row(
                 children: [
                   Text(
                     'Periodo:',
-                    style: GoogleFonts.montserrat(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: FashionColors.gris,
+                      fontWeight: FontWeight.w700,
+                      color: FashionColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -415,18 +423,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: _mesesFiltro == m ? AdminPalette.negro : AdminPalette.crema,
+                            color: _mesesFiltro == m ? FashionColors.inkPrimary : FashionColors.canvasBackground,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: _mesesFiltro == m ? AdminPalette.negro : AdminPalette.arenaSuave,
+                              color: _mesesFiltro == m ? FashionColors.inkPrimary : FashionColors.borderSubtle,
                             ),
                           ),
                           child: Text(
                             '$m meses',
-                            style: GoogleFonts.montserrat(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: _mesesFiltro == m ? Colors.white : AdminPalette.negro,
+                              color: _mesesFiltro == m ? Colors.white : FashionColors.inkPrimary,
                             ),
                           ),
                         ),
@@ -440,9 +448,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AdminPalette.negro),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: FashionColors.inkPrimary),
                           )
-                        : const Icon(Icons.refresh, size: 20, color: AdminPalette.negro),
+                        : const Icon(Icons.refresh, size: 20, color: FashionColors.inkPrimary),
                     tooltip: 'Actualizar indicadores',
                     visualDensity: VisualDensity.compact,
                   ),
@@ -456,21 +464,21 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: FashionColors.surfaceCard,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: FashionColors.borde),
+                  border: Border.all(color: FashionColors.borderSubtle),
                 ),
                 child: Column(
                   children: [
                     const SizedBox(
                       width: 28,
                       height: 28,
-                      child: CircularProgressIndicator(strokeWidth: 2.5, color: AdminPalette.negro),
+                      child: CircularProgressIndicator(strokeWidth: 2.5, color: FashionColors.inkPrimary),
                     ),
                     const SizedBox(height: 12),
                     Text(
                       'Cargando indicadores del panel...',
-                      style: GoogleFonts.montserrat(fontSize: 12, color: FashionColors.gris),
+                      style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary),
                     ),
                   ],
                 ),
@@ -479,18 +487,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AdminPalette.rojo.withValues(alpha: 0.08),
+                  color: FashionColors.statusDanger.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AdminPalette.rojo.withValues(alpha: 0.3)),
+                  border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: AdminPalette.rojo),
+                    const Icon(Icons.error_outline, color: FashionColors.statusDanger),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         _error!,
-                        style: GoogleFonts.montserrat(fontSize: 12, color: AdminPalette.rojo),
+                        style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.statusDanger),
                       ),
                     ),
                     TextButton(
@@ -501,7 +509,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 ),
               ),
             ] else if (_datos != null) ...[
-              // 6 RESUMEN KPIS
+              // 6 RESUMEN KPIS BENTO
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -589,10 +597,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   onPressed: () => context.go('/admin/inventario'),
                   child: Text(
                     'Ver kárdex',
-                    style: GoogleFonts.montserrat(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: AdminPalette.pizarra,
+                      color: FashionColors.inkPrimary,
                     ),
                   ),
                 ),
@@ -609,10 +617,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             Text(
               'Módulos del Sistema',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.spaceGrotesk(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: FashionColors.textoOscuro,
+                color: FashionColors.inkPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -631,14 +639,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               itemBuilder: (context, index) {
                 final m = modulos[index];
                 return InkWell(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(16),
                   onTap: () => context.go(m.ruta),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: FashionColors.grisBorde),
+                      color: FashionColors.surfaceCard,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: FashionColors.borderSubtle),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.02),
@@ -652,7 +660,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(color: m.fondo, borderRadius: BorderRadius.circular(10)),
+                          decoration: BoxDecoration(color: m.fondo, borderRadius: BorderRadius.circular(12)),
                           child: Icon(m.icono, color: m.color, size: 24),
                         ),
                         const Spacer(),
@@ -660,14 +668,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           m.titulo,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: FashionColors.textoOscuro),
+                          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 13.5, color: FashionColors.inkPrimary),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           m.descripcion,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
                         ),
                       ],
                     ),
@@ -676,7 +684,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               },
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 96), // Clearance para Floating Pill Dock
           ],
         ),
       ),
@@ -701,7 +709,3 @@ class _ModuloItem {
     required this.fondo,
   });
 }
-
-// ============================================================================
-// 2. INVENTARIO Y KÁRDEX (VistaInventario.vue)
-// ============================================================================

@@ -9,6 +9,7 @@ import 'package:fashion_style_mobile/data/models/production/calculator_dataset.d
 import 'package:fashion_style_mobile/data/models/production/production_formula_model.dart';
 import 'package:fashion_style_mobile/data/services/production_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminProductionScreen extends ConsumerStatefulWidget {
   const AdminProductionScreen({super.key});
@@ -87,10 +88,10 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
             child: TabBar(
               controller: _tabController,
               isScrollable: true,
-              labelColor: FashionColors.negroElegante,
-              unselectedLabelColor: FashionColors.textoMuted,
-              indicatorColor: FashionColors.rosaCorporativo,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              labelColor: FashionColors.inkPrimary,
+              unselectedLabelColor: FashionColors.inkSecondary,
+              indicatorColor: FashionColors.brandAccent,
+              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 12),
               tabs: const [
                 Tab(icon: Icon(Icons.calculate_outlined, size: 16), text: 'Simulador Costos'),
                 Tab(icon: Icon(Icons.layers_outlined, size: 16), text: 'Materias Primas'),
@@ -245,7 +246,12 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
         const SizedBox(height: 16),
 
         ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: FashionColors.brandAccent,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
           onPressed: () async {
             try {
               await ProductionService.instance.crearOrdenProduccion({
@@ -271,8 +277,9 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
             }
           },
           icon: const Icon(Icons.post_add),
-          label: const Text('Generar Orden de Producción', style: TextStyle(fontWeight: FontWeight.bold)),
+          label: Text('Generar Orden de Producción', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
         ),
+        const SizedBox(height: 96),
       ],
     );
   }
@@ -283,8 +290,8 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(etq, style: TextStyle(fontSize: 12, color: FashionColors.textoMuted, fontWeight: negrita ? FontWeight.bold : FontWeight.normal)),
-          Text(val, style: TextStyle(fontSize: 13, fontWeight: negrita ? FontWeight.bold : FontWeight.w600, color: col ?? FashionColors.textoOscuro)),
+          Text(etq, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary, fontWeight: negrita ? FontWeight.bold : FontWeight.normal)),
+          Text(val, style: GoogleFonts.jetBrainsMono(fontSize: 13, fontWeight: negrita ? FontWeight.bold : FontWeight.w600, color: col ?? FashionColors.inkPrimary)),
         ],
       ),
     );
@@ -293,17 +300,21 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   // 2. MATERIAS PRIMAS
   Widget _construirMateriasPrimas() {
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
       itemCount: _materias.length,
       itemBuilder: (context, index) {
         final m = _materias[index];
         return Card(
-          elevation: 0.5,
+          elevation: 0,
           margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
           child: ListTile(
             leading: const Icon(Icons.layers, color: Color(0xFF2563EB)),
-            title: Text(m['nombre']?.toString() ?? 'Insumo', style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('Stock: ${m['stock_actual']} ${m['unidad_medida']?['codigo'] ?? ''} · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(m['costo_unitario']))}'),
+            title: Text(m['nombre']?.toString() ?? 'Insumo', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+            subtitle: Text(
+              'Stock: ${m['stock_actual']} ${m['unidad_medida']?['codigo'] ?? ''} · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(m['costo_unitario']))}',
+              style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+            ),
           ),
         );
       },
@@ -313,17 +324,18 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   // 3. FÓRMULAS
   Widget _construirFormulas() {
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
       itemCount: _formulas.length,
       itemBuilder: (context, index) {
         final f = _formulas[index];
         return Card(
-          elevation: 0.5,
+          elevation: 0,
           margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
           child: ListTile(
             leading: const Icon(Icons.format_list_bulleted, color: Color(0xFF7C3AED)),
-            title: Text(f['nombre']?.toString() ?? 'Fórmula', style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('${(f['consumos'] as List?)?.length ?? 0} insumos configurados'),
+            title: Text(f['nombre']?.toString() ?? 'Fórmula', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+            subtitle: Text('${(f['consumos'] as List?)?.length ?? 0} insumos configurados', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
           ),
         );
       },
@@ -333,17 +345,18 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   // 4. PROVEEDORES
   Widget _construirProveedores() {
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
       itemCount: _proveedores.length,
       itemBuilder: (context, index) {
         final p = _proveedores[index];
         return Card(
-          elevation: 0.5,
+          elevation: 0,
           margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
           child: ListTile(
             leading: const Icon(Icons.store, color: Color(0xFF0D9488)),
-            title: Text(p['nombre']?.toString() ?? 'Proveedor', style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('Contacto: ${p['contacto'] ?? ''} · Tel: ${p['telefono'] ?? ''}'),
+            title: Text(p['nombre']?.toString() ?? 'Proveedor', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+            subtitle: Text('Contacto: ${p['contacto'] ?? ''} · Tel: ${p['telefono'] ?? ''}', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
           ),
         );
       },
@@ -353,7 +366,7 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   // 5. ÓRDENES DE PRODUCCIÓN
   Widget _construirOrdenes() {
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
       itemCount: _ordenes.length,
       itemBuilder: (context, index) {
         final o = _ordenes[index];
@@ -361,23 +374,31 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
         final estado = o['estado']?.toString() ?? 'planificada';
 
         return Card(
-          elevation: 0.5,
+          elevation: 0,
           margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
           child: ListTile(
-            title: Text('Orden #$id · ${o['formula']?['nombre'] ?? "Lote"}', style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('Volumen: ${o['cantidad']} prendas · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(o['costo_estimado']))}'),
+            title: Text('Orden #$id · ${o['formula']?['nombre'] ?? "Lote"}', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+            subtitle: Text(
+              'Volumen: ${o['cantidad']} prendas · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(o['costo_estimado']))}',
+              style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+            ),
             trailing: estado != 'completada'
                 ? ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: FashionColors.verdeExito, foregroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(backgroundColor: FashionColors.statusSuccess, foregroundColor: Colors.white),
                     onPressed: () async {
                       try {
                         await ProductionService.instance.completarOrdenProduccion(id);
                         _cargarTodo();
                       } catch (_) {}
                     },
-                    child: const Text('Completar', style: TextStyle(fontSize: 11)),
+                    child: Text('Completar', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
                   )
-                : const Chip(label: Text('Completada', style: TextStyle(fontSize: 10))),
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: FashionColors.statusSuccess.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
+                    child: Text('Completada', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: FashionColors.statusSuccess)),
+                  ),
           ),
         );
       },

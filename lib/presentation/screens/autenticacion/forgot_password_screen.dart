@@ -63,31 +63,47 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       currentIndex: 3,
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 96), // Clearance para Floating Pill Dock
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: const BoxConstraints(maxWidth: 440),
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: FashionColors.grisBorde),
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: FashionColors.borderSubtle),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 18, offset: const Offset(0, 6)),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: FashionColors.brandAccent.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.lock_reset_rounded, size: 28, color: FashionColors.brandAccent),
+                  ),
+                  const SizedBox(height: 18),
                   Text(
                     'Recuperar Contraseña',
-                    style: GoogleFonts.poppins(
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: FashionColors.textoOscuro,
+                      fontWeight: FontWeight.w700,
+                      color: FashionColors.inkPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Ingresa tu correo registrado y te enviaremos un código para restablecer tu contraseña.',
-                    style: TextStyle(fontSize: 13, color: FashionColors.textoMuted),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
                   ),
                   const SizedBox(height: 24),
 
@@ -96,42 +112,54 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
                       ),
-                      child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
+                      child: Text(
+                        _error!,
+                        style: GoogleFonts.plusJakartaSans(color: FashionColors.statusDanger, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
                     ),
 
                   TextField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                    decoration: InputDecoration(
                       labelText: 'Correo electrónico',
-                      prefixIcon: Icon(Icons.email_outlined, size: 20),
-                      border: OutlineInputBorder(),
+                      labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                      prefixIcon: const Icon(Icons.email_outlined, size: 20, color: FashionColors.inkSecondary),
+                      filled: true,
+                      fillColor: FashionColors.surfaceMuted,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   SizedBox(
-                    height: 48,
+                    height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.negroElegante,
+                        backgroundColor: FashionColors.brandAccent,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
                       ),
                       onPressed: _cargando ? null : _solicitar,
                       child: _cargando
                           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Enviar código de recuperación', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          : Text('Enviar código de recuperación', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
                     ),
                   ),
                   const SizedBox(height: 16),
 
                   TextButton(
                     onPressed: () => context.go('/login'),
-                    child: const Text('Volver a iniciar sesión', style: TextStyle(color: FashionColors.textoMuted)),
+                    child: Text(
+                      'Volver a iniciar sesión',
+                      style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
@@ -142,7 +170,3 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     );
   }
 }
-
-// ============================================================================
-// 5. VISTA RESTABLECER CONTRASEÑA (VistaRestablecerContrasena.vue)
-// ============================================================================

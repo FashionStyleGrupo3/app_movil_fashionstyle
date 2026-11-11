@@ -5,6 +5,7 @@ import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/services/security_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminSecurityAndUsersScreen extends ConsumerStatefulWidget {
   const AdminSecurityAndUsersScreen({super.key});
@@ -131,9 +132,10 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
-              labelColor: FashionColors.negroElegante,
-              unselectedLabelColor: FashionColors.textoMuted,
-              indicatorColor: FashionColors.rosaCorporativo,
+              labelColor: FashionColors.inkPrimary,
+              unselectedLabelColor: FashionColors.inkSecondary,
+              indicatorColor: FashionColors.brandAccent,
+              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: [
                 const Tab(icon: Icon(Icons.people_alt_outlined, size: 18), text: 'Clientes'),
                 if (esAdmin) const Tab(icon: Icon(Icons.badge_outlined, size: 18), text: 'Staff / Empleados'),
@@ -142,23 +144,24 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
           ),
           Expanded(
             child: _cargando
-                ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+                ? const Center(child: CircularProgressIndicator(color: FashionColors.brandAccent))
                 : TabBarView(
                     controller: _tabController,
                     children: [
                       // Pestaña Clientes
                       ListView.builder(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                         itemCount: _clientes.length,
                         itemBuilder: (context, index) {
                           final c = _clientes[index];
                           return Card(
-                            elevation: 0.5,
+                            elevation: 0,
                             margin: const EdgeInsets.only(bottom: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
                             child: ListTile(
-                              leading: const CircleAvatar(backgroundColor: FashionColors.rosaSuave, child: Icon(Icons.person, color: FashionColors.rosaOscuro)),
-                              title: Text(c['nombre']?.toString() ?? 'Cliente', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text('${c['email'] ?? c['correo'] ?? ''} · Ciudad: ${c['ciudad'] ?? "N/A"}'),
+                              leading: const CircleAvatar(backgroundColor: FashionColors.surfaceMuted, child: Icon(Icons.person, color: FashionColors.brandAccent)),
+                              title: Text(c['nombre']?.toString() ?? 'Cliente', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: FashionColors.inkPrimary)),
+                              subtitle: Text('${c['email'] ?? c['correo'] ?? ''} · Ciudad: ${c['ciudad'] ?? "N/A"}', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
                             ),
                           );
                         },
@@ -172,35 +175,56 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Colaboradores (${_usuarios.length})', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  Text('Colaboradores (${_usuarios.length})', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary)),
                                   ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: FashionColors.brandAccent,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
                                     onPressed: _abrirModalNuevoUsuario,
                                     icon: const Icon(Icons.add, size: 16),
-                                    label: const Text('Nuevo Usuario'),
+                                    label: Text('Nuevo Usuario', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
                                   ),
                                 ],
                               ),
                             ),
                             Expanded(
                               child: ListView.builder(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.only(left: 12, right: 12, top: 0, bottom: 96),
                                 itemCount: _usuarios.length,
                                 itemBuilder: (context, index) {
                                   final u = _usuarios[index];
                                   final id = u['id_usuario'] ?? u['id'];
-                                  final rol = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? 'empleado').toString();
+                                  final rol = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? 'empleado').toString().toLowerCase();
                                   final activo = u['activo'] == true || u['activo'] == 1;
 
+                                  final colorRol = rol.contains('admin')
+                                      ? FashionColors.brandAccent
+                                      : (rol.contains('empleado') || rol.contains('staff') ? FashionColors.atelierJade : FashionColors.editorialOchre);
+
                                   return Card(
-                                    elevation: 0.5,
+                                    elevation: 0,
                                     margin: const EdgeInsets.only(bottom: 8),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
                                     child: ListTile(
-                                      title: Text(u['nombre']?.toString() ?? 'Usuario', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                      subtitle: Text('${u['email'] ?? ''} · Rol: ${rol.toUpperCase()}'),
+                                      title: Text(u['nombre']?.toString() ?? 'Usuario', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: FashionColors.inkPrimary)),
+                                      subtitle: Row(
+                                        children: [
+                                          Text('${u['email'] ?? ''} · ', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(color: colorRol.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
+                                            child: Text(
+                                              rol.toUpperCase(),
+                                              style: GoogleFonts.jetBrainsMono(fontSize: 9.5, fontWeight: FontWeight.w700, color: colorRol),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                       trailing: Switch(
                                         value: activo,
-                                        activeThumbColor: FashionColors.rosaCorporativo,
+                                        activeThumbColor: FashionColors.statusSuccess,
                                         onChanged: (val) async {
                                           try {
                                             await SecurityService.instance.actualizarUsuario(id, {'activo': val});

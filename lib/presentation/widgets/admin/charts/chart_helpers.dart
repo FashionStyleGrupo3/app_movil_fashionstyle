@@ -1,18 +1,32 @@
 // @source-mirror: src/components/admin/GraficoPanel.vue
 import 'package:flutter/material.dart';
+import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Paleta visual neutral y de lujo alineada 100% con la Web
+/// Paleta visual Neo-Atelier Mineral & Terracotta para analítica y métricas móvil
 class AdminPalette {
-  static const Color negro = Color(0xFF111111);
-  static const Color pizarra = Color(0xFF56657A);
-  static const Color arena = Color(0xFFD4C2A8);
-  static const Color arenaSuave = Color(0xFFECE5DA);
-  static const Color crema = Color(0xFFF7F4EF);
-  static const Color rojo = Color(0xFFD9434B);
-  static const Color ambar = Color(0xFFC08A2B);
-  static const Color verde = Color(0xFF3F7D5C);
-  static const Color textoMuted = Color(0xFF6F6F6F);
+  static const Color inkPrimary = FashionColors.inkPrimary; // #14161F
+  static const Color brandAccent = FashionColors.brandAccent; // #B83A24
+  static const Color atelierJade = FashionColors.atelierJade; // #115E59
+  static const Color editorialOchre = FashionColors.editorialOchre; // #9A6700
+  static const Color statusSuccess = FashionColors.statusSuccess; // #157347
+  static const Color statusDanger = FashionColors.statusDanger; // #C92A2A
+  static const Color borderSubtle = FashionColors.borderSubtle; // #DFE3EC
+  static const Color mineralSurface = FashionColors.canvasBackground; // #F6F7F9
+  static const Color surfaceCard = FashionColors.surfaceCard; // #FFFFFF
+  static const Color textMuted = FashionColors.inkSecondary; // #525866
+  static const Color textSecondary = FashionColors.inkPrimary; // #14161F
+
+  // Alias semánticos para compatibilidad con widgets existentes
+  static const Color negro = FashionColors.inkPrimary;
+  static const Color pizarra = FashionColors.inkPrimary;
+  static const Color arena = FashionColors.brandAccent;
+  static const Color arenaSuave = FashionColors.borderSubtle;
+  static const Color crema = FashionColors.canvasBackground;
+  static const Color rojo = FashionColors.statusDanger;
+  static const Color ambar = FashionColors.editorialOchre;
+  static const Color verde = FashionColors.statusSuccess;
+  static const Color textoMuted = FashionColors.inkSecondary;
 }
 
 String formatearNombreMesGrafico(String claveMes) {
@@ -37,18 +51,19 @@ String formatearNumeroGrafico(num valor) {
 }
 
 // ============================================================================
-// 1. STACKED BAR CHART: VENTAS POR MES (POS vs Web)
+// LEYENDAS Y UTILIDADES DE GRÁFICOS
 // ============================================================================
 
 typedef VoidToCallback = void Function();
 
-// Indicador reutilizable para las leyendas de gráficos
+/// Indicador reutilizable para las leyendas de gráficos con tipografía Plus Jakarta Sans
 class IndicadorLeyenda extends StatelessWidget {
   final Color color;
   final String etiqueta;
   final bool esPunto;
 
-  const IndicadorLeyenda({super.key, 
+  const IndicadorLeyenda({
+    super.key,
     required this.color,
     required this.etiqueta,
     this.esPunto = false,
@@ -65,16 +80,16 @@ class IndicadorLeyenda extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             shape: esPunto ? BoxShape.circle : BoxShape.rectangle,
-            borderRadius: esPunto ? null : BorderRadius.circular(2),
+            borderRadius: esPunto ? null : BorderRadius.circular(3),
           ),
         ),
         const SizedBox(width: 6),
         Text(
           etiqueta,
-          style: GoogleFonts.montserrat(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 11,
-            color: AdminPalette.textoMuted,
-            fontWeight: FontWeight.w500,
+            color: AdminPalette.textMuted,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],

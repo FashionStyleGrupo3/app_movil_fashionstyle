@@ -7,6 +7,7 @@ import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -151,7 +152,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                   children: [
                     Text(
                       'Registrar Movimiento de Kárdex',
-                      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
                     ),
                     const SizedBox(height: 16),
 
@@ -302,10 +303,10 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
-              labelColor: FashionColors.negroElegante,
-              unselectedLabelColor: FashionColors.textoMuted,
-              indicatorColor: FashionColors.rosaCorporativo,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              labelColor: FashionColors.inkPrimary,
+              unselectedLabelColor: FashionColors.inkSecondary,
+              indicatorColor: FashionColors.brandAccent,
+              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: const [
                 Tab(icon: Icon(Icons.shelves, size: 18), text: 'Existencias'),
                 Tab(icon: Icon(Icons.history, size: 18), text: 'Kárdex'),
@@ -387,49 +388,66 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
         ),
         Expanded(
           child: filtradas.isEmpty
-              ? const Center(child: Text('No hay prendas que coincidan con los filtros'))
+              ? const Center(
+                  child: AtelierEmptyStateIllustration(
+                    type: AtelierEmptyStateType.emptySearch,
+                    title: 'Sin existencias coincidentes',
+                    subtitle: 'No hay prendas que coincidan con los filtros aplicados.',
+                  ),
+                )
               : ListView.builder(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                   itemCount: filtradas.length,
                   itemBuilder: (context, index) {
                     final v = filtradas[index];
                     final colorStock = v.stock <= 0
-                        ? FashionColors.peligro
-                        : (v.stock <= 5 ? FashionColors.aviso : FashionColors.verdeExito);
+                        ? FashionColors.statusDanger
+                        : (v.stock <= 5 ? FashionColors.statusWarning : FashionColors.statusSuccess);
 
                     return Card(
-                      elevation: 0.5,
+                      elevation: 0,
                       margin: const EdgeInsets.only(bottom: 8),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        side: const BorderSide(color: FashionColors.grisBorde),
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: FashionColors.borderSubtle),
                       ),
                       child: ListTile(
                         leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(8),
                           child: SizedBox(
-                            width: 44,
-                            height: 52,
+                            width: 48,
+                            height: 64,
                             child: v.imagenUrl.isNotEmpty
-                                ? CachedNetworkImage(imageUrl: v.imagenUrl, fit: BoxFit.cover)
-                                : Container(color: FashionColors.fondoClaro, child: const Icon(Icons.checkroom)),
+                                ? CachedNetworkImage(
+                                    imageUrl: v.imagenUrl,
+                                    fit: BoxFit.cover,
+                                    errorWidget: (_, __, ___) => Container(color: FashionColors.surfaceMuted, child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary)),
+                                  )
+                                : Container(color: FashionColors.surfaceMuted, child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary)),
                           ),
                         ),
-                        title: Text(v.nombrePrenda, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                        subtitle: Text('Talla: ${v.talla} · SKU: ${v.sku} · Color: ${v.color}', style: const TextStyle(fontSize: 11)),
+                        title: Text(v.nombrePrenda, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+                        subtitle: Text(
+                          'Talla: ${v.talla} · Color: ${v.color}\nSKU: ${v.sku}',
+                          style: GoogleFonts.jetBrainsMono(fontSize: 10.5, color: FashionColors.inkSecondary),
+                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: colorStock.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
+                              decoration: BoxDecoration(
+                                color: colorStock.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: colorStock.withValues(alpha: 0.3)),
+                              ),
                               child: Text(
                                 '${v.stock} uds',
-                                style: TextStyle(color: colorStock, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: GoogleFonts.jetBrainsMono(color: colorStock, fontWeight: FontWeight.w700, fontSize: 11.5),
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.add_circle_outline, size: 20),
+                              icon: const Icon(Icons.add_circle_outline, size: 20, color: FashionColors.inkPrimary),
                               tooltip: 'Ajustar stock',
                               onPressed: () => _abrirModalRegistrarMovimiento(v),
                             ),
@@ -527,7 +545,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
           child: filtrados.isEmpty
               ? const Center(child: Text('No hay movimientos registrados en el kárdex'))
               : ListView.builder(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                   itemCount: filtrados.length,
                   itemBuilder: (context, index) {
                     final m = filtrados[index];
@@ -611,7 +629,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
       itemCount: enAlerta.length,
       itemBuilder: (context, index) {
         final v = enAlerta[index];

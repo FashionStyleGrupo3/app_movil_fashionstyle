@@ -32,9 +32,10 @@ class StackedBarChartWidget extends StatelessWidget {
               : Center(
                   child: Text(
                     'Aún no hay ventas registradas en este periodo.',
-                    style: GoogleFonts.montserrat(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
-                      color: AdminPalette.textoMuted,
+                      color: AdminPalette.textMuted,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -42,14 +43,14 @@ class StackedBarChartWidget extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: const [
             IndicadorLeyenda(
-              color: AdminPalette.pizarra,
+              color: AdminPalette.inkPrimary,
               etiqueta: 'Tienda física (POS)',
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             IndicadorLeyenda(
-              color: AdminPalette.arena,
+              color: AdminPalette.brandAccent,
               etiqueta: 'Tienda en línea',
             ),
           ],
@@ -66,7 +67,7 @@ class _StackedBarChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const double paddingLeft = 45;
+    const double paddingLeft = 48;
     const double paddingRight = 12;
     const double paddingTop = 15;
     const double paddingBottom = 26;
@@ -75,13 +76,13 @@ class _StackedBarChartPainter extends CustomPainter {
     final chartHeight = size.height - paddingTop - paddingBottom;
     if (chartWidth <= 0 || chartHeight <= 0 || items.isEmpty) return;
 
-    // Calcular escala máxima con margen del 10%
+    // Calcular escala máxima con margen del 15%
     double maxVal = items.map((e) => e.total).reduce(math.max);
     if (maxVal <= 0) maxVal = 100000;
     maxVal = maxVal * 1.15;
 
     final gridPaint = Paint()
-      ..color = AdminPalette.arenaSuave
+      ..color = AdminPalette.borderSubtle
       ..strokeWidth = 1;
 
     // Líneas de guía horizontales (4 niveles: 0%, 33%, 66%, 100%)
@@ -96,9 +97,9 @@ class _StackedBarChartPainter extends CustomPainter {
       final val = maxVal * (i / 3.0);
       final textSpan = TextSpan(
         text: '\$${formatearNumeroGrafico(val)}',
-        style: GoogleFonts.montserrat(
-          fontSize: 9,
-          color: AdminPalette.textoMuted,
+        style: GoogleFonts.jetBrainsMono(
+          fontSize: 9.5,
+          color: AdminPalette.textMuted,
           fontWeight: FontWeight.w500,
         ),
       );
@@ -115,11 +116,11 @@ class _StackedBarChartPainter extends CustomPainter {
     final barWidth = math.min(28.0, slotWidth * 0.55);
 
     final posPaint = Paint()
-      ..color = AdminPalette.pizarra
+      ..color = AdminPalette.inkPrimary
       ..style = PaintingStyle.fill;
 
     final webPaint = Paint()
-      ..color = AdminPalette.arena
+      ..color = AdminPalette.brandAccent
       ..style = PaintingStyle.fill;
 
     for (int i = 0; i < n; i++) {
@@ -137,10 +138,10 @@ class _StackedBarChartPainter extends CustomPainter {
         final posTop = baseY - posHeight;
         final rectPos = RRect.fromRectAndCorners(
           Rect.fromLTRB(left, posTop, right, baseY),
-          bottomLeft: const Radius.circular(3),
-          bottomRight: const Radius.circular(3),
-          topLeft: webHeight <= 0 ? const Radius.circular(4) : Radius.zero,
-          topRight: webHeight <= 0 ? const Radius.circular(4) : Radius.zero,
+          bottomLeft: const Radius.circular(4),
+          bottomRight: const Radius.circular(4),
+          topLeft: webHeight <= 0 ? const Radius.circular(5) : Radius.zero,
+          topRight: webHeight <= 0 ? const Radius.circular(5) : Radius.zero,
         );
         canvas.drawRRect(rectPos, posPaint);
       }
@@ -151,10 +152,10 @@ class _StackedBarChartPainter extends CustomPainter {
         final webTop = webBottom - webHeight;
         final rectWeb = RRect.fromRectAndCorners(
           Rect.fromLTRB(left, webTop, right, webBottom),
-          topLeft: const Radius.circular(4),
-          topRight: const Radius.circular(4),
-          bottomLeft: posHeight <= 0 ? const Radius.circular(3) : Radius.zero,
-          bottomRight: posHeight <= 0 ? const Radius.circular(3) : Radius.zero,
+          topLeft: const Radius.circular(5),
+          topRight: const Radius.circular(5),
+          bottomLeft: posHeight <= 0 ? const Radius.circular(4) : Radius.zero,
+          bottomRight: posHeight <= 0 ? const Radius.circular(4) : Radius.zero,
         );
         canvas.drawRRect(rectWeb, webPaint);
       }
@@ -163,10 +164,10 @@ class _StackedBarChartPainter extends CustomPainter {
       final mesTexto = formatearNombreMesGrafico(item.mes);
       final mesSpan = TextSpan(
         text: mesTexto,
-        style: GoogleFonts.montserrat(
-          fontSize: 9,
-          color: AdminPalette.textoMuted,
-          fontWeight: FontWeight.w500,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 9.5,
+          color: AdminPalette.textMuted,
+          fontWeight: FontWeight.w600,
         ),
       );
       final mesTp = TextPainter(
@@ -180,7 +181,3 @@ class _StackedBarChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _StackedBarChartPainter oldDelegate) => true;
 }
-
-// ============================================================================
-// 2. DOUGHNUT CHART: VENTAS POR MEDIO DE PAGO
-// ============================================================================

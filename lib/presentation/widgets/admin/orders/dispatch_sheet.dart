@@ -1,5 +1,6 @@
 // @source-mirror: src/views/admin/VistaPedidosyFacturas.vue, src/components/pedidos/ModalGestionDespacho.vue, src/components/facturas/ModalCrearFactura.vue, src/components/facturas/ModalCargaMasivaFacturas.vue, src/views/admin/VistaProduccion.vue, src/components/produccion/CalculadoraProduccion.vue, src/components/produccion/GestorOrdenesProduccion.vue
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/order/order_model.dart';
@@ -91,47 +92,108 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      decoration: const BoxDecoration(
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
-        top: 20,
+        top: 12,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Gestionar Despacho (${widget.pedido.referencia})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 12),
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 14),
+              decoration: BoxDecoration(
+                color: FashionColors.borderSubtle,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Text(
+                'Gestionar Despacho ',
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 17, color: FashionColors.inkPrimary),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: FashionColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  widget.pedido.referencia,
+                  style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 12, color: FashionColors.inkPrimary),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
           DropdownButtonFormField<String>(
             initialValue: _estado,
-            decoration: const InputDecoration(labelText: 'Estado del pedido', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Estado del pedido',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
             items: OrderService.estadosPedido.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
             onChanged: (v) => setState(() => _estado = v ?? _estado),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: OrderService.transportadorasSugeridas.contains(_transportadora) ? _transportadora : OrderService.transportadorasSugeridas.first,
-            decoration: const InputDecoration(labelText: 'Empresa transportadora', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Empresa transportadora',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
             items: OrderService.transportadorasSugeridas.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
             onChanged: (v) => setState(() => _transportadora = v ?? _transportadora),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           TextField(
             controller: _guiaCtrl,
-            decoration: const InputDecoration(labelText: 'Número de guía de despacho', border: OutlineInputBorder()),
+            style: GoogleFonts.jetBrainsMono(fontSize: 13, fontWeight: FontWeight.w600),
+            decoration: InputDecoration(
+              labelText: 'Número de guía de despacho',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           TextField(
             controller: _notasCtrl,
-            decoration: const InputDecoration(labelText: 'Notas operativas de despacho', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Notas operativas de despacho',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.brandAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             onPressed: _guardando ? null : _guardar,
-            child: _guardando ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text('Actualizar Despacho'),
+            child: _guardando
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text('Actualizar Despacho', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
           ),
         ],
       ),

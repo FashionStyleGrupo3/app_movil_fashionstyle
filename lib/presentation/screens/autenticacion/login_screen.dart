@@ -82,23 +82,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       currentIndex: 3,
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 96), // Clearance para Floating Pill Dock
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 440),
             child: Container(
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: FashionColors.grisBorde),
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: FashionColors.borderSubtle),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 4)),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Banner visual de marca (espejo de DisenoAutenticacion.vue)
+                  // Banner visual de marca Nocturnal Atelier Header
                   const AuthBrandBanner(height: 160),
 
                   Padding(
@@ -108,16 +112,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         Text(
                           'Iniciar Sesión',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.spaceGrotesk(
                             fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            color: FashionColors.textoOscuro,
+                            fontWeight: FontWeight.w700,
+                            color: FashionColors.inkPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'Accede a tu cuenta para gestionar pedidos y favoritos.',
-                          style: GoogleFonts.montserrat(fontSize: 13, color: FashionColors.textoMuted),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            color: FashionColors.inkSecondary,
+                          ),
                         ),
                         const SizedBox(height: 24),
 
@@ -126,20 +133,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             margin: const EdgeInsets.only(bottom: 16),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: FashionColors.peligro.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.3)),
+                              color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
                             ),
-                            child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
+                            child: Text(
+                              _error!,
+                              style: GoogleFonts.plusJakartaSans(
+                                color: FashionColors.statusDanger,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
 
                         TextField(
                           controller: _emailCtrl,
                           keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
                             labelText: 'Correo electrónico',
-                            prefixIcon: Icon(Icons.email_outlined, size: 20),
-                            border: OutlineInputBorder(),
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            prefixIcon: const Icon(Icons.email_outlined, size: 20, color: FashionColors.inkSecondary),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: FashionColors.brandAccent, width: 1.2),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -147,14 +169,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _passCtrl,
                           obscureText: _ocultarPass,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
                           decoration: InputDecoration(
                             labelText: 'Contraseña',
-                            prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            prefixIcon: const Icon(Icons.lock_outline, size: 20, color: FashionColors.inkSecondary),
                             suffixIcon: IconButton(
-                              icon: Icon(_ocultarPass ? Icons.visibility_off : Icons.visibility, size: 20),
+                              icon: Icon(_ocultarPass ? Icons.visibility_off : Icons.visibility, size: 20, color: FashionColors.inkSecondary),
                               onPressed: () => setState(() => _ocultarPass = !_ocultarPass),
                             ),
-                            border: const OutlineInputBorder(),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: FashionColors.brandAccent, width: 1.2),
+                            ),
                           ),
                         ),
 
@@ -164,7 +194,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onPressed: () => context.go('/recuperar-contrasena'),
                             child: Text(
                               '¿Olvidaste tu contraseña?',
-                              style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: FashionColors.textoOscuro),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: FashionColors.brandAccent,
+                              ),
                             ),
                           ),
                         ),
@@ -172,33 +206,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 12),
 
                         SizedBox(
-                          height: 48,
+                          height: 50,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: FashionColors.negroElegante,
+                              backgroundColor: FashionColors.brandAccent,
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 2,
                             ),
                             onPressed: _cargando ? null : _iniciarSesion,
                             child: _cargando
                                 ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                : Text('Ingresar', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
+                                : Text('Ingresar', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 15)),
                           ),
                         ),
 
                         const SizedBox(height: 24),
-                        const Divider(),
+                        const Divider(color: FashionColors.borderSubtle),
                         const SizedBox(height: 16),
 
                         Center(
                           child: RichText(
                             text: TextSpan(
                               text: '¿Aún no tienes cuenta? ',
-                              style: GoogleFonts.montserrat(color: FashionColors.textoMuted, fontSize: 13),
+                              style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
                               children: [
                                 TextSpan(
                                   text: 'Regístrate aquí',
-                                  style: GoogleFonts.montserrat(color: FashionColors.textoOscuro, fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.plusJakartaSans(color: FashionColors.brandAccent, fontWeight: FontWeight.w700),
                                   recognizer: TapGestureRecognizer()..onTap = () => context.go('/registro'),
                                 ),
                               ],
@@ -217,7 +252,3 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
-
-// ============================================================================
-// 2. VISTA REGISTRO (VistaRegistro.vue)
-// ============================================================================

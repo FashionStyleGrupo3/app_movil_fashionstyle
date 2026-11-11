@@ -3,103 +3,169 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Paleta de color oficial FashionStyle Mobile "Neo-Atelier Mineral & Terracotta".
+///
+/// Combina un fondo mineral ultra-limpio con la calidez sartorial del Terracotta Couture (#B83A24),
+/// acentos jade de taller (#115E59) y negros entintados (#14161F).
 class FashionColors {
-  static const Color negro = Color(0xFF111111);
-  static const Color texto = Color(0xFF2B2B2B);
-  static const Color gris = Color(0xFF6F6F6F);
-  static const Color crema = Color(0xFFF7F4EF);
-  static const Color arena = Color(0xFFECE5DA);
-  static const Color arenaSuave = Color(0xFFF3EEE6);
-  static const Color arenaOscura = Color(0xFFD4C2A8);
-  static const Color pizarra = Color(0xFF56657A);
-  static const Color borde = Color(0xFFE4DDD2);
-  static const Color rojo = Color(0xFFD9434B);
-  static const Color rosaCorporativo = Color(0xFF111111); // Alineado con la paleta de lujo neutral de la Web (#111111)
-  static const Color blanco = Color(0xFFFFFFFF);
-  static const Color verdeExito = Color(0xFF2E7D32);
+  // --- PALETA PRIMARIA MÓVIL (NEO-ATELIER MINERAL & TERRACOTTA) ---
+  static const Color canvasBackground = Color(0xFFF6F7F9);
+  static const Color surfaceCard = Color(0xFFFFFFFF);
+  static const Color surfaceMuted = Color(0xFFEBEEF3);
+  static const Color inkPrimary = Color(0xFF14161F);
+  static const Color inkSecondary = Color(0xFF525866);
+  static const Color brandAccent = Color(0xFFB83A24); // Terracotta Couture
+  static const Color atelierJade = Color(0xFF115E59); // Verde Jade de Taller
+  static const Color editorialOchre = Color(0xFF9A6700);
+  static const Color editorialGoldDark = Color(0xFFF59F00);
+  static const Color borderSubtle = Color(0xFFDFE3EC);
+  static const Color statusSuccess = Color(0xFF157347);
+  static const Color statusWarning = Color(0xFF9A6700);
+  static const Color statusDanger = Color(0xFFC92A2A);
 
-  // Aliases compatibles con las pantallas
-  static const Color fondoClaro = crema;
-  static const Color textoOscuro = texto;
-  static const Color textoMuted = gris;
-  static const Color grisBorde = borde;
-  static const Color negroElegante = negro;
-  static const Color peligro = rojo;
-  static const Color aviso = Color(0xFFE65100);
-  static const Color rosaSuave = arenaSuave;
-  static const Color rosaOscuro = rosaCorporativo;
-  static const Color exito = verdeExito;
-  static const Color cremaSuave = arenaSuave;
-  static const Color azulInfo = pizarra;
+  // --- ALIASES Y CONSTANTES LEGACY (COMPATIBILIDAD 100% RETROACTIVA) ---
+  static const Color negro = inkPrimary;
+  static const Color texto = inkPrimary;
+  static const Color gris = inkSecondary;
+  static const Color crema = canvasBackground;
+  static const Color arena = surfaceMuted;
+  static const Color arenaSuave = surfaceMuted;
+  static const Color arenaOscura = borderSubtle;
+  static const Color pizarra = inkSecondary;
+  static const Color borde = borderSubtle;
+  static const Color rojo = statusDanger;
+  static const Color rosaCorporativo = brandAccent;
+  static const Color blanco = surfaceCard;
+  static const Color verdeExito = statusSuccess;
+
+  static const Color fondoClaro = canvasBackground;
+  static const Color textoOscuro = inkPrimary;
+  static const Color textoMuted = inkSecondary;
+  static const Color grisBorde = borderSubtle;
+  static const Color negroElegante = inkPrimary;
+  static const Color peligro = statusDanger;
+  static const Color aviso = statusWarning;
+  static const Color rosaSuave = surfaceMuted;
+  static const Color rosaOscuro = brandAccent;
+  static const Color exito = statusSuccess;
+  static const Color cremaSuave = surfaceMuted;
+  static const Color azulInfo = atelierJade;
 }
 
 class FashionTheme {
-  static ThemeData get lightTheme {
-    final baseTextTheme = ThemeData.light().textTheme;
-    final poppinsTheme = GoogleFonts.poppinsTextTheme(baseTextTheme);
-    final montserratTheme = GoogleFonts.montserratTextTheme(baseTextTheme);
+  /// Estilo monoespaciado técnico para precios monetarios en COP, códigos y SKU.
+  static TextStyle priceTextStyle({
+    double fontSize = 16,
+    FontWeight fontWeight = FontWeight.w700,
+    Color color = FashionColors.inkPrimary,
+    TextDecoration? decoration,
+  }) {
+    return GoogleFonts.jetBrainsMono(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      decoration: decoration,
+      fontFeatures: const [FontFeature.tabularFigures()],
+      letterSpacing: -0.3,
+    );
+  }
 
-    final mergedTextTheme = montserratTheme.copyWith(
-      displayLarge: poppinsTheme.displayLarge?.copyWith(
-        color: FashionColors.negro,
+  /// Estilo numérico para métricas analíticas de KPIs y contadores.
+  static TextStyle monoMetricStyle({
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w600,
+    Color color = FashionColors.inkPrimary,
+  }) {
+    return GoogleFonts.jetBrainsMono(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      fontFeatures: const [FontFeature.tabularFigures()],
+      letterSpacing: -0.5,
+    );
+  }
+
+  static ThemeData get lightTheme {
+    // Tríada tipográfica: Space Grotesk (Titulares) + Plus Jakarta Sans (Cuerpo) + JetBrains Mono (Precios)
+    final textTheme = TextTheme(
+      displayLarge: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
       ),
-      displayMedium: poppinsTheme.displayMedium?.copyWith(
-        color: FashionColors.negro,
+      displayMedium: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
+        letterSpacing: -0.5,
       ),
-      displaySmall: poppinsTheme.displaySmall?.copyWith(
-        color: FashionColors.negro,
+      displaySmall: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
+        letterSpacing: -0.5,
       ),
-      headlineLarge: poppinsTheme.headlineLarge?.copyWith(
-        color: FashionColors.negro,
+      headlineLarge: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
+        letterSpacing: -0.5,
       ),
-      headlineMedium: poppinsTheme.headlineMedium?.copyWith(
-        color: FashionColors.negro,
+      headlineMedium: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.5,
+      ),
+      headlineSmall: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.5,
+      ),
+      titleLarge: GoogleFonts.spaceGrotesk(
+        color: FashionColors.inkPrimary,
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.5,
+      ),
+      titleMedium: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
       ),
-      headlineSmall: poppinsTheme.headlineSmall?.copyWith(
-        color: FashionColors.negro,
-        fontWeight: FontWeight.w600,
-      ),
-      titleLarge: poppinsTheme.titleLarge?.copyWith(
-        color: FashionColors.texto,
-        fontWeight: FontWeight.w600,
-      ),
-      titleMedium: poppinsTheme.titleMedium?.copyWith(
-        color: FashionColors.texto,
-        fontWeight: FontWeight.w600,
-      ),
-      titleSmall: poppinsTheme.titleSmall?.copyWith(
-        color: FashionColors.texto,
+      titleSmall: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkSecondary,
         fontWeight: FontWeight.w500,
       ),
-      bodyLarge: montserratTheme.bodyLarge?.copyWith(
-        color: FashionColors.texto,
+      bodyLarge: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkPrimary,
         fontSize: 16,
+        fontWeight: FontWeight.w400,
       ),
-      bodyMedium: montserratTheme.bodyMedium?.copyWith(
-        color: FashionColors.texto,
+      bodyMedium: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkPrimary,
         fontSize: 14,
+        fontWeight: FontWeight.w400,
       ),
-      bodySmall: montserratTheme.bodySmall?.copyWith(
-        color: FashionColors.gris,
+      bodySmall: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkSecondary,
         fontSize: 12,
+        fontWeight: FontWeight.w400,
       ),
-      labelLarge: poppinsTheme.labelLarge?.copyWith(
+      labelLarge: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
-        letterSpacing: 0.5,
+        letterSpacing: 0.3,
+      ),
+      labelMedium: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkSecondary,
+        fontWeight: FontWeight.w500,
+      ),
+      labelSmall: GoogleFonts.plusJakartaSans(
+        color: FashionColors.inkSecondary,
+        fontWeight: FontWeight.w500,
       ),
     );
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      primaryColor: FashionColors.negro,
-      scaffoldBackgroundColor: FashionColors.crema,
+      primaryColor: FashionColors.brandAccent,
+      scaffoldBackgroundColor: FashionColors.canvasBackground,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.android: CupertinoPageTransitionsBuilder(),
@@ -108,63 +174,82 @@ class FashionTheme {
       ),
       colorScheme: const ColorScheme(
         brightness: Brightness.light,
-        primary: FashionColors.negro,
-        onPrimary: FashionColors.blanco,
-        secondary: FashionColors.pizarra,
-        onSecondary: FashionColors.blanco,
-        error: FashionColors.rojo,
-        onError: FashionColors.blanco,
-        surface: FashionColors.blanco,
-        onSurface: FashionColors.texto,
-        surfaceContainerHighest: FashionColors.arenaSuave,
-        outline: FashionColors.borde,
+        primary: FashionColors.brandAccent,
+        onPrimary: FashionColors.surfaceCard,
+        secondary: FashionColors.inkPrimary,
+        onSecondary: FashionColors.surfaceCard,
+        tertiary: FashionColors.atelierJade,
+        onTertiary: FashionColors.surfaceCard,
+        error: FashionColors.statusDanger,
+        onError: FashionColors.surfaceCard,
+        surface: FashionColors.surfaceCard,
+        onSurface: FashionColors.inkPrimary,
+        surfaceContainerHighest: FashionColors.surfaceMuted,
+        outline: FashionColors.borderSubtle,
       ),
-      textTheme: mergedTextTheme,
+      textTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: FashionColors.crema,
-        foregroundColor: FashionColors.negro,
+        backgroundColor: FashionColors.canvasBackground,
+        foregroundColor: FashionColors.inkPrimary,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         surfaceTintColor: Colors.transparent,
-        titleTextStyle: GoogleFonts.poppins(
-          color: FashionColors.negro,
+        titleTextStyle: GoogleFonts.spaceGrotesk(
+          color: FashionColors.inkPrimary,
           fontSize: 18,
           fontWeight: FontWeight.w700,
+          letterSpacing: -0.5,
         ),
-        iconTheme: const IconThemeData(color: FashionColors.negro),
+        iconTheme: const IconThemeData(color: FashionColors.inkPrimary),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Colors.white,
-        modalBackgroundColor: Colors.white,
+        backgroundColor: FashionColors.surfaceCard,
+        modalBackgroundColor: FashionColors.surfaceCard,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        dragHandleColor: FashionColors.borde,
+        dragHandleColor: FashionColors.borderSubtle,
         dragHandleSize: Size(44, 4),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
       cardTheme: CardThemeData(
-        color: FashionColors.blanco,
+        color: FashionColors.surfaceCard,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: FashionColors.borde, width: 1),
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: FashionColors.borderSubtle, width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: FashionColors.negro,
-          foregroundColor: FashionColors.blanco,
-          disabledBackgroundColor: FashionColors.borde,
-          disabledForegroundColor: FashionColors.gris,
+          backgroundColor: FashionColors.brandAccent,
+          foregroundColor: FashionColors.surfaceCard,
+          disabledBackgroundColor: FashionColors.surfaceMuted,
+          disabledForegroundColor: FashionColors.inkSecondary,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: FashionColors.brandAccent,
+          foregroundColor: FashionColors.surfaceCard,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w600,
             fontSize: 15,
             letterSpacing: 0.3,
@@ -173,13 +258,13 @@ class FashionTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: FashionColors.negro,
-          side: const BorderSide(color: FashionColors.negro, width: 1.2),
+          foregroundColor: FashionColors.inkPrimary,
+          side: const BorderSide(color: FashionColors.borderSubtle, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w600,
             fontSize: 15,
           ),
@@ -187,11 +272,11 @@ class FashionTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: FashionColors.pizarra,
+          foregroundColor: FashionColors.brandAccent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          textStyle: const TextStyle(
+          textStyle: GoogleFonts.plusJakartaSans(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -199,49 +284,49 @@ class FashionTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: FashionColors.blanco,
+        fillColor: FashionColors.surfaceMuted,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: const TextStyle(
-          color: FashionColors.gris,
+        hintStyle: GoogleFonts.plusJakartaSans(
+          color: FashionColors.inkSecondary,
           fontSize: 14,
         ),
-        labelStyle: const TextStyle(
-          color: FashionColors.texto,
+        labelStyle: GoogleFonts.plusJakartaSans(
+          color: FashionColors.inkPrimary,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: FashionColors.borde, width: 1),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: FashionColors.borderSubtle, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: FashionColors.borde, width: 1),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: FashionColors.borderSubtle, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: FashionColors.negro, width: 1.5),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: FashionColors.brandAccent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: FashionColors.rojo, width: 1),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: FashionColors.statusDanger, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: FashionColors.rojo, width: 1.5),
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: FashionColors.statusDanger, width: 1.5),
         ),
       ),
       dividerTheme: const DividerThemeData(
-        color: FashionColors.borde,
+        color: FashionColors.borderSubtle,
         thickness: 1,
         space: 1,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: FashionColors.blanco,
-        selectedItemColor: FashionColors.negro,
-        unselectedItemColor: FashionColors.gris,
+        backgroundColor: FashionColors.surfaceCard,
+        selectedItemColor: FashionColors.brandAccent,
+        unselectedItemColor: FashionColors.inkSecondary,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 0,
         selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
         unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
       ),

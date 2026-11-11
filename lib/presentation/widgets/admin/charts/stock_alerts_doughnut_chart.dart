@@ -1,7 +1,6 @@
 // @source-mirror: src/components/admin/GraficoPanel.vue
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/dashboard/dashboard_models.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/chart_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,17 +49,17 @@ class StockAlertsDoughnutWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IndicadorLeyenda(
-                color: AdminPalette.rojo,
+                color: AdminPalette.statusDanger,
                 etiqueta: 'Agotado: $agotado',
               ),
               const SizedBox(width: 12),
               IndicadorLeyenda(
-                color: AdminPalette.ambar,
+                color: AdminPalette.editorialOchre,
                 etiqueta: 'Crítico: $critico',
               ),
               const SizedBox(width: 12),
               IndicadorLeyenda(
-                color: AdminPalette.pizarra,
+                color: AdminPalette.inkPrimary,
                 etiqueta: 'Bajo: $bajo',
               ),
             ],
@@ -69,21 +68,21 @@ class StockAlertsDoughnutWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AdminPalette.verde.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AdminPalette.verde.withValues(alpha: 0.2)),
+              color: AdminPalette.statusSuccess.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AdminPalette.statusSuccess.withValues(alpha: 0.2)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.check_circle_outline, color: AdminPalette.verde, size: 20),
+                const Icon(Icons.check_circle_outline, color: AdminPalette.statusSuccess, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Sin alertas de stock pendientes.',
-                  style: GoogleFonts.montserrat(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AdminPalette.verde,
+                    color: AdminPalette.statusSuccess,
                   ),
                 ),
               ],
@@ -95,10 +94,10 @@ class StockAlertsDoughnutWidget extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Prendas con menor stock',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: AdminPalette.negro,
+              color: AdminPalette.inkPrimary,
             ),
           ),
           const SizedBox(height: 8),
@@ -106,7 +105,7 @@ class StockAlertsDoughnutWidget extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: math.min(5, menorStock.length),
-            separatorBuilder: (_, __) => const Divider(height: 8, color: AdminPalette.arenaSuave),
+            separatorBuilder: (_, __) => const Divider(height: 8, color: AdminPalette.borderSubtle),
             itemBuilder: (context, index) {
               final item = menorStock[index];
               final esCritico = item.stock <= 0;
@@ -117,27 +116,28 @@ class StockAlertsDoughnutWidget extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '${item.producto} · Talla ${item.talla}',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 11,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w500,
-                          color: FashionColors.textoOscuro,
+                          color: AdminPalette.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                       decoration: BoxDecoration(
-                        color: esCritico ? AdminPalette.rojo.withValues(alpha: 0.12) : AdminPalette.crema,
+                        color: esCritico ? AdminPalette.statusDanger.withValues(alpha: 0.12) : AdminPalette.mineralSurface,
                         borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: esCritico ? AdminPalette.statusDanger.withValues(alpha: 0.3) : AdminPalette.borderSubtle),
                       ),
                       child: Text(
                         '${item.stock} un.',
-                        style: GoogleFonts.montserrat(
+                        style: GoogleFonts.jetBrainsMono(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: esCritico ? AdminPalette.rojo : AdminPalette.negro,
+                          color: esCritico ? AdminPalette.statusDanger : AdminPalette.inkPrimary,
                         ),
                       ),
                     ),
@@ -152,10 +152,10 @@ class StockAlertsDoughnutWidget extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'Materias primas bajo su mínimo: $materiasBajoMinimo',
-            style: GoogleFonts.montserrat(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: AdminPalette.ambar,
+              color: AdminPalette.editorialOchre,
             ),
           ),
         ],
@@ -189,9 +189,9 @@ class _StockAlertsPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: center, radius: arcRadius);
 
     final slices = [
-      MapEntry(agotado, AdminPalette.rojo),
-      MapEntry(critico, AdminPalette.ambar),
-      MapEntry(bajo, AdminPalette.pizarra),
+      MapEntry(agotado, AdminPalette.statusDanger),
+      MapEntry(critico, AdminPalette.editorialOchre),
+      MapEntry(bajo, AdminPalette.inkPrimary),
     ].where((e) => e.key > 0).toList();
 
     double startAngle = -math.pi / 2;
@@ -208,21 +208,21 @@ class _StockAlertsPainter extends CustomPainter {
       startAngle += sweepAngle;
     }
 
-    // Texto central
+    // Texto central con JetBrains Mono + Plus Jakarta Sans
     final textSpan = TextSpan(
       text: '$total\n',
-      style: GoogleFonts.poppins(
-        fontSize: 18,
+      style: GoogleFonts.jetBrainsMono(
+        fontSize: 20,
         fontWeight: FontWeight.w700,
-        color: AdminPalette.negro,
+        color: AdminPalette.inkPrimary,
       ),
       children: [
         TextSpan(
           text: total == 1 ? 'Alerta' : 'Alertas',
-          style: GoogleFonts.montserrat(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 10,
             fontWeight: FontWeight.w600,
-            color: AdminPalette.textoMuted,
+            color: AdminPalette.textMuted,
           ),
         ),
       ],

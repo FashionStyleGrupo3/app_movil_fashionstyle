@@ -112,19 +112,34 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
+      decoration: const BoxDecoration(
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
-        top: 20,
+        top: 12,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: FashionColors.borderSubtle,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
             Text(
               widget.prenda != null ? 'Editar Prenda' : 'Nueva Prenda de Catálogo',
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+              style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
             ),
             const SizedBox(height: 16),
 
@@ -229,15 +244,15 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: FashionColors.negroElegante,
+                backgroundColor: FashionColors.brandAccent,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               onPressed: _guardando ? null : _guardarPrenda,
               child: _guardando
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : Text(widget.prenda != null ? 'Actualizar Prenda' : 'Crear Prenda', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  : Text(widget.prenda != null ? 'Actualizar Prenda' : 'Crear Prenda', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
             ),
           ],
         ),

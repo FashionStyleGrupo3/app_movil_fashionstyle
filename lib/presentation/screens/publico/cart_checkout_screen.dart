@@ -20,6 +20,7 @@ import 'package:fashion_style_mobile/data/services/wompi_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
 import 'package:fashion_style_mobile/presentation/widgets/payment/wompi_checkout_modal.dart';
 import 'package:go_router/go_router.dart';
@@ -249,14 +250,22 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
     final cartState = ref.read(cartProvider);
     if (cartState.items.isEmpty) return;
 
-    final buffer = StringBuffer('¡Hola Fashion Style! Me gustaría consultar y apartar las siguientes prendas:\n\n');
-    for (int i = 0; i < cartState.items.length; i++) {
-      final it = cartState.items[i];
-      buffer.writeln('${i + 1}. ${it.nombre} (Talla: ${it.talla}) x${it.cantidad} — ${CurrencyFormatter.formatearCOP(it.precio * it.cantidad)}');
-    }
-    buffer.writeln('\nTotal estimado: ${CurrencyFormatter.formatearCOP(cartState.totalMonto)}');
+    final lineas = cartState.items.map((i) {
+      return '- ${i.nombre} (Talla: ${i.talla}) x${i.cantidad} = ${CurrencyFormatter.formatearCOP(i.precio * i.cantidad)}';
+    }).join('\n');
 
-    final uri = Uri.parse('https://wa.me/573000000000?text=${Uri.encodeComponent(buffer.toString())}');
+    final mensaje = '''
+¡Hola Fashion Style! Deseo consultar la disponibilidad y apartar las siguientes prendas de mi bolsa:
+
+$lineas
+
+Total estimado: ${CurrencyFormatter.formatearCOP(cartState.totalMonto)}
+Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
+
+¿Podrían asistirme con el despacho? ¡Muchas gracias!
+''';
+
+    final uri = Uri.parse('https://wa.me/573001234567?text=${Uri.encodeComponent(mensaje.trim())}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -266,20 +275,35 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Vaciar bolsa de compras'),
-        content: const Text('¿Estás seguro de que deseas eliminar todas las prendas de tu bolsa?'),
+        backgroundColor: FashionColors.surfaceCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          '¿Vaciar bolsa de compras?',
+          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 18),
+        ),
+        content: Text(
+          'Se eliminarán todas las prendas que tienes agregadas en este momento.',
+          style: GoogleFonts.plusJakartaSans(fontSize: 13.5),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(
+              'Cancelar',
+              style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary),
+            ),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.peligro),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.statusDanger,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
             onPressed: () {
               ref.read(cartProvider.notifier).limpiarCarrito();
               Navigator.pop(ctx);
             },
-            child: const Text('Vaciar bolsa', style: TextStyle(color: Colors.white)),
+            child: const Text('Vaciar bolsa'),
           ),
         ],
       ),
@@ -293,11 +317,12 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
 
     return PublicShellLayout(
       child: RefreshIndicator(
-        color: FashionColors.rosaCorporativo,
-        onRefresh: () async => _cargarRelacionados(),
+        color: FashionColors.brandAccent,
+        backgroundColor: FashionColors.surfaceCard,
+        onRefresh: _cargarRelacionados,
         child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96), // Clearance para Floating Pill Dock
           children: [
             // SI SE RECIBIÓ CONFIRMACIÓN DE PAGO
             if (_reciboConfirmado != null)
@@ -313,17 +338,20 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                 children: [
                   Text(
                     'Bolsa de Compras (${cartState.totalPrendas})',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: FashionColors.textoOscuro,
+                      color: FashionColors.inkPrimary,
                     ),
                   ),
                   TextButton.icon(
-                    style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
+                    style: TextButton.styleFrom(foregroundColor: FashionColors.statusDanger),
                     onPressed: _confirmarVaciarCarrito,
                     icon: const Icon(Icons.delete_outline, size: 16),
-                    label: const Text('Vaciar bolsa', style: TextStyle(fontSize: 12)),
+                    label: Text(
+                      'Vaciar bolsa',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
@@ -334,7 +362,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
 
               const SizedBox(height: 20),
 
-              // RESUMEN DE COMPRA
+              // RESUMEN DE COMPRA CON JETBRAINS MONO
               _construirResumenFinanciero(cartState),
 
               const SizedBox(height: 20),
@@ -344,38 +372,41 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: FashionColors.rosaSuave,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: FashionColors.rosaCorporativo.withValues(alpha: 0.3)),
+                    color: FashionColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: FashionColors.borderSubtle),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: FashionColors.rosaOscuro),
+                      const Icon(Icons.info_outline, color: FashionColors.brandAccent),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Inicia sesión para pagar',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: FashionColors.textoOscuro),
+                              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13.5, color: FashionColors.inkPrimary),
                             ),
-                            const Text(
+                            Text(
                               'Guarda tu pedido, genera tu recibo y dale seguimiento a tus despachos.',
-                              style: TextStyle(fontSize: 11, color: FashionColors.textoMuted),
+                              style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: FashionColors.inkSecondary),
                             ),
                           ],
                         ),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: FashionColors.negroElegante,
+                          backgroundColor: FashionColors.inkPrimary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         onPressed: () => context.go('/login?redir=%2Fcarrito'),
-                        child: const Text('Ingresar', style: TextStyle(fontSize: 12)),
+                        child: Text(
+                          'Ingresar',
+                          style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
                       ),
                     ],
                   ),
@@ -393,18 +424,18 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: FashionColors.peligro.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.3)),
+                    color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: FashionColors.peligro, size: 20),
+                      const Icon(Icons.error_outline, color: FashionColors.statusDanger, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _errorPago!,
-                          style: const TextStyle(color: FashionColors.peligro, fontSize: 12, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.plusJakartaSans(color: FashionColors.statusDanger, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -413,15 +444,16 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
 
               const SizedBox(height: 16),
 
-              // BOTONES DE ACCIÓN: PAGAR CON WOMPI O WHATSAPP
+              // BOTONES DE ACCIÓN: PAGAR CON WOMPI TERRACOTTA (#B83A24) O WHATSAPP
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: FashionColors.negroElegante,
+                    backgroundColor: FashionColors.brandAccent,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 2,
                   ),
                   onPressed: _cargandoPago ? null : _pagarConWompi,
                   icon: _cargandoPago
@@ -433,7 +465,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                       : const Icon(Icons.credit_card),
                   label: Text(
                     _cargandoPago ? 'Conectando con Wompi...' : 'Pagar con Wompi Bancolombia',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 15),
                   ),
                 ),
               ),
@@ -445,14 +477,17 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                 height: 48,
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF0F766E),
-                    side: const BorderSide(color: Color(0xFF0D9488)),
-                    backgroundColor: const Color(0xFFF0FDFA),
+                    foregroundColor: FashionColors.atelierJade,
+                    side: const BorderSide(color: FashionColors.atelierJade),
+                    backgroundColor: FashionColors.surfaceCard,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: _enviarWhatsApp,
                   icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                  label: const Text('Consultar y apartar por WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  label: Text(
+                    'Consultar y apartar por WhatsApp',
+                    style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
               ),
 
@@ -460,14 +495,14 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
 
               // SECCIÓN INFERIOR DE PRODUCTOS RELACIONADOS
               if (_productosRelacionados.isNotEmpty) ...[
-                const Divider(),
+                const Divider(color: FashionColors.borderSubtle),
                 const SizedBox(height: 16),
                 Text(
                   'También te podría gustar',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: FashionColors.textoOscuro,
+                    color: FashionColors.inkPrimary,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -479,7 +514,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                     crossAxisCount: 2,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 0.62,
+                    childAspectRatio: 0.63,
                   ),
                   itemBuilder: (context, index) {
                     return ProductCardWidget(
@@ -502,29 +537,29 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: FashionColors.grisBorde),
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: FashionColors.borderSubtle),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             child: SizedBox(
-              width: 70,
-              height: 85,
+              width: 72,
+              height: 96,
               child: item.imagen.isNotEmpty
                   ? CachedNetworkImage(
                       imageUrl: item.imagen,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(color: FashionColors.rosaSuave),
-                      errorWidget: (_, __, ___) => const Icon(Icons.style, color: FashionColors.textoMuted),
+                      placeholder: (_, __) => Container(color: FashionColors.surfaceMuted),
+                      errorWidget: (_, __, ___) => const Icon(Icons.checkroom_rounded, color: FashionColors.inkSecondary),
                     )
-                  : const Icon(Icons.style, color: FashionColors.textoMuted),
+                  : const Icon(Icons.checkroom_rounded, color: FashionColors.inkSecondary),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,37 +568,36 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                   item.nombre,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: FashionColors.fondoClaro,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: FashionColors.grisBorde),
+                    color: FashionColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     'Talla: ${item.talla}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Text(
                       CurrencyFormatter.formatearCOP(item.precio),
-                      style: GoogleFonts.poppins(
+                      style: FashionTheme.priceTextStyle(
                         fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        color: FashionColors.textoOscuro,
+                        fontSize: 14.5,
+                        color: FashionColors.inkPrimary,
                       ),
                     ),
                     const Spacer(),
                     Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: FashionColors.grisBorde),
-                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: FashionColors.borderSubtle),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         children: [
@@ -572,15 +606,15 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                                 ? () => ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad - 1)
                                 : null,
                             child: const Padding(
-                              padding: EdgeInsets.all(4.0),
-                              child: Icon(Icons.remove, size: 16),
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(Icons.remove, size: 16, color: FashionColors.inkPrimary),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               '${item.cantidad}',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary),
                             ),
                           ),
                           InkWell(
@@ -588,8 +622,8 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                                 ? () => ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad + 1)
                                 : null,
                             child: const Padding(
-                              padding: EdgeInsets.all(4.0),
-                              child: Icon(Icons.add, size: 16),
+                              padding: EdgeInsets.all(5.0),
+                              child: Icon(Icons.add, size: 16, color: FashionColors.inkPrimary),
                             ),
                           ),
                         ],
@@ -597,7 +631,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 18, color: FashionColors.peligro),
+                      icon: const Icon(Icons.close_rounded, size: 18, color: FashionColors.statusDanger),
                       tooltip: 'Eliminar',
                       onPressed: () => ref.read(cartProvider.notifier).eliminarPrenda(item.varianteId),
                     ),
@@ -613,40 +647,49 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
 
   Widget _construirResumenFinanciero(CartState cart) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: FashionColors.grisBorde),
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: FashionColors.borderSubtle),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Subtotal prendas:', style: TextStyle(color: FashionColors.textoMuted)),
-              Text(CurrencyFormatter.formatearCOP(cart.totalMonto), style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text('Subtotal prendas:', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13)),
+              Text(
+                CurrencyFormatter.formatearCOP(cart.totalMonto),
+                style: FashionTheme.priceTextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Costo de envío:', style: TextStyle(color: FashionColors.textoMuted)),
-              Text('Gratis a nivel nacional', style: TextStyle(color: FashionColors.verdeExito, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Total a pagar:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Costo de envío:', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13)),
+              Text(
+                'Gratis a nivel nacional',
+                style: GoogleFonts.plusJakartaSans(color: FashionColors.statusSuccess, fontWeight: FontWeight.w700, fontSize: 12.5),
+              ),
+            ],
+          ),
+          const Divider(height: 24, color: FashionColors.borderSubtle),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total a pagar:',
+                style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+              ),
               Text(
                 CurrencyFormatter.formatearCOP(cart.totalMonto),
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
+                style: FashionTheme.priceTextStyle(
+                  fontSize: 19,
                   fontWeight: FontWeight.w700,
-                  color: FashionColors.textoOscuro,
+                  color: FashionColors.inkPrimary,
                 ),
               ),
             ],
@@ -659,40 +702,55 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
   Widget _construirFormularioEntrega() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: FashionColors.grisBorde),
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: FashionColors.borderSubtle),
       ),
       child: ExpansionTile(
         initiallyExpanded: _mostrarFormularioEnvio,
         onExpansionChanged: (exp) => setState(() => _mostrarFormularioEnvio = exp),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.local_shipping_outlined, color: FashionColors.rosaOscuro, size: 20),
-            SizedBox(width: 8),
+            const Icon(Icons.local_shipping_outlined, color: FashionColors.brandAccent, size: 20),
+            const SizedBox(width: 10),
             Text(
               'Datos para el Envío y Factura',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary),
             ),
           ],
         ),
-        childrenPadding: const EdgeInsets.all(16),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
           TextField(
             controller: _nombreCtrl,
-            decoration: const InputDecoration(labelText: 'Nombre completo destinatario *', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Nombre completo destinatario *',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _correoCtrl,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(labelText: 'Correo electrónico *', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Correo electrónico *',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _telefonoCtrl,
             keyboardType: TextInputType.phone,
-            decoration: const InputDecoration(labelText: 'Teléfono de contacto (10 dígitos) *', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Teléfono de contacto (10 dígitos) *',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            ),
           ),
           const SizedBox(height: 12),
           // Autocomplete de ciudad colombiana
@@ -710,11 +768,13 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
               return TextField(
                 controller: controller,
                 focusNode: focusNode,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Ciudad de destino *',
                   hintText: 'Ej. Medellín, Bogotá, Cali...',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.location_city, size: 18),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  suffixIcon: const Icon(Icons.location_city, size: 18, color: FashionColors.inkSecondary),
                 ),
                 onChanged: (val) {
                   _ciudadCtrl.text = val;
@@ -726,9 +786,11 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
           const SizedBox(height: 12),
           TextField(
             controller: _direccionCtrl,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Dirección completa (calle, número, apto/barrio) *',
-              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
           ),
         ],
@@ -739,39 +801,35 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
   Widget _construirCarritoVacio() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 60.0),
+        padding: const EdgeInsets.symmetric(vertical: 40.0),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: FashionColors.rosaSuave,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.shopping_bag_outlined, size: 54, color: FashionColors.rosaOscuro),
+            const AtelierEmptyStateIllustration(
+              type: AtelierEmptyStateType.emptyBag,
+              size: 140,
             ),
             const SizedBox(height: 20),
             Text(
               'Tu bolsa de compras está vacía',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.spaceGrotesk(
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
-                color: FashionColors.textoOscuro,
+                color: FashionColors.inkPrimary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Descubre nuestras colecciones exclusivas y agrega tus prendas favoritas.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: FashionColors.textoMuted, fontSize: 13),
+              style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: FashionColors.negroElegante,
+                backgroundColor: FashionColors.inkPrimary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
               ),
               onPressed: () => context.go('/catalogo'),
               child: const Text('Explorar el catálogo'),
@@ -787,37 +845,44 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: FashionColors.verdeExito.withValues(alpha: 0.4)),
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: FashionColors.statusSuccess.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFFDCFCE7),
+            decoration: BoxDecoration(
+              color: FashionColors.statusSuccess.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check_circle, size: 48, color: FashionColors.verdeExito),
+            child: const Icon(Icons.check_circle_rounded, size: 48, color: FashionColors.statusSuccess),
           ),
           const SizedBox(height: 16),
           Text(
             '¡Pago Confirmado con Éxito!',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.spaceGrotesk(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: FashionColors.textoOscuro,
+              color: FashionColors.inkPrimary,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Tu orden ha sido registrada en el sistema de Fashion Style y comenzará su empaque.',
+          Text(
+            'Tu orden ha sido registrada en el sistema de Fashion Style y comenzará su confección y despacho.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: FashionColors.textoMuted),
+            style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
           ),
           const SizedBox(height: 20),
-          const Divider(),
+          const Divider(color: FashionColors.borderSubtle),
           const SizedBox(height: 12),
           _filaRecibo('Referencia de pedido:', r.referencia),
           if (r.transaccionId != null) _filaRecibo('ID Transacción Wompi:', r.transaccionId!),
@@ -828,6 +893,11 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
             children: [
               Expanded(
                 child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: FashionColors.inkPrimary,
+                    side: const BorderSide(color: FashionColors.borderSubtle),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
                   onPressed: () => context.go('/catalogo'),
                   child: const Text('Seguir comprando'),
                 ),
@@ -835,7 +905,11 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.inkPrimary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
                   onPressed: () => context.go('/perfil?seccion=pedidos'),
                   child: const Text('Ver mis pedidos'),
                 ),
@@ -853,14 +927,13 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(etiqueta, style: const TextStyle(fontSize: 12, color: FashionColors.textoMuted)),
-          Text(valor, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: FashionColors.textoOscuro)),
+          Text(etiqueta, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary)),
+          Text(
+            valor,
+            style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+          ),
         ],
       ),
     );
   }
 }
-
-// ============================================================================
-// VISTA TÉRMINOS Y CONDICIONES (VistaTerminos.vue)
-// ============================================================================

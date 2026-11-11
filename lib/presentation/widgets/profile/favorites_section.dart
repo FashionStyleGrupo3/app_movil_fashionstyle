@@ -2,12 +2,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/product/product.dart';
 import 'package:fashion_style_mobile/data/models/product/promotion.dart';
 import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/data/services/promotion_service.dart';
 import 'package:fashion_style_mobile/presentation/providers/favorites_provider.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
 import 'package:go_router/go_router.dart';
 
@@ -54,7 +56,7 @@ class _SeccionFavoritosState extends ConsumerState<SeccionFavoritos> {
     final prendasFavoritas = _productos.where((p) => favsState.esFavorito(p.idProducto)).toList();
 
     if (_cargando) {
-      return const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo));
+      return const Center(child: CircularProgressIndicator(color: FashionColors.inkPrimary));
     }
 
     if (prendasFavoritas.isEmpty) {
@@ -64,15 +66,33 @@ class _SeccionFavoritosState extends ConsumerState<SeccionFavoritos> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.favorite_border, size: 48, color: FashionColors.textoMuted),
-              const SizedBox(height: 12),
-              const Text(
-                'No tienes prendas guardadas en favoritos',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              const AtelierEmptyStateIllustration(
+                type: AtelierEmptyStateType.emptyBag,
+                size: 130,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              Text(
+                'No tienes prendas en tus favoritos',
+                style: GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 17,
+                  color: FashionColors.inkPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Guarda las piezas de sastrería que más te gusten para revisarlas o comprarlas luego.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
+              ),
+              const SizedBox(height: 24),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FashionColors.inkPrimary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                ),
                 onPressed: () => context.go('/catalogo'),
                 child: const Text('Descubrir catálogo'),
               ),
@@ -83,13 +103,13 @@ class _SeccionFavoritosState extends ConsumerState<SeccionFavoritos> {
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 96), // Clearance para Floating Pill Dock
       itemCount: prendasFavoritas.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: 16,
+        mainAxisSpacing: 14,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.62,
+        childAspectRatio: 0.63,
       ),
       itemBuilder: (context, index) {
         return ProductCardWidget(

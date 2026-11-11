@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <style>
+      .bg-canvas { fill: #EBEEF3; }
+      .border-box { fill: none; stroke: #DFE3EC; stroke-width: 2; }
+      .ruler-line { stroke: #DFE3EC; stroke-width: 1.5; }
+      .ruler-tick { stroke: #525866; stroke-width: 1; }
+      .pattern-cut { fill: #FFFFFF; stroke: #14161F; stroke-width: 3.5; stroke-linejoin: round; }
+      .tailor-guideline { fill: none; stroke: #B83A24; stroke-width: 2; stroke-dasharray: 6,4; }
+      .fold-guideline { fill: none; stroke: #525866; stroke-width: 1.5; stroke-dasharray: 4,3; }
+      .grainline { stroke: #115E59; stroke-width: 2; marker-start: url(#arrow-start); marker-end: url(#arrow-end); }
+      .notch { stroke: #B83A24; stroke-width: 3; stroke-linecap: square; }
+      .brand-mono { font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 15px; font-weight: 700; fill: #14161F; letter-spacing: 2px; }
+      .brand-sub { font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 10px; font-weight: 600; fill: #525866; letter-spacing: 1.5px; }
+      .size-pill { fill: #14161F; }
+      .size-text { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; fill: #FFFFFF; }
+    </style>
+  </defs>
+
+  <!-- Background Base (#EBEEF3) -->
+  <rect width="512" height="512" rx="24" class="bg-canvas"/>
+  <rect x="16" y="16" width="480" height="480" rx="16" class="border-box"/>
+
+  <!-- Atelier Cutting Mat Grid Overlay -->
+  <g opacity="0.6">
+    <line x1="16" y1="96" x2="496" y2="96" class="ruler-line"/>
+    <line x1="16" y1="176" x2="496" y2="176" class="ruler-line"/>
+    <line x1="16" y1="256" x2="496" y2="256" class="ruler-line"/>
+    <line x1="16" y1="336" x2="496" y2="336" class="ruler-line"/>
+    <line x1="16" y1="416" x2="496" y2="416" class="ruler-line"/>
+
+    <line x1="96" y1="16" x2="96" y2="496" class="ruler-line"/>
+    <line x1="176" y1="16" x2="176" y2="496" class="ruler-line"/>
+    <line x1="256" y1="16" x2="256" y2="496" class="ruler-line"/>
+    <line x1="336" y1="16" x2="336" y2="496" class="ruler-line"/>
+    <line x1="416" y1="16" x2="416" y2="496" class="ruler-line"/>
+  </g>
+
+  <!-- TECHNICAL GARMENT PATTERN SILHOUETTE (Sartorial Blazer Pattern Front Half) -->
+  <g transform="translate(256, 230)">
+    <!-- Main Pattern Piece (Lapel + Body + Hem) -->
+    <path d="M -90 -160 L -40 -160 L -10 -90 L 0 -90 L 10 -90 L 40 -160 L 90 -160 L 120 -100 L 110 -20 L 115 110 L 90 150 L -90 150 L -115 110 L -110 -20 L -120 -100 Z" class="pattern-cut"/>
+
+    <!-- Lapel / Collar Construction (V-Neck Tailor Cut) -->
+    <path d="M -40 -160 L 0 -30 L 40 -160" class="tailor-guideline"/>
+    <line x1="0" y1="-30" x2="0" y2="150" class="fold-guideline"/>
+
+    <!-- Bust & Chest Dart Guidelines (Pinzas de entalle) -->
+    <path d="M -60 10 L -50 80 L -60 150" class="tailor-guideline"/>
+    <path d="M 60 10 L 50 80 L 60 150" class="tailor-guideline"/>
+
+    <!-- Waistline Reference Line (Línea de cintura técnica) -->
+    <line x1="-106" y1="36" x2="106" y2="36" class="fold-guideline"/>
+
+    <!-- Seam Allowance Notches (Piquetes de costura en Terracotta) -->
+    <line x1="-122" y1="-60" x2="-112" y2="-60" class="notch"/>
+    <line x1="112" y1="-60" x2="122" y2="-60" class="notch"/>
+    <line x1="-116" y1="60" x2="-106" y2="60" class="notch"/>
+    <line x1="106" y1="60" x2="116" y2="60" class="notch"/>
+
+    <!-- Tailor Grainline (Línea de aplomo del hilo) -->
+    <line x1="-24" y1="-10" x2="-24" y2="110" stroke="#115E59" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="-24,-16 -28,-6 -20,-6" fill="#115E59"/>
+    <polygon points="-24,116 -28,106 -20,106" fill="#115E59"/>
+
+    <!-- Pocket Placement Marker -->
+    <rect x="-80" y="55" width="40" height="18" rx="2" fill="none" stroke="#525866" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <rect x="40" y="55" width="40" height="18" rx="2" fill="none" stroke="#525866" stroke-width="1.5" stroke-dasharray="3,3"/>
+  </g>
+
+  <!-- Brand Label & Production Reference -->
+  <g transform="translate(256, 436)">
+    <!-- Label Banner -->
+    <rect x="-120" y="-18" width="240" height="36" rx="8" fill="#FFFFFF" stroke="#DFE3EC" stroke-width="1.5"/>
+    <text x="0" y="-1" class="brand-mono" text-anchor="middle">FASHIONSTYLE</text>
+    <text x="0" y="11" class="brand-sub" text-anchor="middle">ATELIER PATTERN PIECE &bull; 01-A</text>
+  </g>
+
+  <!-- Technical Spec Badges (Top Left & Top Right) -->
+  <g transform="translate(32, 42)">
+    <rect width="68" height="20" rx="6" class="size-pill"/>
+    <text x="34" y="14" class="size-text" text-anchor="middle">GRAIN: 90°</text>
+  </g>
+  <g transform="translate(412, 42)">
+    <rect width="68" height="20" rx="6" class="size-pill"/>
+    <text x="34" y="14" class="size-text" text-anchor="middle">SEAM: 1.5CM</text>
+  </g>
+</svg>

@@ -10,6 +10,7 @@ import 'package:fashion_style_mobile/core/validators/password_validator.dart';
 import 'package:fashion_style_mobile/data/services/city_validation_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
+import 'package:fashion_style_mobile/presentation/widgets/auth/auth_brand_banner.dart';
 import 'package:fashion_style_mobile/presentation/widgets/auth/password_requirements_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -130,182 +131,240 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       currentIndex: 3,
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 96), // Clearance para Floating Pill Dock
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: Container(
-              padding: const EdgeInsets.all(28),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: FashionColors.grisBorde),
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: FashionColors.borderSubtle),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 4)),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 18, offset: const Offset(0, 6)),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Crear Cuenta',
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: FashionColors.textoOscuro,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Únete a Fashion Style y disfruta de promociones exclusivas.',
-                    style: TextStyle(fontSize: 13, color: FashionColors.textoMuted),
-                  ),
-                  const SizedBox(height: 24),
+                  const AuthBrandBanner(height: 140),
 
-                  if (_error != null)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: FashionColors.peligro.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.3)),
-                      ),
-                      child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
-                    ),
-
-                  TextField(
-                    controller: _nombreCtrl,
-                    decoration: const InputDecoration(labelText: 'Nombre completo *', border: OutlineInputBorder()),
-                  ),
-                  const SizedBox(height: 14),
-
-                  TextField(
-                    controller: _correoCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Correo electrónico *', border: OutlineInputBorder()),
-                  ),
-                  const SizedBox(height: 14),
-
-                  TextField(
-                    controller: _telefonoCtrl,
-                    keyboardType: TextInputType.phone,
-                    decoration: const InputDecoration(
-                      labelText: 'Celular (10 dígitos) *',
-                      hintText: 'Ej. 3001234567',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  Autocomplete<String>(
-                    optionsBuilder: (textEditingValue) async {
-                      if (textEditingValue.text.length < 2) return const [];
-                      return await CityValidationService.instance.buscarCiudades(textEditingValue.text);
-                    },
-                    onSelected: (seleccion) => _ciudadCtrl.text = seleccion,
-                    fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                      return TextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        decoration: const InputDecoration(
-                          labelText: 'Ciudad de residencia *',
-                          hintText: 'Ej. Medellín, Cali...',
-                          border: OutlineInputBorder(),
+                  Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Crear Cuenta',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: FashionColors.inkPrimary,
+                          ),
                         ),
-                        onChanged: (val) => _ciudadCtrl.text = val,
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 14),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Únete a Fashion Style y disfruta de confección atelier y lanzamientos exclusivos.',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            color: FashionColors.inkSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
 
-                  TextField(
-                    controller: _direccionCtrl,
-                    decoration: const InputDecoration(labelText: 'Dirección habitual *', border: OutlineInputBorder()),
-                  ),
-                  const SizedBox(height: 14),
+                        if (_error != null)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
+                            ),
+                            child: Text(
+                              _error!,
+                              style: GoogleFonts.plusJakartaSans(color: FashionColors.statusDanger, fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                          ),
 
-                  TextField(
-                    controller: _passCtrl,
-                    obscureText: _ocultarPass,
-                    onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña *',
-                      suffixIcon: IconButton(
-                        icon: Icon(_ocultarPass ? Icons.visibility_off : Icons.visibility, size: 20),
-                        onPressed: () => setState(() => _ocultarPass = !_ocultarPass),
-                      ),
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+                        TextField(
+                          controller: _nombreCtrl,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Nombre completo *',
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
 
-                  // Requisitos de contraseña
-                  PasswordRequirementsWidget(password: _passCtrl.text),
-                  const SizedBox(height: 14),
+                        TextField(
+                          controller: _correoCtrl,
+                          keyboardType: TextInputType.emailAddress,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Correo electrónico *',
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
 
-                  TextField(
-                    controller: _passConfirmCtrl,
-                    obscureText: _ocultarPass,
-                    decoration: const InputDecoration(labelText: 'Confirmar contraseña *', border: OutlineInputBorder()),
-                  ),
-                  const SizedBox(height: 14),
+                        TextField(
+                          controller: _telefonoCtrl,
+                          keyboardType: TextInputType.phone,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Celular (10 dígitos) *',
+                            hintText: 'Ej. 3001234567',
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
 
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _aceptaTerminos,
-                        activeColor: FashionColors.negroElegante,
-                        onChanged: (val) => setState(() => _aceptaTerminos = val ?? false),
-                      ),
-                      Expanded(
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'He leído y acepto los ',
-                            style: const TextStyle(fontSize: 12, color: FashionColors.textoOscuro),
-                            children: [
-                              TextSpan(
-                                text: 'Términos y Condiciones',
-                                style: const TextStyle(color: FashionColors.rosaOscuro, fontWeight: FontWeight.bold),
-                                recognizer: TapGestureRecognizer()..onTap = () => context.go('/terminos'),
+                        Autocomplete<String>(
+                          optionsBuilder: (textEditingValue) async {
+                            if (textEditingValue.text.length < 2) return const [];
+                            return await CityValidationService.instance.buscarCiudades(textEditingValue.text);
+                          },
+                          onSelected: (seleccion) => _ciudadCtrl.text = seleccion,
+                          fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                            return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                              decoration: InputDecoration(
+                                labelText: 'Ciudad de residencia *',
+                                hintText: 'Ej. Medellín, Cali...',
+                                labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                                filled: true,
+                                fillColor: FashionColors.surfaceMuted,
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                               ),
-                            ],
+                              onChanged: (val) => _ciudadCtrl.text = val,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 14),
+
+                        TextField(
+                          controller: _direccionCtrl,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Dirección habitual *',
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(height: 14),
 
-                  const SizedBox(height: 16),
-
-                  SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.negroElegante,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: _cargando ? null : _registrar,
-                      child: _cargando
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Crear mi cuenta', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                        text: '¿Ya tienes una cuenta? ',
-                        style: const TextStyle(color: FashionColors.textoMuted, fontSize: 13),
-                        children: [
-                          TextSpan(
-                            text: 'Inicia sesión',
-                            style: const TextStyle(color: FashionColors.rosaOscuro, fontWeight: FontWeight.bold),
-                            recognizer: TapGestureRecognizer()..onTap = () => context.go('/login'),
+                        TextField(
+                          controller: _passCtrl,
+                          obscureText: _ocultarPass,
+                          onChanged: (_) => setState(() {}),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Contraseña *',
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            suffixIcon: IconButton(
+                              icon: Icon(_ocultarPass ? Icons.visibility_off : Icons.visibility, size: 20, color: FashionColors.inkSecondary),
+                              onPressed: () => setState(() => _ocultarPass = !_ocultarPass),
+                            ),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Requisitos de contraseña atelier
+                        PasswordRequirementsWidget(password: _passCtrl.text),
+                        const SizedBox(height: 14),
+
+                        TextField(
+                          controller: _passConfirmCtrl,
+                          obscureText: _ocultarPass,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                          decoration: InputDecoration(
+                            labelText: 'Confirmar contraseña *',
+                            labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                            filled: true,
+                            fillColor: FashionColors.surfaceMuted,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _aceptaTerminos,
+                              activeColor: FashionColors.brandAccent,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              onChanged: (val) => setState(() => _aceptaTerminos = val ?? false),
+                            ),
+                            Expanded(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: 'He leído y acepto los ',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkPrimary),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Términos y Condiciones',
+                                      style: GoogleFonts.plusJakartaSans(color: FashionColors.brandAccent, fontWeight: FontWeight.w700),
+                                      recognizer: TapGestureRecognizer()..onTap = () => context.go('/terminos'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: FashionColors.brandAccent,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 2,
+                            ),
+                            onPressed: _cargando ? null : _registrar,
+                            child: _cargando
+                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                : Text('Crear mi cuenta', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 15)),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+                        Center(
+                          child: RichText(
+                            text: TextSpan(
+                              text: '¿Ya tienes una cuenta? ',
+                              style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
+                              children: [
+                                TextSpan(
+                                  text: 'Inicia sesión',
+                                  style: GoogleFonts.plusJakartaSans(color: FashionColors.brandAccent, fontWeight: FontWeight.w700),
+                                  recognizer: TapGestureRecognizer()..onTap = () => context.go('/login'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -317,7 +376,3 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 }
-
-// ============================================================================
-// 3. VISTA VERIFICAR CORREO (VistaVerificarCorreo.vue)
-// ============================================================================

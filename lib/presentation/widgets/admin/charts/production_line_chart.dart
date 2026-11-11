@@ -1,7 +1,6 @@
 // @source-mirror: src/components/admin/GraficoPanel.vue
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/dashboard/dashboard_models.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/charts/chart_helpers.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,9 +34,10 @@ class ProductionLineChartWidget extends StatelessWidget {
               : Center(
                   child: Text(
                     'Aún no hay datos de producción en este periodo.',
-                    style: GoogleFonts.montserrat(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 12,
-                      color: AdminPalette.textoMuted,
+                      color: AdminPalette.textMuted,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -45,15 +45,15 @@ class ProductionLineChartWidget extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: const [
             IndicadorLeyenda(
-              color: AdminPalette.arena,
+              color: AdminPalette.brandAccent,
               etiqueta: 'Unidades planificadas',
               esPunto: true,
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             IndicadorLeyenda(
-              color: AdminPalette.negro,
+              color: AdminPalette.inkPrimary,
               etiqueta: 'Unidades completadas',
               esPunto: true,
             ),
@@ -76,17 +76,30 @@ class ProductionLineChartWidget extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AdminPalette.crema,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AdminPalette.arenaSuave),
+                  border: Border.all(color: AdminPalette.borderSubtle),
                 ),
-                child: Text(
-                  '$nombre: ${entry.value}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: FashionColors.textoOscuro,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$nombre: ',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AdminPalette.textSecondary,
+                      ),
+                    ),
+                    Text(
+                      '${entry.value}',
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AdminPalette.inkPrimary,
+                      ),
+                    ),
+                  ],
                 ),
               );
             }).toList(),
@@ -104,7 +117,7 @@ class _ProductionLineChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const double paddingLeft = 35;
+    const double paddingLeft = 38;
     const double paddingRight = 15;
     const double paddingTop = 15;
     const double paddingBottom = 26;
@@ -121,7 +134,7 @@ class _ProductionLineChartPainter extends CustomPainter {
     maxVal = maxVal * 1.2;
 
     final gridPaint = Paint()
-      ..color = AdminPalette.arenaSuave
+      ..color = AdminPalette.borderSubtle
       ..strokeWidth = 1;
 
     // Líneas guía horizontales
@@ -136,9 +149,9 @@ class _ProductionLineChartPainter extends CustomPainter {
       final val = maxVal * (i / 3.0);
       final textSpan = TextSpan(
         text: formatearNumeroGrafico(val),
-        style: GoogleFonts.montserrat(
-          fontSize: 9,
-          color: AdminPalette.textoMuted,
+        style: GoogleFonts.jetBrainsMono(
+          fontSize: 9.5,
+          color: AdminPalette.textMuted,
           fontWeight: FontWeight.w500,
         ),
       );
@@ -169,10 +182,10 @@ class _ProductionLineChartPainter extends CustomPainter {
       final mesTexto = formatearNombreMesGrafico(items[i].mes);
       final mesSpan = TextSpan(
         text: mesTexto,
-        style: GoogleFonts.montserrat(
-          fontSize: 9,
-          color: AdminPalette.textoMuted,
-          fontWeight: FontWeight.w500,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 9.5,
+          color: AdminPalette.textMuted,
+          fontWeight: FontWeight.w600,
         ),
       );
       final mesTp = TextPainter(
@@ -192,25 +205,25 @@ class _ProductionLineChartPainter extends CustomPainter {
       fillPath.close();
 
       final fillPaint = Paint()
-        ..color = AdminPalette.arena.withValues(alpha: 0.25)
+        ..color = AdminPalette.brandAccent.withValues(alpha: 0.10)
         ..style = PaintingStyle.fill;
       canvas.drawPath(fillPath, fillPaint);
     }
 
-    // Línea de Planificadas (Arena)
+    // Línea de Planificadas (Brand Accent / Terracotta)
     _dibujarLineaYVertices(
       canvas: canvas,
       puntos: puntosPlan,
-      color: AdminPalette.arena,
+      color: AdminPalette.brandAccent,
       grosor: 2.2,
       radioPunto: 3.5,
     );
 
-    // Línea de Completadas (Negro)
+    // Línea de Completadas (Ink Primary / Mineral Noir)
     _dibujarLineaYVertices(
       canvas: canvas,
       puntos: puntosComp,
-      color: AdminPalette.negro,
+      color: AdminPalette.inkPrimary,
       grosor: 2.2,
       radioPunto: 3.5,
     );
@@ -255,7 +268,3 @@ class _ProductionLineChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ProductionLineChartPainter oldDelegate) => true;
 }
-
-// ============================================================================
-// 4. STOCK ALERTS DOUGHNUT: ALERTAS AUTOMÁTICAS
-// ============================================================================

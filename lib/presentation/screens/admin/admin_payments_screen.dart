@@ -156,15 +156,15 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
               padding: const EdgeInsets.all(16),
               children: [
                 // CONTROL PARALELO DE INGRESOS
-                Text('Control Paralelo de Recaudos', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700)),
+                Text('Control Paralelo de Recaudos', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    _cardRecaudo('Wompi Online', CurrencyFormatter.formatearCOP(_control?.recaudoWompiOnline ?? 0), '${_control?.cantidadPedidosPagados ?? 0} pedidos', FashionColors.rosaCorporativo),
+                    _cardRecaudo('Wompi Online', CurrencyFormatter.formatearCOP(_control?.recaudoWompiOnline ?? 0), '${_control?.cantidadPedidosPagados ?? 0} pedidos', FashionColors.brandAccent),
                     const SizedBox(width: 8),
-                    _cardRecaudo('POS Mostrador', CurrencyFormatter.formatearCOP(_control?.recaudoPosMostrador ?? 0), '${_control?.cantidadVentasPos ?? 0} ventas', const Color(0xFF2563EB)),
+                    _cardRecaudo('POS Mostrador', CurrencyFormatter.formatearCOP(_control?.recaudoPosMostrador ?? 0), '${_control?.cantidadVentasPos ?? 0} ventas', FashionColors.atelierJade),
                     const SizedBox(width: 8),
-                    _cardRecaudo('Consolidado', CurrencyFormatter.formatearCOP(totalConsolidado), '${_control?.facturasEmitidas ?? 0} facturas', FashionColors.verdeExito),
+                    _cardRecaudo('Consolidado', CurrencyFormatter.formatearCOP(totalConsolidado), '${_control?.facturasEmitidas ?? 0} facturas', FashionColors.statusSuccess),
                   ],
                 ),
 
@@ -174,7 +174,7 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Dispersión en Cuentas Bancarias', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700)),
+                    Text('Dispersión en Cuentas Bancarias', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
                     TextButton.icon(
                       onPressed: () => _abrirModalCuenta(),
                       icon: const Icon(Icons.add, size: 16),
@@ -212,10 +212,16 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
 
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.brandAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                   onPressed: _guardando ? null : _guardarConfiguracion,
-                  child: _guardando ? const CircularProgressIndicator(color: Colors.white) : const Text('Guardar Configuración de Dispersión', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: _guardando ? const CircularProgressIndicator(color: Colors.white) : Text('Guardar Configuración de Dispersión', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700)),
                 ),
+                const SizedBox(height: 96),
               ],
             ),
     );
@@ -225,14 +231,19 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: col.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(
+          color: col.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: col.withValues(alpha: 0.2)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(monto, style: TextStyle(fontWeight: FontWeight.bold, color: col, fontSize: 13)),
-            const SizedBox(height: 2),
-            Text(titulo, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-            Text(sub, style: const TextStyle(fontSize: 10, color: FashionColors.textoMuted)),
+            Text(monto, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, color: col, fontSize: 13)),
+            const SizedBox(height: 4),
+            Text(titulo, style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
+            const SizedBox(height: 1),
+            Text(sub, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: FashionColors.inkSecondary)),
           ],
         ),
       ),

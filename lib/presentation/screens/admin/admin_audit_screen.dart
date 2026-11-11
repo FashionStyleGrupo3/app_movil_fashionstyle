@@ -5,6 +5,7 @@ import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/audit_text_formatter.dart';
 import 'package:fashion_style_mobile/data/services/security_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminAuditScreen extends ConsumerStatefulWidget {
   const AdminAuditScreen({super.key});
@@ -75,11 +76,11 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
           ),
           Expanded(
             child: _cargando
-                ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+                ? const Center(child: CircularProgressIndicator(color: FashionColors.brandAccent))
                 : _auditorias.isEmpty
                     ? const Center(child: Text('No hay registros de auditoría'))
                     : ListView.builder(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                         itemCount: _auditorias.length,
                         itemBuilder: (context, index) {
                           final a = _auditorias[index];
@@ -90,12 +91,21 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
                           final usuarioFmt = AuditTextFormatter.formatearUsuario(a['user'] ?? a['usuario']);
 
                           return Card(
-                            elevation: 0.5,
+                            elevation: 0,
                             margin: const EdgeInsets.only(bottom: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
                             child: ListTile(
-                              leading: const Icon(Icons.history, color: FashionColors.pizarra),
-                              title: Text(desc.titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                              subtitle: Text('$dia · $relativo · Usuario: $usuarioFmt', style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted)),
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(color: FashionColors.surfaceMuted, borderRadius: BorderRadius.circular(10)),
+                                child: const Icon(Icons.history, color: FashionColors.brandAccent, size: 20),
+                              ),
+                              title: Text(desc.titulo, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+                              subtitle: Text(
+                                '$dia · $relativo · Usuario: $usuarioFmt',
+                                style: GoogleFonts.jetBrainsMono(fontSize: 10.5, color: FashionColors.inkSecondary),
+                              ),
                             ),
                           );
                         },

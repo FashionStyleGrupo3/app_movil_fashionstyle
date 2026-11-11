@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <style>
+      .bg-oct { fill: #FFFFFF; stroke: #DFE3EC; stroke-width: 4; }
+      .frame-oct { fill: none; stroke: #14161F; stroke-width: 12; stroke-linejoin: round; }
+      .inner-grid { fill: none; stroke: #EBEEF3; stroke-width: 2; stroke-dasharray: 4,4; }
+      .monogram-stem { fill: #14161F; }
+      .stitch-accent { stroke: #B83A24; stroke-width: 8; stroke-linecap: round; stroke-dasharray: 18,10; }
+      .stitch-solid { stroke: #B83A24; stroke-width: 6; stroke-linecap: round; }
+      .knot { fill: #B83A24; }
+      .subtext { font-family: 'Space Grotesk', -apple-system, sans-serif; font-size: 16px; font-weight: 700; fill: #525866; letter-spacing: 6px; }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" fill="#F6F7F9" rx="80"/>
+
+  <!-- Sartorial Octagon Outer Border -->
+  <polygon points="150,36 362,36 476,150 476,362 362,476 150,476 36,362 36,150" class="bg-oct"/>
+  <polygon points="154,44 358,44 468,154 468,358 358,468 154,468 44,358 44,154" class="frame-oct"/>
+
+  <!-- Tailor Grid Guidelines inside Octagon -->
+  <line x1="256" y1="56" x2="256" y2="456" class="inner-grid"/>
+  <line x1="56" y1="256" x2="456" y2="256" class="inner-grid"/>
+  <circle cx="256" cy="256" r="140" class="inner-grid"/>
+
+  <!-- GEOMETRIC MONOGRAM 'FS' -->
+  <g transform="translate(146, 126)">
+    <!-- Letter 'F' Architecture -->
+    <!-- Vertical Spine -->
+    <rect x="0" y="0" width="36" height="260" rx="4" class="monogram-stem"/>
+    <!-- Top Horizontal Bar -->
+    <path d="M 0 0 L 105 0 C 112 0 118 6 118 13 L 118 25 C 118 32 112 38 105 38 L 36 38 L 36 0 Z" class="monogram-stem"/>
+    <!-- Middle Horizontal Bar -->
+    <path d="M 0 100 L 85 100 C 92 100 98 106 98 113 L 98 125 C 98 132 92 138 85 138 L 36 138 L 36 100 Z" class="monogram-stem"/>
+
+    <!-- Letter 'S' Architecture (Interlocking Sartorial Precision) -->
+    <!-- Upper Top Bar -->
+    <path d="M 125 0 L 210 0 C 218 0 224 6 224 14 L 224 50 C 224 58 218 64 210 64 L 140 64 C 132 64 126 70 126 78 L 126 94 C 126 102 132 108 140 108 L 210 108 C 220 108 226 116 226 126 L 226 182 C 226 192 218 200 208 200 L 105 200 C 97 200 91 194 91 186 L 91 168 L 126 168 L 126 172 C 126 174 128 176 130 176 L 194 176 C 196 176 198 174 198 172 L 198 134 C 198 132 196 130 194 130 L 130 130 C 116 130 104 118 104 104 L 104 74 C 104 60 116 48 130 48 L 196 48 C 198 48 200 46 200 44 L 200 26 C 200 24 198 22 196 22 L 125 22 Z" class="monogram-stem"/>
+  </g>
+
+  <!-- SARTORIAL COUTURE ACCENT: Diagonal Terracotta Thread & Stitching -->
+  <!-- Diagonal stitch line cutting through the composition from lower-left to upper-right -->
+  <line x1="86" y1="410" x2="426" y2="102" class="stitch-accent"/>
+  <!-- Anchor points (Needle entrance/exit points) -->
+  <circle cx="86" cy="410" r="8" class="knot"/>
+  <circle cx="426" cy="102" r="8" class="knot"/>
+  <!-- Tangible Tailor's Needle Silhouette at the head -->
+  <g transform="translate(426, 102) rotate(-42)">
+    <path d="M 0 -24 L 6 0 L 0 42 L -6 0 Z" fill="#14161F"/>
+    <ellipse cx="0" cy="-14" rx="2" ry="5" fill="#F6F7F9"/>
+    <!-- Thread looped through eye -->
+    <path d="M 0 -14 C 12 -28 24 -10 18 12" class="stitch-solid"/>
+  </g>
+
+  <!-- Precision Dot Markings at the 4 Cardinal Corners -->
+  <circle cx="256" cy="44" r="5" fill="#B83A24"/>
+  <circle cx="468" cy="256" r="5" fill="#B83A24"/>
+  <circle cx="256" cy="468" r="5" fill="#B83A24"/>
+  <circle cx="44" cy="256" r="5" fill="#B83A24"/>
+</svg>

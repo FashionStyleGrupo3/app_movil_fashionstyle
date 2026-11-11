@@ -127,22 +127,41 @@ class _ModalPromocionesSheetState extends State<ModalPromocionesSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.75,
-      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: FashionColors.borderSubtle,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Campañas y Promociones',
-                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+                style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
               ),
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FashionColors.brandAccent,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
                 onPressed: _crearPromoModal,
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text('Nueva Promo'),
+                label: Text('Nueva Promo', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
               ),
             ],
           ),

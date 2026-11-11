@@ -1,27 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
-  <rect width="600" height="600" fill="#F3EEE6"/>
-  <!-- Marco editorial sutil -->
-  <rect x="30" y="30" width="540" height="540" fill="none" stroke="#E4DDD2" stroke-width="2"/>
-  <rect x="42" y="42" width="516" height="516" fill="none" stroke="#D4C2A8" stroke-width="1" stroke-opacity="0.6"/>
-  
-  <!-- Perchero de alta costura -->
+  <rect width="600" height="600" fill="#F6F7F9"/>
+  <rect x="42" y="42" width="516" height="516" fill="none" stroke="#DFE3EC" stroke-width="1" stroke-opacity="0.6"/>
+  <!-- Perchero / Silueta estilizada Neo-Atelier -->
   <g transform="translate(300, 240)">
-    <!-- Gancho superior -->
-    <path d="M 0 -85 C 18 -85 32 -70 32 -52 C 32 -36 18 -26 0 -15 L 0 0" fill="none" stroke="#111111" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="0" cy="0" r="4" fill="#111111"/>
-    <!-- Barra triangular del gancho -->
-    <path d="M 0 0 L -140 70 C -145 72 -145 78 -140 80 L 140 80 C 145 78 145 72 140 70 Z" fill="#56657A" fill-opacity="0.12" stroke="#111111" stroke-width="4" stroke-linejoin="round"/>
-    <!-- Travesaño de madera/metal -->
-    <line x1="-125" y1="76" x2="125" y2="76" stroke="#56657A" stroke-width="3" stroke-linecap="round"/>
-    
-    <!-- Silueta minimalista de prenda editorial -->
-    <path d="M -75 80 Q -95 130 -85 190 Q -50 200 0 195 Q 50 200 85 190 Q 95 130 75 80 Z" fill="#FFFFFF" fill-opacity="0.85" stroke="#56657A" stroke-width="3" stroke-linejoin="round"/>
-    <!-- Detalles de costura y solapa -->
-    <path d="M 0 80 L -25 135 L 0 155 L 25 135 Z" fill="none" stroke="#111111" stroke-width="2"/>
-    <line x1="0" y1="155" x2="0" y2="195" stroke="#56657A" stroke-width="2" stroke-dasharray="4,4"/>
+    <!-- Gancho perchero -->
+    <path d="M 0 -40 C 18 -40 28 -28 28 -14 C 28 -2 14 6 0 16" fill="none" stroke="#14161F" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Hombros de la prenda -->
+    <path d="M 0 0 L -140 70 C -145 72 -145 78 -140 80 L 140 80 C 145 78 145 72 140 70 Z" fill="#14161F" fill-opacity="0.08" stroke="#14161F" stroke-width="4" stroke-linejoin="round"/>
+    <line x1="-125" y1="76" x2="125" y2="76" stroke="#DFE3EC" stroke-width="3" stroke-linecap="round"/>
+    <!-- Cuerpo del maniquí / prenda -->
+    <path d="M -75 80 Q -95 130 -85 190 Q -50 200 0 195 Q 50 200 85 190 Q 95 130 75 80 Z" fill="#FFFFFF" fill-opacity="0.9" stroke="#14161F" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Costura central -->
+    <line x1="0" y1="155" x2="0" y2="195" stroke="#B83A24" stroke-width="2" stroke-dasharray="4,4"/>
   </g>
-  
-  <!-- Tipografia de marca -->
-  <text x="300" y="495" font-family="'Poppins', sans-serif" font-size="22" font-weight="700" letter-spacing="4" fill="#111111" text-anchor="middle">FASHION STYLE</text>
-  <text x="300" y="522" font-family="'Montserrat', sans-serif" font-size="12" font-weight="500" letter-spacing="3" fill="#56657A" text-anchor="middle">PRENDA EXCLUSIVA</text>
+  <!-- Texto Atelier -->
+  <text x="300" y="522" font-family="'Space Grotesk', sans-serif" font-size="12" font-weight="600" letter-spacing="3" fill="#525866" text-anchor="middle">PRENDA EXCLUSIVA</text>
 </svg>

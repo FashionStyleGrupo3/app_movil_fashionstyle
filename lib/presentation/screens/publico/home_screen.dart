@@ -16,7 +16,7 @@ import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/data/services/promotion_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/filters_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/fashion_brand_emblem.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 import 'package:fashion_style_mobile/presentation/widgets/store/product_card.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -35,12 +35,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<Catalog> _colecciones = [];
   List<Promotion> _promociones = [];
 
-  final PageController _pageController = PageController(viewportFraction: 0.92);
+  final PageController _pageController = PageController();
   int _diapositivaActual = 0;
   Timer? _temporizadorCarrusel;
   StreamSubscription<DataChangeEvent>? _busSub;
 
-  int _tabFiltroRapido = 0; // 0: Todos, 1: Novedades, 2: Con descuento
+  int _tabFiltroRapido = 0; // 0: Todos/Imprescindibles, 1: Novedades, 2: Con descuento
 
   @override
   void initState() {
@@ -162,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return _DiapositivaHero(
           id: col.idCatalogo,
           titulo: col.nombre,
-          texto: col.descripcion.isNotEmpty ? col.descripcion : 'Piezas seleccionadas de nuestra colección.',
+          texto: col.descripcion.isNotEmpty ? col.descripcion : 'Piezas seleccionadas de nuestra colección sartorial.',
           fotoUrl: foto,
           imagenesPrendas: imagenes,
           totalPrendas: prendasCol.length,
@@ -212,8 +212,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return PublicShellLayout(
       currentIndex: 0,
       child: RefreshIndicator(
-        color: FashionColors.negro,
-        backgroundColor: Colors.white,
+        color: FashionColors.inkPrimary,
+        backgroundColor: FashionColors.surfaceCard,
         displacement: 20,
         onRefresh: _cargarDatos,
         child: _cargando
@@ -222,29 +222,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ? _construirVistaError()
                 : ListView(
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                    padding: const EdgeInsets.only(bottom: 32),
+                    padding: const EdgeInsets.only(bottom: 96), // Clearance para Floating Pill Dock
                     children: [
-                      // 1. EMBLEMA DE PORTADA E IDENTIDAD VISUAL DE LA MARCA
-                      _construirBannerEmblemaPortada(),
+                      const SizedBox(height: 12),
 
-                      const SizedBox(height: 16),
-
-                      // 2. HERO CAROUSEL TÁCTIL (Deslizamiento horizontal)
-                      _construirHeroSection(),
+                      // 1. HERO BENTO ASIMÉTRICO (DARK CARD + 2 TILES MINERALES)
+                      _construirBentoHero(),
 
                       const SizedBox(height: 24),
 
-                      // 3. CATEGORÍAS EN BURBUJAS DESLIZABLES (Estilo Stories Móvil)
+                      // 2. CATEGORÍAS HORIZONTALES (ESTILO HISTORIAS ATELIER)
                       _construirCategoriasHistorias(),
 
                       const SizedBox(height: 24),
 
-                      // 4. PRENDAS DESTACADAS CON CHIPS DE FILTRO RÁPIDO
+                      // 3. PRENDAS DESTACADAS CON CHIPS DE FILTRO RÁPIDO Y LOOKBOOK GRID
                       _construirSeccionPrendasDestacadas(),
 
                       const SizedBox(height: 32),
 
-                      // 5. PILARES DE LA MARCA EN CARRUSEL HORIZONTAL TÁCTIL
+                      // 4. PILARES DE LA MARCA (EXPERIENCIA FASHIONSTYLE)
                       _construirValoresMarca(),
                     ],
                   ),
@@ -252,292 +249,354 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// 1. Emblema distintivo de portada para la aplicación móvil
-  Widget _construirBannerEmblemaPortada() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: FashionColors.borde),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
+  /// 1. Asymmetric Editorial Bento Hero: Dark Card `#14161F` + 2 Mineral Highlight Tiles
+  Widget _construirBentoHero() {
+    final diapositivas = _obtenerDiapositivas();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Símbolo e Isotipo Oficial central
-          const Hero(
-            tag: 'fashion_style_app_emblem',
-            child: FashionBrandEmblem(
-              size: 54,
-              conSombra: true,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: FashionColors.arenaSuave,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'ATELIER OFICIAL',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                          color: FashionColors.pizarra,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    const Icon(Icons.touch_app_outlined, size: 14, color: FashionColors.gris),
-                    const SizedBox(width: 4),
-                    const Text('Desliza', style: TextStyle(fontSize: 10, color: FashionColors.gris)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Moda & Sastrería Fina',
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: FashionColors.negro,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                Text(
-                  'Piezas atemporales con confección boutique.',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12,
-                    color: FashionColors.gris,
-                  ),
+          // Tarjeta principal Nocturna #14161F con AtelierPatternBackground
+          Container(
+            height: 320,
+            decoration: BoxDecoration(
+              color: FashionColors.inkPrimary,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: FashionColors.borderSubtle.withValues(alpha: 0.15)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// 2. Carrusel Hero táctil con PageView y gestos de deslizamiento
-  Widget _construirHeroSection() {
-    final diapositivas = _obtenerDiapositivas();
-
-    return Column(
-      children: [
-        SizedBox(
-          height: 330,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: diapositivas.length,
-            physics: const BouncingScrollPhysics(),
-            onPageChanged: (i) => setState(() => _diapositivaActual = i),
-            itemBuilder: (context, index) {
-              final d = diapositivas[index];
-              final activa = _diapositivaActual == index;
-
-              return AnimatedPadding(
-                duration: const Duration(milliseconds: 300),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: activa ? 0 : 8,
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Fondo decorativo con retícula y puntadas sutiles
+                const AtelierPatternBackground(
+                  colorFondo: FashionColors.inkPrimary,
+                  opacidadReticula: 0.08,
+                  child: SizedBox.expand(),
                 ),
-                child: GestureDetector(
-                  onTap: () {
-                    if (d.id != null) {
-                      ref.read(filtersProvider.notifier).establecerCatalogo(d.id);
-                    }
-                    context.go('/catalogo');
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: FashionColors.borde),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Stack(
+
+                // Carrusel de diapositivas
+                PageView.builder(
+                  controller: _pageController,
+                  itemCount: diapositivas.length,
+                  physics: const BouncingScrollPhysics(),
+                  onPageChanged: (i) => setState(() => _diapositivaActual = i),
+                  itemBuilder: (context, index) {
+                    final d = diapositivas[index];
+
+                    return Stack(
                       fit: StackFit.expand,
                       children: [
-                        // Imagen de portada
+                        // Imagen de portada (a la derecha/fondo con gradiente)
                         if (d.fotoUrl.isNotEmpty)
-                          CachedNetworkImage(
-                            imageUrl: d.fotoUrl,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => Container(color: FashionColors.arenaSuave),
-                            errorWidget: (_, __, ___) => Container(
-                              color: FashionColors.arenaSuave,
-                              child: const Center(
-                                child: Icon(Icons.image_outlined, size: 48, color: FashionColors.gris),
+                          Positioned(
+                            right: -20,
+                            top: 0,
+                            bottom: 0,
+                            width: 220,
+                            child: Opacity(
+                              opacity: 0.45,
+                              child: CachedNetworkImage(
+                                imageUrl: d.fotoUrl,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => Container(color: Colors.transparent),
+                                errorWidget: (_, __, ___) => const SizedBox.shrink(),
                               ),
-                            ),
-                          )
-                        else
-                          Container(
-                            color: FashionColors.arenaSuave,
-                            child: const Center(
-                              child: FashionBrandEmblem(size: 64, conSombra: false),
                             ),
                           ),
 
-                        // Gradiente de lectura oscuro elegante
+                        // Gradiente de contraste para legibilidad total del texto
                         Positioned.fill(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
                                 colors: [
-                                  Colors.transparent,
-                                  Colors.black.withValues(alpha: 0.25),
-                                  Colors.black.withValues(alpha: 0.85),
+                                  FashionColors.inkPrimary,
+                                  FashionColors.inkPrimary.withValues(alpha: 0.92),
+                                  FashionColors.inkPrimary.withValues(alpha: 0.50),
                                 ],
-                                stops: const [0.4, 0.65, 1.0],
+                                stops: const [0.45, 0.75, 1.0],
                               ),
                             ),
                           ),
                         ),
 
-                        // Contenido textual inferior
-                        Positioned(
-                          left: 18,
-                          right: 18,
-                          bottom: 18,
+                        // Contenido textual editorial
+                        Padding(
+                          padding: const EdgeInsets.all(22),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.22),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                                ),
-                                child: Text(
-                                  'COLECCIÓN ATELIER',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.5,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                d.titulo,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                d.texto,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 12,
-                                  color: Colors.white.withValues(alpha: 0.85),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
+                              // Kicker superior con Monograma y Badge de Colección
                               Row(
                                 children: [
+                                  const AtelierMonogram(
+                                    size: 32,
+                                    primaryColor: FashionColors.surfaceCard,
+                                    accentColor: FashionColors.brandAccent,
+                                    surfaceColor: FashionColors.inkPrimary,
+                                  ),
+                                  const SizedBox(width: 10),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: FashionColors.brandAccent.withValues(alpha: 0.18),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: FashionColors.brandAccent.withValues(alpha: 0.4)),
                                     ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Ver colección',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: FashionColors.negro,
+                                    child: Text(
+                                      'NEO-ATELIER',
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1.4,
+                                        color: FashionColors.brandAccent,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // Titular en Space Grotesk y descripción
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    d.titulo,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.spaceGrotesk(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w700,
+                                      color: FashionColors.surfaceCard,
+                                      letterSpacing: -0.4,
+                                      height: 1.15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    d.texto,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 12.5,
+                                      color: FashionColors.surfaceMuted.withValues(alpha: 0.85),
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // Botón de acción Terracotta (#B83A24) y contador de prendas
+                              Row(
+                                children: [
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(100),
+                                    onTap: () {
+                                      if (d.id != null) {
+                                        ref.read(filtersProvider.notifier).establecerCatalogo(d.id);
+                                      }
+                                      context.go('/catalogo');
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: FashionColors.brandAccent,
+                                        borderRadius: BorderRadius.circular(100),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: FashionColors.brandAccent.withValues(alpha: 0.35),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
                                           ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        const Icon(Icons.arrow_forward_rounded, size: 14, color: FashionColors.negro),
-                                      ],
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'Explorar Colección',
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   const Spacer(),
-                                  Text(
-                                    '${d.totalPrendas} prendas',
-                                    style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.w500),
-                                  ),
+                                  if (d.totalPrendas > 0)
+                                    Text(
+                                      '${d.totalPrendas} piezas',
+                                      style: GoogleFonts.jetBrainsMono(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: FashionColors.surfaceMuted.withValues(alpha: 0.7),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ],
                           ),
                         ),
                       ],
+                    );
+                  },
+                ),
+
+                // Indicadores de diapositiva inferiores discretos
+                if (diapositivas.length > 1)
+                  Positioned(
+                    bottom: 12,
+                    right: 20,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        diapositivas.length,
+                        (index) {
+                          final activa = _diapositivaActual == index;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                            width: activa ? 18 : 5,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: activa ? FashionColors.brandAccent : Colors.white24,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
-        ),
-        if (diapositivas.length > 1) ...[
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              diapositivas.length,
-              (index) {
-                final activa = _diapositivaActual == index;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: activa ? 22 : 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: activa ? FashionColors.negro : FashionColors.borde,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                );
-              },
+              ],
             ),
           ),
+
+          const SizedBox(height: 12),
+
+          // 2 Tiles Minerales Complementarios (#FFFFFF / #EBEEF3 con acento Jade #115E59)
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: FashionColors.surfaceCard,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: FashionColors.borderSubtle),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: FashionColors.atelierJade.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.verified_rounded, size: 20, color: FashionColors.atelierJade),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Atelier Original',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: FashionColors.inkPrimary,
+                              ),
+                            ),
+                            Text(
+                              'Confección local fina',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                color: FashionColors.inkSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: FashionColors.surfaceCard,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: FashionColors.borderSubtle),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: FashionColors.brandAccent.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.shield_outlined, size: 20, color: FashionColors.brandAccent),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Pago Protegido',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: FashionColors.inkPrimary,
+                              ),
+                            ),
+                            Text(
+                              'Wompi Bancolombia',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                color: FashionColors.inkSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
-      ],
+      ),
     );
   }
 
-  /// 3. Categorías en burbujas con scroll horizontal fluido
+  /// 2. Categorías en burbujas con scroll horizontal fluido y estética mineral
   Widget _construirCategoriasHistorias() {
     if (_categorias.isEmpty) return const SizedBox.shrink();
 
@@ -550,11 +609,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Categorías',
-                style: GoogleFonts.poppins(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: FashionColors.negro,
+                'Líneas de Diseño',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: FashionColors.inkPrimary,
                 ),
               ),
               GestureDetector(
@@ -566,20 +625,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     Text(
                       'Ver catálogo',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: FashionColors.pizarra,
+                        color: FashionColors.brandAccent,
                       ),
                     ),
-                    const Icon(Icons.chevron_right_rounded, size: 16, color: FashionColors.pizarra),
+                    const Icon(Icons.chevron_right_rounded, size: 16, color: FashionColors.brandAccent),
                   ],
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 14),
         SizedBox(
           height: 98,
           child: ListView.separated(
@@ -604,7 +663,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   context.go('/catalogo');
                 },
                 child: SizedBox(
-                  width: 72,
+                  width: 74,
                   child: Column(
                     children: [
                       Container(
@@ -613,22 +672,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         padding: const EdgeInsets.all(2.5),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: FashionColors.arenaOscura, width: 1.5),
-                          color: Colors.white,
+                          border: Border.all(color: FashionColors.borderSubtle, width: 1.5),
+                          color: FashionColors.surfaceCard,
                         ),
                         child: ClipOval(
                           child: imagen.isNotEmpty
                               ? CachedNetworkImage(
                                   imageUrl: imagen,
                                   fit: BoxFit.cover,
-                                  placeholder: (_, __) => Container(color: FashionColors.arenaSuave),
+                                  placeholder: (_, __) => Container(color: FashionColors.surfaceMuted),
                                   errorWidget: (_, __, ___) => const Icon(
                                     Icons.checkroom_rounded,
                                     size: 24,
-                                    color: FashionColors.pizarra,
+                                    color: FashionColors.inkSecondary,
                                   ),
                                 )
-                              : const Icon(Icons.checkroom_rounded, size: 24, color: FashionColors.pizarra),
+                              : const Icon(Icons.checkroom_rounded, size: 24, color: FashionColors.inkSecondary),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -637,10 +696,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.montserrat(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: FashionColors.negro,
+                          color: FashionColors.inkPrimary,
                         ),
                       ),
                     ],
@@ -654,7 +713,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// 4. Prendas destacadas con pestañas rápidas y grid de 2 columnas
+  /// 3. Prendas destacadas con pestañas rápidas y lookbook grid de 2 columnas
   Widget _construirSeccionPrendasDestacadas() {
     final prendas = _obtenerPrendasFiltradas();
 
@@ -668,14 +727,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Text(
                 'Prendas Destacadas',
-                style: GoogleFonts.poppins(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: FashionColors.negro,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: FashionColors.inkPrimary,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.tune_rounded, size: 20, color: FashionColors.negro),
+                icon: const Icon(Icons.tune_rounded, size: 20, color: FashionColors.inkPrimary),
                 tooltip: 'Filtrar',
                 onPressed: () => context.go('/catalogo'),
               ),
@@ -704,7 +763,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(32),
               alignment: Alignment.center,
-              child: const Text('No hay prendas en esta selección', style: TextStyle(color: FashionColors.gris)),
+              child: Text(
+                'No hay prendas en esta selección.',
+                style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary),
+              ),
             )
           else
             GridView.builder(
@@ -735,27 +797,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       onTap: () => setState(() => _tabFiltroRapido = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: activo ? FashionColors.negro : Colors.white,
+          color: activo ? FashionColors.inkPrimary : FashionColors.surfaceCard,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: activo ? FashionColors.negro : FashionColors.borde,
+            color: activo ? FashionColors.inkPrimary : FashionColors.borderSubtle,
           ),
         ),
         child: Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
             fontWeight: activo ? FontWeight.w700 : FontWeight.w500,
-            color: activo ? Colors.white : FashionColors.texto,
+            color: activo ? Colors.white : FashionColors.inkPrimary,
           ),
         ),
       ),
     );
   }
 
-  /// 5. Pilares de servicio en carrusel horizontal deslizable
+  /// 4. Pilares de servicio en carrusel horizontal deslizable
   Widget _construirValoresMarca() {
     final valores = [
       _PilarMarca(
@@ -782,14 +844,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Experiencia FashionStyle',
-            style: GoogleFonts.poppins(
-              fontSize: 15,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: FashionColors.negro,
+              color: FashionColors.inkPrimary,
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         SizedBox(
           height: 110,
           child: ListView.separated(
@@ -804,19 +866,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 250,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: FashionColors.borde),
+                  color: FashionColors.surfaceCard,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: FashionColors.borderSubtle),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: FashionColors.arenaSuave,
-                        borderRadius: BorderRadius.circular(10),
+                        color: FashionColors.surfaceMuted,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(v.icono, color: FashionColors.negro, size: 24),
+                      child: Icon(v.icono, color: FashionColors.brandAccent, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -826,10 +888,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           Text(
                             v.titulo,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.spaceGrotesk(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,
-                              color: FashionColors.negro,
+                              color: FashionColors.inkPrimary,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -837,7 +899,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             v.descripcion,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 11, color: FashionColors.gris),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              color: FashionColors.inkSecondary,
+                            ),
                           ),
                         ],
                       ),
@@ -857,21 +922,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.all(16),
       children: [
         Container(
-          height: 70,
+          height: 320,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: FashionColors.borde),
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: FashionColors.borderSubtle),
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          height: 320,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: FashionColors.borde),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: FashionColors.surfaceCard,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: FashionColors.borderSubtle),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: FashionColors.surfaceCard,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: FashionColors.borderSubtle),
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 24),
         Row(
@@ -882,7 +964,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 height: 72,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: FashionColors.surfaceCard,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -900,18 +982,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off_rounded, size: 52, color: FashionColors.peligro),
+            const Icon(Icons.cloud_off_rounded, size: 52, color: FashionColors.statusDanger),
             const SizedBox(height: 14),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: FashionColors.texto),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: FashionColors.inkPrimary,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: FashionColors.negro,
+                backgroundColor: FashionColors.inkPrimary,
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: _cargarDatos,
               icon: const Icon(Icons.refresh_rounded, size: 18),

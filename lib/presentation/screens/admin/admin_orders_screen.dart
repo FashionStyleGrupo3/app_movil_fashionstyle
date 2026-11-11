@@ -11,6 +11,7 @@ import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dar
 import 'package:fashion_style_mobile/presentation/widgets/admin/orders/bulk_invoice_upload_sheet.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/orders/create_invoice_sheet.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/orders/dispatch_sheet.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminOrdersAndInvoicesScreen extends ConsumerStatefulWidget {
   const AdminOrdersAndInvoicesScreen({super.key});
@@ -137,10 +138,10 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
             color: Colors.white,
             child: TabBar(
               controller: _tabController,
-              labelColor: FashionColors.negroElegante,
-              unselectedLabelColor: FashionColors.textoMuted,
-              indicatorColor: FashionColors.rosaCorporativo,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              labelColor: FashionColors.inkPrimary,
+              unselectedLabelColor: FashionColors.inkSecondary,
+              indicatorColor: FashionColors.brandAccent,
+              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: const [
                 Tab(icon: Icon(Icons.local_shipping_outlined, size: 18), text: 'Pedidos Online'),
                 Tab(icon: Icon(Icons.receipt_outlined, size: 18), text: 'Facturas DIAN'),
@@ -217,27 +218,28 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
               : _pedidos.isEmpty
                   ? const Center(child: Text('No hay pedidos en este estado'))
                   : ListView.builder(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                       itemCount: _pedidos.length,
                       itemBuilder: (context, index) {
                         final p = _pedidos[index];
                         return Card(
-                          elevation: 0.5,
+                          elevation: 0,
                           margin: const EdgeInsets.only(bottom: 10),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: const BorderSide(color: FashionColors.grisBorde),
+                            borderRadius: BorderRadius.circular(14),
+                            side: const BorderSide(color: FashionColors.borderSubtle),
                           ),
                           child: ExpansionTile(
                             title: Row(
                               children: [
-                                Text(p.referencia, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                Text(p.referencia, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary)),
                                 const Spacer(),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                                   decoration: BoxDecoration(
                                     color: _colorEstado(p.estado).withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: _colorEstado(p.estado).withValues(alpha: 0.3)),
                                   ),
                                   child: Text(
                                     OrderService.estadosPedido[p.estado] ?? p.estado,
@@ -248,7 +250,7 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
                             ),
                             subtitle: Text(
                               '${p.fechaPedido ?? ''} · Cliente: ${p.clienteNombre} · Total: ${CurrencyFormatter.formatearCOP(p.total)}',
-                              style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted),
+                              style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
                             ),
                             childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                             children: [
@@ -258,22 +260,26 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('${d.nombre} (${d.talla}) x${d.cantidad}', style: const TextStyle(fontSize: 12)),
-                                    Text(CurrencyFormatter.formatearCOP(d.subtotal), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                    Text('${d.nombre} (${d.talla}) x${d.cantidad}', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                                    Text(CurrencyFormatter.formatearCOP(d.subtotal), style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.w600)),
                                   ],
                                 ),
                               )),
                               const SizedBox(height: 8),
                               if (p.numeroGuia.isNotEmpty)
-                                Text('Guía: ${p.numeroGuia} (${p.empresaTransportadora})', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                Text('Guía: ${p.numeroGuia} (${p.empresaTransportadora})', style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 10),
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: FashionColors.brandAccent,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
                                   onPressed: () => _abrirModalGestionDespacho(p),
                                   icon: const Icon(Icons.local_shipping, size: 16),
-                                  label: const Text('Gestionar Despacho', style: TextStyle(fontSize: 12)),
+                                  label: Text('Gestionar Despacho', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
                                 ),
                               ),
                             ],
@@ -327,29 +333,29 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
         ),
         Expanded(
           child: _cargandoFacturas
-              ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+              ? const Center(child: CircularProgressIndicator(color: FashionColors.brandAccent))
               : _facturas.isEmpty
                   ? const Center(child: Text('No hay facturas emitidas'))
                   : ListView.builder(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                       itemCount: _facturas.length,
                       itemBuilder: (context, index) {
                         final f = _facturas[index];
                         return Card(
-                          elevation: 0.5,
+                          elevation: 0,
                           margin: const EdgeInsets.only(bottom: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), side: const BorderSide(color: FashionColors.grisBorde)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
                           child: ListTile(
                             title: Row(
                               children: [
-                                Text(f.numero, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                Text(f.numero, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary)),
                                 const Spacer(),
-                                Text(CurrencyFormatter.formatearCOP(f.total), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+                                Text(CurrencyFormatter.formatearCOP(f.total), style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary)),
                               ],
                             ),
-                            subtitle: Text('${f.fecha ?? ''} · Cliente: ${f.clienteNombre.isNotEmpty ? f.clienteNombre : "Consumidor Final"}', style: const TextStyle(fontSize: 11)),
+                            subtitle: Text('${f.fecha ?? ''} · Cliente: ${f.clienteNombre.isNotEmpty ? f.clienteNombre : "Consumidor Final"}', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
                             trailing: IconButton(
-                              icon: const Icon(Icons.print_outlined, size: 20),
+                              icon: const Icon(Icons.print_outlined, size: 20, color: FashionColors.inkPrimary),
                               tooltip: 'Imprimir / Compartir Factura PDF',
                               onPressed: () => InvoicePdfGenerator.generarYCompartirFactura(f),
                             ),

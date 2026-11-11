@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
@@ -10,6 +11,7 @@ import 'package:fashion_style_mobile/data/services/order_service.dart';
 import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/data/services/wompi_service.dart';
 import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 import 'package:fashion_style_mobile/presentation/widgets/payment/wompi_checkout_modal.dart';
 import 'package:go_router/go_router.dart';
 
@@ -64,7 +66,7 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'No se pudieron cargar los pedidos.';
+          _error = 'No se pudieron sincronizar los pedidos.';
           _cargando = false;
           _cargandoMas = false;
         });
@@ -104,7 +106,7 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible reanudar el proceso de pago.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -125,7 +127,7 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cancelar el pedido.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -154,6 +156,7 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
             content: Text('Se agregaron $agregados prendas disponibles a tu bolsa.'),
             action: SnackBarAction(
               label: 'Ir a bolsa',
+              textColor: FashionColors.brandAccent,
               onPressed: () => context.go('/carrito'),
             ),
           ),
@@ -170,18 +173,18 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
     switch (estado) {
       case 'Pagado':
       case 'Entregado':
-        return FashionColors.verdeExito;
+        return FashionColors.statusSuccess;
       case 'En_Preparacion':
       case 'Enviado':
-        return FashionColors.azulInfo;
+        return FashionColors.atelierJade;
       case 'Pendiente_Pago':
       case 'Revision_Pago':
-        return FashionColors.aviso;
+        return FashionColors.statusWarning;
       case 'Cancelado':
       case 'Rechazado':
       case 'Expirado':
       default:
-        return FashionColors.peligro;
+        return FashionColors.statusDanger;
     }
   }
 
@@ -201,7 +204,8 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
         // CHIPS DE FILTRO POR ESTADO
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: estados.map((e) {
               final sel = _filtroEstado == e['val'];
@@ -210,11 +214,13 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                 child: ChoiceChip(
                   label: Text(e['label']!),
                   selected: sel,
-                  selectedColor: FashionColors.negroElegante,
-                  labelStyle: TextStyle(
+                  selectedColor: FashionColors.inkPrimary,
+                  backgroundColor: FashionColors.surfaceCard,
+                  side: BorderSide(color: sel ? FashionColors.inkPrimary : FashionColors.borderSubtle),
+                  labelStyle: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
-                    fontWeight: sel ? FontWeight.bold : FontWeight.normal,
-                    color: sel ? Colors.white : FashionColors.textoOscuro,
+                    fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                    color: sel ? Colors.white : FashionColors.inkPrimary,
                   ),
                   onSelected: (_) {
                     setState(() => _filtroEstado = e['val']!);
@@ -229,21 +235,37 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
         // LISTA DE PEDIDOS O ESTADOS
         Expanded(
           child: _cargando
-              ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+              ? const Center(child: CircularProgressIndicator(color: FashionColors.inkPrimary))
               : _error != null
-                  ? Center(child: Text(_error!))
+                  ? Center(
+                      child: Text(
+                        _error!,
+                        style: GoogleFonts.plusJakartaSans(color: FashionColors.inkPrimary),
+                      ),
+                    )
                   : _pedidos.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Padding(
-                            padding: EdgeInsets.all(32.0),
-                            child: Text(
-                              'No tienes pedidos registrados en este estado.',
-                              style: TextStyle(color: FashionColors.textoMuted),
+                            padding: const EdgeInsets.all(32.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const AtelierEmptyStateIllustration(
+                                  type: AtelierEmptyStateType.emptyBag,
+                                  size: 110,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No tienes pedidos registrados en este estado.',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
+                                ),
+                              ],
                             ),
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 96), // Clearance para Floating Pill Dock
                           itemCount: _pedidos.length + (_pagina < _totalPaginas ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index == _pedidos.length) {
@@ -251,7 +273,11 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                                 padding: const EdgeInsets.symmetric(vertical: 12.0),
                                 child: Center(
                                   child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: FashionColors.fondoClaro, foregroundColor: FashionColors.textoOscuro),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: FashionColors.surfaceMuted,
+                                      foregroundColor: FashionColors.inkPrimary,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
                                     onPressed: _cargandoMas
                                         ? null
                                         : () {
@@ -273,20 +299,25 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: FashionColors.grisBorde),
+                                color: FashionColors.surfaceCard,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: FashionColors.borderSubtle),
                               ),
                               child: Column(
                                 children: [
                                   // Encabezado del pedido
                                   ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                                     onTap: () => setState(() => _pedidoExpandido = expandido ? null : pedido.id),
                                     title: Row(
                                       children: [
                                         Text(
                                           pedido.referencia,
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                          style: GoogleFonts.jetBrainsMono(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14,
+                                            color: FashionColors.inkPrimary,
+                                          ),
                                         ),
                                         const Spacer(),
                                         Container(
@@ -297,25 +328,31 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                                           ),
                                           child: Text(
                                             OrderService.estadosPedido[pedido.estado] ?? pedido.estado,
-                                            style: TextStyle(
+                                            style: GoogleFonts.plusJakartaSans(
                                               fontSize: 11,
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w700,
                                               color: _colorEstado(pedido.estado),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    subtitle: Text(
-                                      '${pedido.fechaPedido} · Total: ${CurrencyFormatter.formatearCOP(pedido.total)}',
-                                      style: const TextStyle(fontSize: 12, color: FashionColors.textoMuted),
+                                    subtitle: Padding(
+                                      padding: const EdgeInsets.only(top: 4.0),
+                                      child: Text(
+                                        '${pedido.fechaPedido} · Total: ${CurrencyFormatter.formatearCOP(pedido.total)}',
+                                        style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary),
+                                      ),
                                     ),
-                                    trailing: Icon(expandido ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down),
+                                    trailing: Icon(
+                                      expandido ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                      color: FashionColors.inkPrimary,
+                                    ),
                                   ),
 
                                   // Detalle expandible
                                   if (expandido) ...[
-                                    const Divider(height: 1),
+                                    const Divider(height: 1, color: FashionColors.borderSubtle),
                                     Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Column(
@@ -329,12 +366,12 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                                                     Expanded(
                                                       child: Text(
                                                         '${it.nombre} (${it.talla}) x${it.cantidad}',
-                                                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                                        style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary),
                                                       ),
                                                     ),
                                                     Text(
                                                       CurrencyFormatter.formatearCOP(it.subtotal),
-                                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                                      style: FashionTheme.priceTextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                                     ),
                                                   ],
                                                 ),
@@ -343,41 +380,56 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                                           const SizedBox(height: 12),
                                           if (pedido.numeroGuia.isNotEmpty)
                                             Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(color: FashionColors.fondoClaro, borderRadius: BorderRadius.circular(6)),
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: FashionColors.surfaceMuted,
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
                                               child: Row(
                                                 children: [
-                                                  const Icon(Icons.local_shipping, size: 16, color: FashionColors.rosaOscuro),
+                                                  const Icon(Icons.local_shipping_outlined, size: 16, color: FashionColors.brandAccent),
                                                   const SizedBox(width: 8),
                                                   Text(
                                                     'Guía: ${pedido.numeroGuia} (${pedido.empresaTransportadora})',
-                                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                                    style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
                                                   ),
                                                 ],
                                               ),
                                             ),
 
-                                          const SizedBox(height: 12),
+                                          const SizedBox(height: 14),
                                           // Acciones de pago o recompra
                                           Row(
                                             children: [
                                               if (pedido.estado == 'Pendiente_Pago' && esOnline) ...[
                                                 ElevatedButton(
-                                                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: FashionColors.brandAccent,
+                                                    foregroundColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                  ),
                                                   onPressed: () => _pagarAhora(pedido),
-                                                  child: const Text('Pagar ahora', style: TextStyle(fontSize: 12)),
+                                                  child: const Text('Pagar ahora', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                                 ),
                                                 const SizedBox(width: 8),
                                                 OutlinedButton(
+                                                  style: OutlinedButton.styleFrom(
+                                                    side: const BorderSide(color: FashionColors.statusDanger),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                  ),
                                                   onPressed: () => _cancelarPedido(pedido),
-                                                  child: const Text('Cancelar', style: TextStyle(fontSize: 12, color: FashionColors.peligro)),
+                                                  child: const Text('Cancelar', style: TextStyle(fontSize: 12, color: FashionColors.statusDanger)),
                                                 ),
                                               ],
                                               const Spacer(),
                                               TextButton.icon(
+                                                style: TextButton.styleFrom(foregroundColor: FashionColors.inkPrimary),
                                                 onPressed: () => _recomprar(pedido),
-                                                icon: const Icon(Icons.replay, size: 16),
-                                                label: const Text('Volver a comprar', style: TextStyle(fontSize: 12)),
+                                                icon: const Icon(Icons.replay_rounded, size: 16),
+                                                label: Text(
+                                                  'Volver a comprar',
+                                                  style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w700),
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -395,7 +447,3 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
     );
   }
 }
-
-// ============================================================================
-// 3. SECCIÓN FAVORITOS (SeccionFavoritos.vue)
-// ============================================================================

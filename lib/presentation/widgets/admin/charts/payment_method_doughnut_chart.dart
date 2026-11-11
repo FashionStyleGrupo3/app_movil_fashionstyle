@@ -17,12 +17,12 @@ class PaymentMethodDoughnutChartWidget extends StatelessWidget {
   });
 
   static const List<Color> _colores = [
-    AdminPalette.negro,
-    AdminPalette.pizarra,
-    AdminPalette.arena,
-    AdminPalette.verde,
-    AdminPalette.ambar,
-    Color(0xFF8B949E),
+    AdminPalette.inkPrimary,     // #14161F
+    AdminPalette.brandAccent,    // #B83A24
+    AdminPalette.atelierJade,    // #115E59
+    AdminPalette.editorialOchre, // #9A6700
+    AdminPalette.statusSuccess,  // #157347
+    Color(0xFF6B7280),
   ];
 
   @override
@@ -37,9 +37,10 @@ class PaymentMethodDoughnutChartWidget extends StatelessWidget {
         child: Center(
           child: Text(
             'Aún no hay ventas en este periodo.',
-            style: GoogleFonts.montserrat(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
-              color: AdminPalette.textoMuted,
+              color: AdminPalette.textMuted,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -61,7 +62,7 @@ class PaymentMethodDoughnutChartWidget extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         Wrap(
-          spacing: 12,
+          spacing: 10,
           runSpacing: 8,
           alignment: WrapAlignment.center,
           children: List.generate(validos.length, (idx) {
@@ -69,11 +70,11 @@ class PaymentMethodDoughnutChartWidget extends StatelessWidget {
             final color = _colores[idx % _colores.length];
             final pct = totalMonto > 0 ? (item.monto / totalMonto * 100).round() : 0;
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: AdminPalette.crema,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AdminPalette.arenaSuave),
+                border: Border.all(color: AdminPalette.borderSubtle),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -86,17 +87,18 @@ class PaymentMethodDoughnutChartWidget extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     '${item.medio}: ',
-                    style: GoogleFonts.montserrat(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AdminPalette.negro,
+                      color: AdminPalette.inkPrimary,
                     ),
                   ),
                   Text(
                     '${CurrencyFormatter.formatearCOP(item.monto)} ($pct%)',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 11,
-                      color: AdminPalette.textoMuted,
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      color: AdminPalette.textMuted,
                     ),
                   ),
                 ],
@@ -170,22 +172,22 @@ class _DoughnutChartPainter extends CustomPainter {
       }
     }
 
-    // Texto central en el cutout del donut
+    // Texto central en el cutout del donut con tipografía Space Grotesk + JetBrains Mono
     final totalSpan = TextSpan(
       text: 'TOTAL\n',
-      style: GoogleFonts.montserrat(
-        fontSize: 10,
-        fontWeight: FontWeight.w600,
-        color: AdminPalette.textoMuted,
-        letterSpacing: 0.5,
+      style: GoogleFonts.spaceGrotesk(
+        fontSize: 9.5,
+        fontWeight: FontWeight.w700,
+        color: AdminPalette.textMuted,
+        letterSpacing: 0.8,
       ),
       children: [
         TextSpan(
           text: CurrencyFormatter.formatearCOP(total),
-          style: GoogleFonts.poppins(
-            fontSize: 12,
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 11.5,
             fontWeight: FontWeight.w700,
-            color: AdminPalette.negro,
+            color: AdminPalette.inkPrimary,
           ),
         ),
       ],
@@ -201,7 +203,3 @@ class _DoughnutChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _DoughnutChartPainter oldDelegate) => true;
 }
-
-// ============================================================================
-// 3. DUAL LINE CHART: PRODUCCIÓN (Planificadas vs Completadas)
-// ============================================================================

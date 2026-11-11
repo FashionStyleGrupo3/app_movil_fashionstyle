@@ -110,31 +110,34 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
       currentIndex: 3,
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 96), // Clearance para Floating Pill Dock
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 440),
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: FashionColors.grisBorde),
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: FashionColors.borderSubtle),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 18, offset: const Offset(0, 6)),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     'Nueva Contraseña',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: FashionColors.textoOscuro,
+                      fontWeight: FontWeight.w700,
+                      color: FashionColors.inkPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
+                  Text(
                     'Ingresa el código que recibiste y define tu nueva clave.',
-                    style: TextStyle(fontSize: 13, color: FashionColors.textoMuted),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
                   ),
                   const SizedBox(height: 24),
 
@@ -143,22 +146,41 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
                       ),
-                      child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
+                      child: Text(
+                        _error!,
+                        style: GoogleFonts.plusJakartaSans(color: FashionColors.statusDanger, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
                     ),
 
                   TextField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Correo electrónico *', border: OutlineInputBorder()),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                    decoration: InputDecoration(
+                      labelText: 'Correo electrónico',
+                      labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                      filled: true,
+                      fillColor: FashionColors.surfaceMuted,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
                   ),
                   const SizedBox(height: 14),
 
                   TextField(
                     controller: _codigoCtrl,
-                    decoration: const InputDecoration(labelText: 'Código de recuperación *', border: OutlineInputBorder()),
+                    style: GoogleFonts.jetBrainsMono(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 2, color: FashionColors.inkPrimary),
+                    decoration: InputDecoration(
+                      labelText: 'Código de 6 dígitos',
+                      hintText: '123456',
+                      labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                      filled: true,
+                      fillColor: FashionColors.surfaceMuted,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
                   ),
                   const SizedBox(height: 14),
 
@@ -166,16 +188,20 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     controller: _passCtrl,
                     obscureText: _ocultarPass,
                     onChanged: (_) => setState(() {}),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
                     decoration: InputDecoration(
-                      labelText: 'Nueva contraseña *',
+                      labelText: 'Nueva contraseña',
+                      labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
                       suffixIcon: IconButton(
-                        icon: Icon(_ocultarPass ? Icons.visibility_off : Icons.visibility, size: 20),
+                        icon: Icon(_ocultarPass ? Icons.visibility_off : Icons.visibility, size: 20, color: FashionColors.inkSecondary),
                         onPressed: () => setState(() => _ocultarPass = !_ocultarPass),
                       ),
-                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: FashionColors.surfaceMuted,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
 
                   PasswordRequirementsWidget(password: _passCtrl.text),
                   const SizedBox(height: 14),
@@ -183,22 +209,39 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   TextField(
                     controller: _passConfirmCtrl,
                     obscureText: _ocultarPass,
-                    decoration: const InputDecoration(labelText: 'Confirmar nueva contraseña *', border: OutlineInputBorder()),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                    decoration: InputDecoration(
+                      labelText: 'Confirmar nueva contraseña',
+                      labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                      filled: true,
+                      fillColor: FashionColors.surfaceMuted,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    ),
                   ),
                   const SizedBox(height: 20),
 
                   SizedBox(
-                    height: 48,
+                    height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.negroElegante,
+                        backgroundColor: FashionColors.brandAccent,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
                       ),
                       onPressed: _cargando ? null : _restablecer,
                       child: _cargando
                           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Restablecer contraseña', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          : Text('Restablecer Contraseña', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextButton(
+                    onPressed: () => context.go('/login'),
+                    child: Text(
+                      'Cancelar y volver',
+                      style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],

@@ -1,4 +1,4 @@
-// @source-mirror: src/components/escaparate/TarjetaProducto.vue, src/components/escaparate/ModalGuiaMedidas.vue, src/components/carrito/CajonCotizacion.vue
+// @source-mirror: src/components/carrito/CajonCotizacion.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,16 +9,15 @@ import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/cart/cart_item.dart';
 import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/fashion_brand_emblem.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 
 class CartDrawerWidget extends ConsumerWidget {
   const CartDrawerWidget({super.key});
 
   Future<void> _abrirWhatsApp(BuildContext context, List<CartItem> items) async {
     const numero = '573001234567';
-    var texto = 'Hola Servicio al Cliente FashionStyle, requiero asistencia con mi pedido.\n';
+    var texto = 'Hola Servicio al Cliente FashionStyle Atelier, requiero asistencia con mi selección:\n';
     if (items.isNotEmpty) {
-      texto += 'Tengo dudas sobre los siguientes artículos en mi bolsa:\n';
       for (final item in items) {
         texto += '- ${item.nombre} (Talla: ${item.talla}) x${item.cantidad}\n';
       }
@@ -37,60 +36,56 @@ class CartDrawerWidget extends ConsumerWidget {
     final cartState = ref.watch(cartProvider);
     final items = cartState.items;
 
-    return SafeArea(
+    return Container(
+      color: FashionColors.canvasBackground,
       child: Column(
         children: [
-          // Drag handle gestual en la parte superior para indicar que se puede deslizar
+          // Header de la Bolsa Atelier
           Container(
-            margin: const EdgeInsets.only(top: 8, bottom: 4),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: FashionColors.borde,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            color: FashionColors.surfaceCard,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const FashionBrandEmblem(size: 26, conSombra: false),
-                    const SizedBox(width: 8),
+                    const AtelierMonogram(size: 28),
+                    const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Bolsa de Compras',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
+                          'Bolsa Atelier',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: FashionColors.negro,
+                            color: FashionColors.inkPrimary,
+                            letterSpacing: -0.3,
                           ),
                         ),
                         Text(
                           '${cartState.totalPrendas} prenda(s) seleccionada(s)',
-                          style: const TextStyle(fontSize: 11, color: FashionColors.gris),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: FashionColors.inkSecondary,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: FashionColors.texto),
-                  tooltip: 'Cerrar bolsa',
+                  icon: const Icon(Icons.close_rounded, color: FashionColors.inkPrimary, size: 22),
+                  tooltip: 'Cerrar',
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1),
+          const Divider(height: 1, color: FashionColors.borderSubtle),
 
-          // Items List con gestos Dismissible
+          // Lista de Artículos o Estado Vacío
           Expanded(
             child: items.isEmpty
                 ? Center(
@@ -99,31 +94,28 @@ class CartDrawerWidget extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const FashionBrandEmblem(size: 64, conSombra: true),
-                          const SizedBox(height: 18),
-                          Text(
-                            'Tu bolsa de compras está vacía',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              color: FashionColors.negro,
-                            ),
+                          const AtelierEmptyStateIllustration(
+                            type: AtelierEmptyStateType.emptyBag,
+                            size: 130,
+                            title: 'Tu bolsa está vacía',
+                            subtitle: 'Explora las piezas exclusivas de nuestro atelier y confecciona tu propio estilo.',
                           ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'Explora las piezas exclusivas de nuestro atelier y agrégalas a tu selección.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 13, color: FashionColors.gris),
-                          ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: FashionColors.negro,
+                              backgroundColor: FashionColors.inkPrimary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                             icon: const Icon(Icons.grid_view_rounded, size: 18),
-                            label: const Text('Explorar Catálogo'),
+                            label: Text(
+                              'Explorar Catálogo',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                            ),
                             onPressed: () {
                               Navigator.pop(context);
                               context.go('/catalogo');
@@ -135,19 +127,23 @@ class CartDrawerWidget extends ConsumerWidget {
                   )
                 : Column(
                     children: [
-                      // Banner informativo sutil del gesto deslizable
+                      // Banner informativo del gesto deslizable
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        color: FashionColors.arenaSuave,
-                        child: const Row(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        color: FashionColors.surfaceMuted,
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.swipe_left_rounded, size: 16, color: FashionColors.pizarra),
-                            SizedBox(width: 6),
+                            const Icon(Icons.swipe_left_rounded, size: 16, color: FashionColors.inkSecondary),
+                            const SizedBox(width: 6),
                             Text(
-                              'Desliza un artículo a la izquierda para eliminarlo',
-                              style: TextStyle(fontSize: 11, color: FashionColors.pizarra, fontWeight: FontWeight.w500),
+                              'Desliza un artículo a la izquierda para retirarlo',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                color: FashionColors.inkSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
@@ -166,15 +162,22 @@ class CartDrawerWidget extends ConsumerWidget {
                                 alignment: Alignment.centerRight,
                                 padding: const EdgeInsets.only(right: 20),
                                 decoration: BoxDecoration(
-                                  color: FashionColors.rojo,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: FashionColors.statusDanger,
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Eliminar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                                    SizedBox(width: 6),
-                                    Icon(Icons.delete_outline_rounded, color: Colors.white, size: 22),
+                                    Text(
+                                      'Retirar',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 22),
                                   ],
                                 ),
                               ),
@@ -186,9 +189,8 @@ class CartDrawerWidget extends ConsumerWidget {
                                     duration: const Duration(seconds: 2),
                                     action: SnackBarAction(
                                       label: 'DESHACER',
-                                      textColor: FashionColors.arenaOscura,
+                                      textColor: FashionColors.brandAccent,
                                       onPressed: () {
-                                        // Restaurar item
                                         ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad);
                                       },
                                     ),
@@ -198,37 +200,38 @@ class CartDrawerWidget extends ConsumerWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: FashionColors.blanco,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: FashionColors.borde),
+                                  color: FashionColors.surfaceCard,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: FashionColors.borderSubtle),
                                 ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Imagen miniatura
+                                    // Miniatura 3:4 con radio 14px
                                     Container(
-                                      width: 64,
-                                      height: 80,
+                                      width: 68,
+                                      height: 90,
                                       decoration: BoxDecoration(
-                                        color: FashionColors.arenaSuave,
-                                        borderRadius: BorderRadius.circular(8),
+                                        color: FashionColors.surfaceMuted,
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(color: FashionColors.borderSubtle),
                                       ),
                                       clipBehavior: Clip.antiAlias,
                                       child: item.imagen.isNotEmpty
                                           ? CachedNetworkImage(
                                               imageUrl: item.imagen,
                                               fit: BoxFit.cover,
-                                              errorWidget: (_, __, ___) => const Icon(
-                                                Icons.image_not_supported_outlined,
-                                                size: 24,
-                                                color: FashionColors.gris,
+                                              errorWidget: (_, __, ___) => const Center(
+                                                child: AtelierMonogram(size: 24),
                                               ),
                                             )
-                                          : const Icon(Icons.checkroom_outlined, color: FashionColors.gris),
+                                          : const Center(
+                                              child: AtelierMonogram(size: 24),
+                                            ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 14),
 
-                                    // Info prenda
+                                    // Info de prenda y variaciones
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,55 +240,68 @@ class CartDrawerWidget extends ConsumerWidget {
                                             item.nombre,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: GoogleFonts.poppins(
-                                              fontWeight: FontWeight.w600,
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontWeight: FontWeight.w700,
                                               fontSize: 14,
-                                              color: FashionColors.negro,
+                                              color: FashionColors.inkPrimary,
                                             ),
                                           ),
-                                          const SizedBox(height: 3),
-                                          Text(
-                                            'Talla: ${item.talla}',
-                                            style: const TextStyle(fontSize: 12, color: FashionColors.gris),
-                                          ),
                                           const SizedBox(height: 4),
+                                          // Chip de Talla
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: FashionColors.surfaceMuted,
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              'Talla: ${item.talla}',
+                                              style: GoogleFonts.jetBrainsMono(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w600,
+                                                color: FashionColors.inkPrimary,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
                                           Row(
                                             children: [
                                               Text(
                                                 CurrencyFormatter.formatearCOP(item.precio),
-                                                style: GoogleFonts.poppins(
+                                                style: FashionTheme.priceTextStyle(
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.w700,
-                                                  fontSize: 13,
-                                                  color: FashionColors.negro,
+                                                  color: FashionColors.inkPrimary,
                                                 ),
                                               ),
                                               if (item.precioOriginal > item.precio) ...[
                                                 const SizedBox(width: 6),
                                                 Text(
                                                   CurrencyFormatter.formatearCOP(item.precioOriginal),
-                                                  style: const TextStyle(
+                                                  style: FashionTheme.priceTextStyle(
                                                     fontSize: 11,
+                                                    fontWeight: FontWeight.w500,
                                                     decoration: TextDecoration.lineThrough,
-                                                    color: FashionColors.gris,
+                                                    color: FashionColors.inkSecondary,
                                                   ),
                                                 ),
                                               ],
                                             ],
                                           ),
-                                          const SizedBox(height: 8),
+                                          const SizedBox(height: 10),
 
-                                          // Controles de cantidad táctiles
+                                          // Steppers táctiles - / +
                                           Row(
                                             children: [
                                               Container(
                                                 decoration: BoxDecoration(
-                                                  color: FashionColors.arenaSuave,
-                                                  borderRadius: BorderRadius.circular(8),
+                                                  color: FashionColors.surfaceMuted,
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
                                                 child: Row(
                                                   children: [
                                                     IconButton(
-                                                      icon: const Icon(Icons.remove, size: 16),
+                                                      icon: const Icon(Icons.remove_rounded, size: 16),
                                                       padding: const EdgeInsets.all(4),
                                                       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                                                       onPressed: () {
@@ -299,11 +315,15 @@ class CartDrawerWidget extends ConsumerWidget {
                                                       padding: const EdgeInsets.symmetric(horizontal: 8),
                                                       child: Text(
                                                         '${item.cantidad}',
-                                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                                        style: GoogleFonts.jetBrainsMono(
+                                                          fontWeight: FontWeight.w700,
+                                                          fontSize: 13,
+                                                          color: FashionColors.inkPrimary,
+                                                        ),
                                                       ),
                                                     ),
                                                     IconButton(
-                                                      icon: const Icon(Icons.add, size: 16),
+                                                      icon: const Icon(Icons.add_rounded, size: 16),
                                                       padding: const EdgeInsets.all(4),
                                                       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                                                       onPressed: () {
@@ -318,8 +338,8 @@ class CartDrawerWidget extends ConsumerWidget {
                                               ),
                                               const Spacer(),
                                               IconButton(
-                                                icon: const Icon(Icons.delete_outline_rounded, size: 20, color: FashionColors.gris),
-                                                tooltip: 'Eliminar',
+                                                icon: const Icon(Icons.delete_outline_rounded, size: 20, color: FashionColors.inkSecondary),
+                                                tooltip: 'Retirar',
                                                 onPressed: () {
                                                   ref.read(cartProvider.notifier).eliminarPrenda(item.varianteId);
                                                 },
@@ -340,60 +360,80 @@ class CartDrawerWidget extends ConsumerWidget {
                   ),
           ),
 
-          // Footer / Checkout
+          // Sartorial Summary Block & Checkout
           if (items.isNotEmpty) ...[
-            const Divider(height: 1),
             Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+              decoration: const BoxDecoration(
+                color: FashionColors.surfaceCard,
+                border: Border(top: BorderSide(color: FashionColors.borderSubtle)),
+              ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Subtotal estimado',
-                        style: TextStyle(fontSize: 14, color: FashionColors.gris),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: FashionColors.inkSecondary,
+                        ),
                       ),
                       Text(
                         CurrencyFormatter.formatearCOP(cartState.totalMonto),
-                        style: GoogleFonts.poppins(
+                        style: FashionTheme.priceTextStyle(
+                          fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: FashionColors.negro,
+                          color: FashionColors.inkPrimary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.negro,
+                        backgroundColor: FashionColors.brandAccent,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       onPressed: () {
                         Navigator.pop(context);
                         context.go('/carrito');
                       },
-                      child: const Text(
-                        'Proceder al pago',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      child: Text(
+                        'Proceder al Pago',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF25D366), width: 1.2),
-                      foregroundColor: const Color(0xFF25D366),
-                      padding: const EdgeInsets.symmetric(vertical: 11),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: FashionColors.inkPrimary, width: 1.2),
+                        foregroundColor: FashionColors.inkPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
+                      label: Text(
+                        'Cotizar / Asistencia por WhatsApp',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      onPressed: () => _abrirWhatsApp(context, items),
                     ),
-                    icon: const Icon(Icons.chat_bubble_outline_rounded, size: 18),
-                    label: const Text('Cotizar / Asistencia por WhatsApp'),
-                    onPressed: () => _abrirWhatsApp(context, items),
                   ),
                 ],
               ),

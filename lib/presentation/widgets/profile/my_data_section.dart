@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
@@ -82,7 +83,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo subir la imagen de perfil.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -103,7 +104,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible quitar la foto de perfil.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -132,7 +133,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible actualizar tus datos personales.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -145,7 +146,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     final correo = _nuevoCorreoCtrl.text.trim();
     if (!validarCorreo(correo)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa un correo electrónico válido'), backgroundColor: FashionColors.peligro),
+        const SnackBar(content: Text('Ingresa un correo electrónico válido'), backgroundColor: FashionColors.statusDanger),
       );
       return;
     }
@@ -164,7 +165,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo solicitar el cambio de correo.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -177,7 +178,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     final codigo = _codigoCorreoCtrl.text.trim();
     if (codigo.length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa el código numérico de 6 dígitos'), backgroundColor: FashionColors.peligro),
+        const SnackBar(content: Text('Ingresa el código numérico de 6 dígitos'), backgroundColor: FashionColors.statusDanger),
       );
       return;
     }
@@ -201,7 +202,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'El código ingresado es incorrecto o ha expirado.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -217,14 +218,14 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
 
     if (!passwordEsSegura(nueva)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La nueva contraseña no cumple con los requisitos de seguridad'), backgroundColor: FashionColors.peligro),
+        const SnackBar(content: Text('La nueva contraseña no cumple con los requisitos de seguridad'), backgroundColor: FashionColors.statusDanger),
       );
       return;
     }
 
     if (nueva != confirm) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Las contraseñas no coinciden'), backgroundColor: FashionColors.peligro),
+        const SnackBar(content: Text('Las contraseñas no coinciden'), backgroundColor: FashionColors.statusDanger),
       );
       return;
     }
@@ -249,7 +250,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible actualizar la contraseña. Revisa la contraseña actual.')),
-            backgroundColor: FashionColors.peligro,
+            backgroundColor: FashionColors.statusDanger,
           ),
         );
       }
@@ -261,28 +262,34 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 96), // Clearance para Floating Pill Dock
       children: [
         // GESTIÓN DE FOTO
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: FashionColors.grisBorde),
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: FashionColors.borderSubtle),
           ),
           child: Row(
             children: [
               OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: FashionColors.inkPrimary,
+                  side: const BorderSide(color: FashionColors.borderSubtle),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
                 onPressed: _subirNuevaFoto,
                 icon: const Icon(Icons.camera_alt_outlined, size: 16),
-                label: const Text('Cambiar foto'),
+                label: Text('Cambiar foto', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13)),
               ),
               const SizedBox(width: 12),
               TextButton(
-                style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
+                style: TextButton.styleFrom(foregroundColor: FashionColors.statusDanger),
                 onPressed: _quitarFoto,
-                child: const Text('Quitar foto'),
+                child: Text('Quitar foto', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13)),
               ),
             ],
           ),
@@ -292,44 +299,83 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
 
         // DATOS PERSONALES
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: FashionColors.grisBorde),
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: FashionColors.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Información Personal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 12),
+              Text(
+                'Información Personal',
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+              ),
+              const SizedBox(height: 14),
               TextField(
                 controller: _nombreCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre completo', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Nombre completo',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _telefonoCtrl,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(labelText: 'Teléfono', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Teléfono',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _ciudadCtrl,
-                decoration: const InputDecoration(labelText: 'Ciudad', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Ciudad',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _direccionCtrl,
-                decoration: const InputDecoration(labelText: 'Dirección habitual', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Dirección habitual',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
-                onPressed: _cargandoPerfil ? null : _guardarPerfil,
-                child: _cargandoPerfil
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Guardar cambios de perfil'),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.brandAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: _cargandoPerfil ? null : _guardarPerfil,
+                  child: _cargandoPerfil
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text('Guardar cambios de perfil', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
+                ),
               ),
             ],
           ),
@@ -339,50 +385,75 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
 
         // CAMBIO DE CORREO (2 PASOS)
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: FashionColors.grisBorde),
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: FashionColors.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Cambio de Correo Electrónico', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 12),
+              Text(
+                'Cambio de Correo Electrónico',
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+              ),
+              const SizedBox(height: 14),
               if (!_esperandoCodigoCorreo) ...[
                 TextField(
                   controller: _nuevoCorreoCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Nuevo correo electrónico', border: OutlineInputBorder()),
+                  style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                  decoration: InputDecoration(
+                    labelText: 'Nuevo correo electrónico',
+                    labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                    filled: true,
+                    fillColor: FashionColors.surfaceMuted,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.inkPrimary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
                   onPressed: _cargandoCorreo ? null : _solicitarCambioCorreo,
                   child: _cargandoCorreo
                       ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Solicitar código de cambio'),
+                      : Text('Solicitar código de cambio', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5)),
                 ),
               ] else ...[
                 TextField(
                   controller: _codigoCorreoCtrl,
                   keyboardType: TextInputType.number,
                   maxLength: 6,
-                  decoration: const InputDecoration(labelText: 'Código de 6 dígitos recibido', border: OutlineInputBorder()),
+                  style: GoogleFonts.jetBrainsMono(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 4),
+                  decoration: InputDecoration(
+                    labelText: 'Código de 6 dígitos recibido',
+                    counterText: '',
+                    filled: true,
+                    fillColor: FashionColors.surfaceMuted,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Row(
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: FashionColors.verdeExito, foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: FashionColors.statusSuccess,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
                       onPressed: _cargandoCorreo ? null : _confirmarCambioCorreo,
                       child: const Text('Confirmar nuevo correo'),
                     ),
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () => setState(() => _esperandoCodigoCorreo = false),
-                      child: const Text('Cancelar'),
+                      child: Text('Cancelar', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary)),
                     ),
                   ],
                 ),
@@ -395,42 +466,74 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
 
         // CAMBIO DE CONTRASEÑA
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: FashionColors.grisBorde),
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: FashionColors.borderSubtle),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Seguridad y Contraseña', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-              const SizedBox(height: 12),
+              Text(
+                'Seguridad y Contraseña',
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+              ),
+              const SizedBox(height: 14),
               TextField(
                 controller: _passActualCtrl,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Contraseña actual', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Contraseña actual',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _passNuevaCtrl,
                 obscureText: true,
                 onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(labelText: 'Nueva contraseña', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Nueva contraseña',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _passConfirmCtrl,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Confirmar nueva contraseña', border: OutlineInputBorder()),
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Confirmar nueva contraseña',
+                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
+                  filled: true,
+                  fillColor: FashionColors.surfaceMuted,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
-                onPressed: _cargandoPass ? null : _actualizarPassword,
-                child: _cargandoPass
-                    ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Actualizar contraseña'),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.brandAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: _cargandoPass ? null : _actualizarPassword,
+                  child: _cargandoPass
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : Text('Actualizar contraseña', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
+                ),
               ),
             ],
           ),
@@ -439,7 +542,3 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     );
   }
 }
-
-// ============================================================================
-// 2. SECCIÓN MIS PEDIDOS (SeccionMisPedidos.vue)
-// ============================================================================

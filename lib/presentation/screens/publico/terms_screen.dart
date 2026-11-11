@@ -53,59 +53,67 @@ class _TermsScreenState extends State<TermsScreen> {
   Widget build(BuildContext context) {
     return PublicShellLayout(
       child: _cargando
-          ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+          ? const Center(child: CircularProgressIndicator(color: FashionColors.inkPrimary))
           : _error != null
               ? Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(28.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: FashionColors.peligro),
+                        const Icon(Icons.error_outline, size: 48, color: FashionColors.statusDanger),
                         const SizedBox(height: 12),
-                        Text(_error!, textAlign: TextAlign.center),
+                        Text(_error!, textAlign: TextAlign.center, style: GoogleFonts.plusJakartaSans(color: FashionColors.inkPrimary)),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FashionColors.inkPrimary,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
                           onPressed: _cargarTerminos,
-                          child: const Text('Reintentar', style: TextStyle(color: Colors.white)),
+                          child: const Text('Reintentar conexión'),
                         ),
                       ],
                     ),
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 96), // Clearance para Floating Pill Dock
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: FashionColors.grisBorde),
+                      color: FashionColors.surfaceCard,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: FashionColors.borderSubtle),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           _termino?['titulo']?.toString() ?? 'Términos y Condiciones de Uso',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.spaceGrotesk(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: FashionColors.textoOscuro,
+                            color: FashionColors.inkPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Versión ${_termino?['version'] ?? '1.0'}',
-                          style: const TextStyle(fontSize: 12, color: FashionColors.textoMuted),
+                          style: GoogleFonts.jetBrainsMono(fontSize: 12, color: FashionColors.inkSecondary),
                         ),
                         const SizedBox(height: 16),
-                        const Divider(),
+                        const Divider(color: FashionColors.borderSubtle),
                         const SizedBox(height: 16),
                         Text(
                           _termino?['contenido']?.toString() ??
                               'Al acceder a nuestra plataforma y adquirir productos, aceptas nuestros términos de despacho, garantías y tratamiento seguro de datos.',
-                          style: const TextStyle(fontSize: 14, height: 1.6, color: FashionColors.textoOscuro),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14,
+                            height: 1.6,
+                            color: FashionColors.inkPrimary,
+                          ),
                         ),
                       ],
                     ),

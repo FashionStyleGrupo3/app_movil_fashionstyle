@@ -8,6 +8,7 @@ import 'package:fashion_style_mobile/data/services/user_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/widgets/auth/password_requirements_widget.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AdminAccountScreen extends ConsumerStatefulWidget {
@@ -104,14 +105,14 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
     return AdminShellLayout(
       currentPath: '/admin/cuenta',
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 96),
         children: [
           Center(
             child: Stack(
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: FashionColors.pizarra,
+                  backgroundColor: FashionColors.inkPrimary,
                   backgroundImage: (authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty) ? NetworkImage(authState.fotoUsuario!) : null,
                   child: (authState.fotoUsuario == null || authState.fotoUsuario!.isEmpty) ? const Icon(Icons.person, size: 40, color: Colors.white) : null,
                 ),
@@ -120,7 +121,7 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
                   right: 0,
                   child: CircleAvatar(
                     radius: 14,
-                    backgroundColor: FashionColors.rosaCorporativo,
+                    backgroundColor: FashionColors.brandAccent,
                     child: IconButton(
                       padding: EdgeInsets.zero,
                       icon: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
@@ -136,11 +137,11 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
           // Datos personales
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: FashionColors.grisBorde)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: FashionColors.borderSubtle)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Información del Colaborador', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('Información del Colaborador', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary)),
                 const SizedBox(height: 12),
                 TextField(controller: _nombreCtrl, decoration: const InputDecoration(labelText: 'Nombre *', border: OutlineInputBorder())),
                 const SizedBox(height: 10),
@@ -149,11 +150,16 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
                 TextField(controller: _ciudadCtrl, decoration: const InputDecoration(labelText: 'Ciudad', border: OutlineInputBorder())),
                 const SizedBox(height: 10),
                 TextField(controller: _dirCtrl, decoration: const InputDecoration(labelText: 'Dirección', border: OutlineInputBorder())),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.brandAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                   onPressed: _cargando ? null : _guardarPerfil,
-                  child: const Text('Guardar Datos'),
+                  child: Text('Guardar Datos', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
                 ),
               ],
             ),
@@ -164,11 +170,11 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
           // Contraseña
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: FashionColors.grisBorde)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: FashionColors.borderSubtle)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Seguridad de la Cuenta', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                Text('Seguridad de la Cuenta', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary)),
                 const SizedBox(height: 12),
                 TextField(controller: _passActualCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Contraseña actual', border: OutlineInputBorder())),
                 const SizedBox(height: 10),
@@ -177,11 +183,16 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
                 PasswordRequirementsWidget(password: _passNuevaCtrl.text),
                 const SizedBox(height: 10),
                 TextField(controller: _passConfirmCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Confirmar nueva contraseña', border: OutlineInputBorder())),
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.brandAccent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                   onPressed: _actualizarPass,
-                  child: const Text('Actualizar Contraseña'),
+                  child: Text('Actualizar Contraseña', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
                 ),
               ],
             ),

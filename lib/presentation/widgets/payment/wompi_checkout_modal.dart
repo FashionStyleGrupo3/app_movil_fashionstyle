@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/payment/wompi_checkout_data.dart';
 import 'package:fashion_style_mobile/data/services/wompi_service.dart';
@@ -259,7 +260,7 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
     body {
       margin: 0;
       padding: 0;
-      background: #faf7f5;
+      background: #F6F7F9;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       flex-direction: column;
@@ -270,11 +271,11 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
     }
     .cargando-box {
       text-align: center;
-      color: #333;
+      color: #14161F;
     }
     .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #f43f5e;
+      border: 4px solid #DFE3EC;
+      border-top: 4px solid #B83A24;
       border-radius: 50%;
       width: 40px;
       height: 40px;
@@ -428,41 +429,70 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          // Barra superior de la pasarela
+          // Barra superior de la pasarela en Nocturnal Dark #14161F
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(bottom: BorderSide(color: FashionColors.grisBorde)),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              color: FashionColors.inkPrimary,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.lock, size: 18, color: FashionColors.verdeExito),
-                const SizedBox(width: 8),
-                const Text(
-                  'Pago Seguro Wompi Bancolombia',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: FashionColors.textoOscuro),
+                // Pill Jade de Pago Seguro
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                  decoration: BoxDecoration(
+                    color: FashionColors.atelierJade,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.lock_rounded, size: 13, color: Colors.white),
+                      const SizedBox(width: 5),
+                      Text(
+                        'Pago Seguro',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Wompi · Bancolombia',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  tooltip: 'Cancelar pago',
+                  icon: const Icon(Icons.close_rounded, size: 22, color: Colors.white70),
+                  tooltip: 'Cerrar pasarela',
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
           ),
-          // Indicador de carga superior si el webview aún está procesando
+          // Indicador de carga superior Terracotta
           if (_cargando)
             const LinearProgressIndicator(
-              color: FashionColors.rosaCorporativo,
-              backgroundColor: FashionColors.rosaSuave,
+              color: FashionColors.brandAccent,
+              backgroundColor: FashionColors.inkPrimary,
+              minHeight: 3,
             ),
           // WebView con el widget
           Expanded(

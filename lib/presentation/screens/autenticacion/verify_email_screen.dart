@@ -115,39 +115,47 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       currentIndex: 3,
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 96), // Clearance para Floating Pill Dock
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: const BoxConstraints(maxWidth: 440),
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: FashionColors.grisBorde),
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: FashionColors.borderSubtle),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 18, offset: const Offset(0, 6)),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(color: FashionColors.rosaSuave, shape: BoxShape.circle),
-                    child: const Icon(Icons.mark_email_read_outlined, size: 40, color: FashionColors.rosaOscuro),
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: FashionColors.atelierJade.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.mark_email_read_outlined, size: 32, color: FashionColors.atelierJade),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   Text(
                     'Verifica tu Correo',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: FashionColors.textoOscuro,
+                      fontWeight: FontWeight.w700,
+                      color: FashionColors.inkPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Hemos enviado un código de 6 dígitos a $correo. Ingrésalo para activar tu cuenta.',
+                    'Hemos enviado un código de 6 dígitos a $correo. Ingrésalo para activar tu cuenta atelier.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 13, color: FashionColors.textoMuted),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
                   ),
                   const SizedBox(height: 24),
 
@@ -156,10 +164,14 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.peligro.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
                       ),
-                      child: Text(_error!, style: const TextStyle(color: FashionColors.peligro, fontSize: 13)),
+                      child: Text(
+                        _error!,
+                        style: GoogleFonts.plusJakartaSans(color: FashionColors.statusDanger, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
                     ),
 
                   if (_exito != null)
@@ -167,51 +179,74 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: FashionColors.verdeExito.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: FashionColors.statusSuccess.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: FashionColors.statusSuccess.withValues(alpha: 0.3)),
                       ),
-                      child: Text(_exito!, style: const TextStyle(color: FashionColors.verdeExito, fontSize: 13)),
+                      child: Text(
+                        _exito!,
+                        style: GoogleFonts.plusJakartaSans(color: FashionColors.statusSuccess, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
                     ),
 
                   TextField(
                     controller: _codigoCtrl,
+                    textAlign: TextAlign.center,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
-                    decoration: const InputDecoration(
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 8,
+                      color: FashionColors.inkPrimary,
+                    ),
+                    decoration: InputDecoration(
                       hintText: '000000',
+                      hintStyle: GoogleFonts.jetBrainsMono(
+                        fontSize: 22,
+                        letterSpacing: 8,
+                        color: FashionColors.inkSecondary.withValues(alpha: 0.4),
+                      ),
                       counterText: '',
-                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: FashionColors.surfaceMuted,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: FashionColors.brandAccent, width: 1.5),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
 
                   SizedBox(
-                    height: 48,
+                    height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.negroElegante,
+                        backgroundColor: FashionColors.brandAccent,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 2,
                       ),
                       onPressed: _cargando ? null : _verificar,
                       child: _cargando
                           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Text('Verificar código', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          : Text('Activar cuenta', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 15)),
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  TextButton(
-                    onPressed: _segundosRestantes > 0 ? null : _reenviar,
-                    child: Text(
-                      _segundosRestantes > 0
-                          ? 'Reenviar código en ${_segundosRestantes}s'
-                          : '¿No recibiste el código? Reenviar',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: _segundosRestantes > 0 ? FashionColors.textoMuted : FashionColors.rosaOscuro,
+                  Center(
+                    child: TextButton(
+                      onPressed: _segundosRestantes == 0 ? _reenviar : null,
+                      child: Text(
+                        _segundosRestantes > 0
+                            ? 'Reenviar código en ${_segundosRestantes}s'
+                            : 'Reenviar nuevo código',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                          color: _segundosRestantes > 0 ? FashionColors.inkSecondary : FashionColors.brandAccent,
+                        ),
                       ),
                     ),
                   ),
@@ -224,7 +259,3 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     );
   }
 }
-
-// ============================================================================
-// 4. VISTA RECUPERAR CONTRASEÑA (VistaRecuperarContrasena.vue)
-// ============================================================================

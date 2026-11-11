@@ -1,5 +1,6 @@
 // @source-mirror: src/views/admin/VistaPedidosyFacturas.vue, src/components/pedidos/ModalGestionDespacho.vue, src/components/facturas/ModalCrearFactura.vue, src/components/facturas/ModalCargaMasivaFacturas.vue, src/views/admin/VistaProduccion.vue, src/components/produccion/CalculadoraProduccion.vue, src/components/produccion/GestorOrdenesProduccion.vue
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/services/invoice_service.dart';
@@ -52,32 +53,80 @@ class _ModalCrearFacturaSheetState extends State<ModalCrearFacturaSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+    return Container(
+      decoration: const BoxDecoration(
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 12, bottom: MediaQuery.of(context).viewInsets.bottom + 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Emitir Factura Manual', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 12),
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 14),
+              decoration: BoxDecoration(
+                color: FashionColors.borderSubtle,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Text(
+            'Emitir Factura Manual',
+            style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 17, color: FashionColors.inkPrimary),
+          ),
+          const SizedBox(height: 14),
           DropdownButtonFormField<String>(
             initialValue: _origen,
-            decoration: const InputDecoration(labelText: 'Origen de operación', border: OutlineInputBorder()),
+            decoration: InputDecoration(
+              labelText: 'Origen de operación',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
             items: const [
               DropdownMenuItem(value: 'pedido', child: Text('Pedido Online')),
               DropdownMenuItem(value: 'venta', child: Text('Venta POS Mostrador')),
             ],
             onChanged: (v) => setState(() => _origen = v ?? 'pedido'),
           ),
-          const SizedBox(height: 10),
-          TextField(controller: _refIdCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'ID de la operación *', border: OutlineInputBorder())),
-          const SizedBox(height: 10),
-          TextField(controller: _metodoCtrl, decoration: const InputDecoration(labelText: 'Método de pago', border: OutlineInputBorder())),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _refIdCtrl,
+            keyboardType: TextInputType.number,
+            style: GoogleFonts.jetBrainsMono(fontSize: 14, fontWeight: FontWeight.w600),
+            decoration: InputDecoration(
+              labelText: 'ID de la operación *',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _metodoCtrl,
+            decoration: InputDecoration(
+              labelText: 'Método de pago',
+              filled: true,
+              fillColor: FashionColors.surfaceMuted,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
+          ),
+          const SizedBox(height: 18),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.brandAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             onPressed: _creando ? null : _crear,
-            child: _creando ? const CircularProgressIndicator(color: Colors.white) : const Text('Emitir Factura'),
+            child: _creando
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text('Emitir Factura', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
           ),
         ],
       ),

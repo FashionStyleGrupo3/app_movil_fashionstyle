@@ -1,5 +1,6 @@
 // @source-mirror: src/views/admin/VistaPedidosyFacturas.vue, src/components/pedidos/ModalGestionDespacho.vue, src/components/facturas/ModalCrearFactura.vue, src/components/facturas/ModalCargaMasivaFacturas.vue, src/views/admin/VistaProduccion.vue, src/components/produccion/CalculadoraProduccion.vue, src/components/produccion/GestorOrdenesProduccion.vue
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/services/invoice_service.dart';
@@ -73,38 +74,66 @@ class _ModalCargaMasivaFacturasSheetState extends State<ModalCargaMasivaFacturas
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(context).viewInsets.bottom + 20),
+    return Container(
+      decoration: const BoxDecoration(
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 12, bottom: MediaQuery.of(context).viewInsets.bottom + 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 14),
+              decoration: BoxDecoration(
+                color: FashionColors.borderSubtle,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Carga Masiva de Facturas', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(
+                'Carga Masiva de Facturas',
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+              ),
               TextButton.icon(
-                icon: const Icon(Icons.download, size: 16),
-                label: const Text('Plantilla CSV', style: TextStyle(fontSize: 12)),
+                icon: const Icon(Icons.download, size: 16, color: FashionColors.inkPrimary),
+                label: Text('Plantilla CSV', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary)),
                 onPressed: () => Share.share(InvoiceService.plantillaCsvContenido, subject: 'Plantilla_Facturas.csv'),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: const BorderSide(color: FashionColors.borderSubtle),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
             onPressed: _subiendo ? null : _seleccionarArchivo,
-            icon: const Icon(Icons.attach_file),
-            label: Text(_nombreArchivo ?? 'Seleccionar archivo (.csv / .xlsx)'),
+            icon: const Icon(Icons.attach_file, color: FashionColors.inkPrimary),
+            label: Text(_nombreArchivo ?? 'Seleccionar archivo (.csv / .xlsx)', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkPrimary)),
           ),
           if (_subiendo) ...[
             const SizedBox(height: 12),
-            LinearProgressIndicator(value: _progreso, color: FashionColors.rosaCorporativo),
+            LinearProgressIndicator(value: _progreso, color: FashionColors.brandAccent),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.brandAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             onPressed: _subiendo || _rutaArchivo == null ? null : _subir,
-            child: const Text('Subir y Procesar'),
+            child: Text('Subir y Procesar', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
           ),
         ],
       ),

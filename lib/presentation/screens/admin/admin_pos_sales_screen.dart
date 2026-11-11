@@ -11,6 +11,7 @@ import 'package:fashion_style_mobile/data/services/invoice_pdf_service.dart';
 import 'package:fashion_style_mobile/data/services/pos_sale_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/pos/new_pos_sale_sheet.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminPosSalesScreen extends ConsumerStatefulWidget {
   const AdminPosSalesScreen({super.key});
@@ -147,10 +148,14 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: FashionColors.brandAccent,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
                       onPressed: _abrirModalNuevaVenta,
                       icon: const Icon(Icons.point_of_sale, size: 16),
-                      label: const Text('Nueva Venta'),
+                      label: Text('Nueva Venta', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -161,55 +166,56 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
           // LISTA DE VENTAS REGISTRADAS
           Expanded(
             child: _cargando
-                ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+                ? const Center(child: CircularProgressIndicator(color: FashionColors.brandAccent))
                 : _error != null
                     ? Center(child: Text(_error!))
                     : _ventas.isEmpty
                         ? const Center(child: Text('No hay ventas registradas'))
                         : ListView.builder(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                             itemCount: _ventas.length,
                             itemBuilder: (context, index) {
                               final v = _ventas[index];
                               final esActiva = v.estado == 'completada' || v.estado == 'activa';
 
                               return Card(
-                                elevation: 0.5,
+                                elevation: 0,
                                 margin: const EdgeInsets.only(bottom: 8),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: const BorderSide(color: FashionColors.grisBorde),
+                                  borderRadius: BorderRadius.circular(14),
+                                  side: const BorderSide(color: FashionColors.borderSubtle),
                                 ),
                                 child: ExpansionTile(
                                   title: Row(
                                     children: [
-                                      Text(v.codigo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                      Text(v.codigo, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary)),
                                       const SizedBox(width: 8),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: esActiva ? FashionColors.verdeExito.withValues(alpha: 0.12) : FashionColors.peligro.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(4),
+                                          color: esActiva ? FashionColors.statusSuccess.withValues(alpha: 0.12) : FashionColors.statusDanger.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: esActiva ? FashionColors.statusSuccess.withValues(alpha: 0.3) : FashionColors.statusDanger.withValues(alpha: 0.3)),
                                         ),
                                         child: Text(
                                           v.medioPago.toUpperCase(),
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
-                                            color: esActiva ? FashionColors.verdeExito : FashionColors.peligro,
+                                            color: esActiva ? FashionColors.statusSuccess : FashionColors.statusDanger,
                                           ),
                                         ),
                                       ),
                                       const Spacer(),
                                       Text(
                                         CurrencyFormatter.formatearCOP(v.total),
-                                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                                        style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary),
                                       ),
                                     ],
                                   ),
                                   subtitle: Text(
                                     '${v.fecha ?? ''} · Cliente: ${v.clienteNombre.isNotEmpty ? v.clienteNombre : "Consumidor"}',
-                                    style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted),
+                                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
                                   ),
                                   childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                                   children: [
@@ -219,8 +225,8 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text('${d.nombre} (${d.talla}) x${d.cantidad}', style: const TextStyle(fontSize: 12)),
-                                          Text(CurrencyFormatter.formatearCOP(d.subtotal), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                          Text('${d.nombre} (${d.talla}) x${d.cantidad}', style: GoogleFonts.plusJakartaSans(fontSize: 12)),
+                                          Text(CurrencyFormatter.formatearCOP(d.subtotal), style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.w600)),
                                         ],
                                       ),
                                     )),
@@ -228,17 +234,21 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
                                     Row(
                                       children: [
                                         ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(backgroundColor: FashionColors.fondoClaro, foregroundColor: FashionColors.textoOscuro),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: FashionColors.canvasBackground,
+                                            foregroundColor: FashionColors.inkPrimary,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
                                           onPressed: () => InvoicePdfGenerator.generarYCompartirReciboPos(v),
                                           icon: const Icon(Icons.print, size: 16),
-                                          label: const Text('Imprimir Recibo', style: TextStyle(fontSize: 12)),
+                                          label: Text('Imprimir Recibo', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
                                         ),
                                         const Spacer(),
                                         if (esActiva)
                                           TextButton(
-                                            style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
+                                            style: TextButton.styleFrom(foregroundColor: FashionColors.statusDanger),
                                             onPressed: () => _cancelarVenta(v),
-                                            child: const Text('Anular Venta', style: TextStyle(fontSize: 12)),
+                                            child: Text('Anular Venta', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
                                           ),
                                       ],
                                     ),

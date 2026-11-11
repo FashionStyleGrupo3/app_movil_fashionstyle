@@ -14,6 +14,8 @@ import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/garments/garment_form_sheet.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/garments/promotions_sheet.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AdminGarmentsScreen extends ConsumerStatefulWidget {
   const AdminGarmentsScreen({super.key});
@@ -280,22 +282,24 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                     const SizedBox(width: 8),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: FashionColors.rosaCorporativo,
-                        side: const BorderSide(color: FashionColors.rosaCorporativo),
+                        foregroundColor: FashionColors.inkPrimary,
+                        side: const BorderSide(color: FashionColors.borderSubtle),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: _abrirModalPromociones,
                       icon: const Icon(Icons.local_offer_outlined, size: 16),
-                      label: const Text('Promociones', style: TextStyle(fontSize: 12)),
+                      label: Text('Promociones', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.negroElegante,
+                        backgroundColor: FashionColors.brandAccent,
                         foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () => _abrirFormularioPrenda(),
                       icon: const Icon(Icons.add, size: 16),
-                      label: const Text('Nueva', style: TextStyle(fontSize: 12)),
+                      label: Text('Nueva', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -321,22 +325,28 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
           // LISTA DE PRENDAS
           Expanded(
             child: _cargando
-                ? const Center(child: CircularProgressIndicator(color: FashionColors.rosaCorporativo))
+                ? const Center(child: CircularProgressIndicator(color: FashionColors.brandAccent))
                 : _error != null
                     ? Center(child: Text(_error!))
                     : filtrados.isEmpty
-                        ? const Center(child: Text('No hay prendas registradas con ese criterio'))
+                        ? const Center(
+                            child: AtelierEmptyStateIllustration(
+                              type: AtelierEmptyStateType.emptySearch,
+                              title: 'Sin prendas coincidentes',
+                              subtitle: 'No hay prendas registradas con ese criterio.',
+                            ),
+                          )
                         : ListView.builder(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
                             itemCount: filtrados.length,
                             itemBuilder: (context, index) {
                               final p = filtrados[index];
                               return Card(
-                                elevation: 0.5,
+                                elevation: 0,
                                 margin: const EdgeInsets.only(bottom: 10),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: const BorderSide(color: FashionColors.grisBorde),
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: const BorderSide(color: FashionColors.borderSubtle),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
@@ -344,13 +354,17 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(10),
                                         child: SizedBox(
-                                          width: 60,
+                                          width: 54,
                                           height: 72,
                                           child: p.primeraImagenUrl.isNotEmpty
-                                              ? CachedNetworkImage(imageUrl: p.primeraImagenUrl, fit: BoxFit.cover)
-                                              : Container(color: FashionColors.fondoClaro, child: const Icon(Icons.checkroom)),
+                                              ? CachedNetworkImage(
+                                                  imageUrl: p.primeraImagenUrl,
+                                                  fit: BoxFit.cover,
+                                                  errorWidget: (_, __, ___) => Container(color: FashionColors.surfaceMuted, child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary)),
+                                                )
+                                              : Container(color: FashionColors.surfaceMuted, child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary)),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
@@ -358,11 +372,11 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(p.nombre, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                            Text(p.nombre, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 14, color: FashionColors.inkPrimary)),
                                             const SizedBox(height: 2),
                                             Text(
                                               '${p.categoria?.nombre ?? "Sin categoría"} · ${p.catalogo?.nombre ?? "Sin colección"}',
-                                              style: const TextStyle(fontSize: 11, color: FashionColors.textoMuted),
+                                              style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
                                             ),
                                             const SizedBox(height: 6),
                                             Row(
@@ -371,17 +385,17 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                 Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: p.activo ? const Color(0xFFDEF7EC) : const Color(0xFFFDE8E8),
+                                                    color: p.activo ? FashionColors.statusSuccess.withValues(alpha: 0.12) : FashionColors.statusDanger.withValues(alpha: 0.12),
                                                     borderRadius: BorderRadius.circular(4),
                                                     border: Border.all(
-                                                      color: p.activo ? const Color(0xFF31C48D) : const Color(0xFFF98080),
+                                                      color: p.activo ? FashionColors.statusSuccess.withValues(alpha: 0.3) : FashionColors.statusDanger.withValues(alpha: 0.3),
                                                       width: 0.5,
                                                     ),
                                                   ),
                                                   child: Text(
                                                     p.activo ? 'Activa' : 'Inactiva',
                                                     style: TextStyle(
-                                                      color: p.activo ? const Color(0xFF03543F) : const Color(0xFF9B1C1C),
+                                                      color: p.activo ? FashionColors.statusSuccess : FashionColors.statusDanger,
                                                       fontSize: 10,
                                                       fontWeight: FontWeight.bold,
                                                     ),
@@ -392,17 +406,17 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                 Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color: p.publicado ? const Color(0xFFDEF7EC) : const Color(0xFFF3F4F6),
+                                                    color: p.publicado ? FashionColors.statusSuccess.withValues(alpha: 0.12) : FashionColors.surfaceMuted,
                                                     borderRadius: BorderRadius.circular(4),
                                                     border: Border.all(
-                                                      color: p.publicado ? const Color(0xFF31C48D) : const Color(0xFFD1D5DB),
+                                                      color: p.publicado ? FashionColors.statusSuccess.withValues(alpha: 0.3) : FashionColors.borderSubtle,
                                                       width: 0.5,
                                                     ),
                                                   ),
                                                   child: Text(
                                                     p.publicado ? 'En tienda' : 'Oculto tienda',
                                                     style: TextStyle(
-                                                      color: p.publicado ? const Color(0xFF03543F) : const Color(0xFF6B7280),
+                                                      color: p.publicado ? FashionColors.statusSuccess : FashionColors.inkSecondary,
                                                       fontSize: 10,
                                                       fontWeight: FontWeight.bold,
                                                     ),
@@ -417,7 +431,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                       Icon(
                                                         p.publicado ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                                                         size: 14,
-                                                        color: p.publicado ? FashionColors.verdeExito : FashionColors.textoMuted,
+                                                        color: p.publicado ? FashionColors.statusSuccess : FashionColors.inkSecondary,
                                                       ),
                                                       const SizedBox(width: 3),
                                                       Text(
@@ -434,15 +448,15 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                               children: [
                                                 Text(
                                                   CurrencyFormatter.formatearCOP(p.precioMinimo),
-                                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: FashionColors.textoOscuro),
+                                                  style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary),
                                                 ),
                                                 const SizedBox(width: 12),
                                                 Text(
                                                   'Stock: ${p.stockTotal} uds',
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.jetBrainsMono(
                                                     fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: p.stockTotal <= 0 ? FashionColors.peligro : FashionColors.verdeExito,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: p.stockTotal <= 0 ? FashionColors.statusDanger : FashionColors.statusSuccess,
                                                   ),
                                                 ),
                                               ],

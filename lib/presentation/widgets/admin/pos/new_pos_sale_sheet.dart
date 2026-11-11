@@ -127,21 +127,36 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
+      decoration: const BoxDecoration(
+        color: FashionColors.surfaceCard,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
       padding: EdgeInsets.only(
         left: 16,
         right: 16,
-        top: 16,
+        top: 12,
         bottom: MediaQuery.of(context).viewInsets.bottom + 16,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Center(
+            child: Container(
+              width: 44,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: FashionColors.borderSubtle,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Caja Mostrador (POS)',
-                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+                style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
               ),
               IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
             ],
@@ -269,10 +284,10 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('Total:', style: TextStyle(fontSize: 11, color: FashionColors.textoMuted)),
+                  Text('Total:', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary)),
                   Text(
                     CurrencyFormatter.formatearCOP(_totalBolsa),
-                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.textoOscuro),
+                    style: GoogleFonts.jetBrainsMono(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
                   ),
                 ],
               ),
@@ -284,15 +299,15 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
             height: 48,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: FashionColors.negroElegante,
+                backgroundColor: FashionColors.brandAccent,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               onPressed: _procesandoCobro || _bolsa.isEmpty ? null : _cobrarVenta,
               icon: _procesandoCobro ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.check),
               label: Text(
                 _procesandoCobro ? 'Procesando...' : 'Cobrar e Imprimir Comprobante',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
           ),
