@@ -107,7 +107,10 @@ class _ModalPromocionesSheetState extends State<ModalPromocionesSheet> {
                 } catch (e) {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error al crear promoción: $e'), backgroundColor: FashionColors.peligro),
+                      SnackBar(
+                        content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible crear la promoción.')),
+                        backgroundColor: FashionColors.peligro,
+                      ),
                     );
                   }
                 }

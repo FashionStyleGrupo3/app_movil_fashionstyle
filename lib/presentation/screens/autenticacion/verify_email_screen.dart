@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
@@ -76,7 +77,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString().replaceFirst('Exception: ', '');
+          _error = ApiClient.obtenerMensajeError(
+            e,
+            'El código ingresado es incorrecto o ya ha expirado.',
+          );
           _cargando = false;
         });
       }
@@ -95,7 +99,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'No se pudo reenviar el código: $e');
+        setState(() => _error = ApiClient.obtenerMensajeError(
+          e,
+          'No se pudo reenviar el código. Intenta de nuevo en unos momentos.',
+        ));
       }
     }
   }

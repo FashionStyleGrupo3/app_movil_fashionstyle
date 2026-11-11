@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
@@ -46,7 +47,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString().replaceFirst('Exception: ', '');
+          _error = ApiClient.obtenerMensajeError(
+            e,
+            'No se pudo enviar el correo de recuperación. Verifica el correo ingresado.',
+          );
           _cargando = false;
         });
       }

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fashion_style_mobile/core/constants/payment_constants.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
@@ -55,7 +56,7 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Error al cargar ventas POS: $e';
+          _error = ApiClient.obtenerMensajeError(e, 'No se pudieron cargar las ventas del punto de venta.');
           _cargando = false;
         });
       }
@@ -90,7 +91,10 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al anular: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible anular la venta.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     }

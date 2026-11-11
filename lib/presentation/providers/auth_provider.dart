@@ -104,7 +104,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<Map<String, dynamic>> guardarSesion(Map<String, dynamic> datos) async {
     final tokenRecibido = datos['access_token'] ?? datos['token'];
     if (tokenRecibido == null || tokenRecibido.toString().trim().isEmpty) {
-      throw StateError('La respuesta no contiene access_token ni token.');
+      throw StateError('No se pudo validar la sesión. Por favor intenta iniciar sesión de nuevo.');
     }
 
     final tokenStr = tokenRecibido.toString();

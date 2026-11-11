@@ -60,7 +60,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Error al cargar prendas: $e';
+          _error = ApiClient.obtenerMensajeError(e, 'No se pudieron cargar las prendas del catálogo.');
           _cargando = false;
         });
       }
@@ -82,7 +82,10 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al alternar publicación: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar la visibilidad de la prenda.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     }
@@ -99,7 +102,10 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('No se pudo cambiar el estado: $e'), backgroundColor: FashionColors.peligro),
+            SnackBar(
+              content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar el estado de la prenda.')),
+              backgroundColor: FashionColors.peligro,
+            ),
           );
         }
       }
@@ -134,7 +140,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
         );
       }
     } catch (e) {
-      String mensaje = 'No se pudo eliminar la prenda.';
+      String mensaje = ApiClient.obtenerMensajeError(e, 'No se pudo eliminar la prenda.');
       if (e is DioException && e.response?.statusCode == 409) {
         mensaje = 'No se puede eliminar esta prenda porque ya tiene ventas registradas. Puedes desactivarla para retirarla del catálogo.';
       }

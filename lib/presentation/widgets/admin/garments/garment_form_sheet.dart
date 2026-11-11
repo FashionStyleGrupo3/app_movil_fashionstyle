@@ -96,7 +96,10 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar prenda: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible guardar la prenda. Verifica los datos ingresados.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {

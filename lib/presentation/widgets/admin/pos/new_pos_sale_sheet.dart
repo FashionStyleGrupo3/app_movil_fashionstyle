@@ -1,6 +1,7 @@
 // @source-mirror: src/views/admin/VistaGestionPrendas.vue, src/composables/useGestionPrendas.js, src/views/admin/VistaVentasPOS.vue
 import 'package:flutter/material.dart';
 import 'package:fashion_style_mobile/core/constants/payment_constants.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/product/product.dart';
@@ -111,7 +112,10 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cobrar venta: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo procesar la venta en el punto de venta.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {

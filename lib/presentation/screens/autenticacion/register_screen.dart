@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
@@ -113,7 +114,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString().replaceFirst('Exception: ', '');
+          _error = ApiClient.obtenerMensajeError(
+            e,
+            'No se pudo completar el registro. Verifica los datos ingresados.',
+          );
           _cargando = false;
         });
       }

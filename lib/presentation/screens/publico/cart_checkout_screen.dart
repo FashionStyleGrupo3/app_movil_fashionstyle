@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
@@ -185,7 +186,16 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
             }
           }
         }
-        mensaje = cuerpo is Map ? (cuerpo['message'] ?? datosError['message'] ?? mensaje) : mensaje;
+        final crudo = cuerpo is Map ? (cuerpo['message'] ?? datosError['message'] ?? mensaje) : mensaje;
+        mensaje = ApiClient.sanitizarTextoError(
+          crudo,
+          'Algunas prendas seleccionadas ya no tienen stock suficiente. Se actualizó tu bolsa.',
+        );
+      } else {
+        mensaje = ApiClient.obtenerMensajeError(
+          err,
+          'No fue posible preparar tu pedido. Por favor intenta nuevamente.',
+        );
       }
 
       setState(() => _errorPago = mensaje);

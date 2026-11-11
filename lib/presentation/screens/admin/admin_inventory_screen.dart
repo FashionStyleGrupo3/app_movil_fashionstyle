@@ -115,7 +115,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Error al cargar los datos del inventario: $e';
+          _error = ApiClient.obtenerMensajeError(e, 'No se pudieron cargar los datos del inventario.');
           _cargando = false;
         });
       }
@@ -249,7 +249,10 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                           );
                         } catch (e) {
                           messenger.showSnackBar(
-                            SnackBar(content: Text('Error al registrar movimiento: $e'), backgroundColor: FashionColors.peligro),
+                            SnackBar(
+                              content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible registrar el movimiento de inventario.')),
+                              backgroundColor: FashionColors.peligro,
+                            ),
                           );
                         }
                       },

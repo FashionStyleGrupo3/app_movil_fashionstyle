@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
@@ -93,7 +94,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString().replaceFirst('Exception: ', '');
+          _error = ApiClient.obtenerMensajeError(
+            e,
+            'No fue posible restablecer la contraseña. Verifica el código e intenta de nuevo.',
+          );
           _cargando = false;
         });
       }

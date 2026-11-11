@@ -1,6 +1,7 @@
 // @source-mirror: src/views/admin/VistaConfiguracionPagos.vue, src/views/admin/VistaUsuariosYClientes.vue, src/views/admin/VistaAuditoria.vue, src/views/admin/VistaEditarCuenta.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/payment/bank_account_config.dart';
@@ -131,7 +132,10 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al guardar: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo guardar la configuración de pagos.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {

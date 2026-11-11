@@ -19,6 +19,6 @@ class DashboardService {
     } else if (data is Map) {
       return DashboardData.fromJson(Map<String, dynamic>.from(data), meses: meses);
     }
-    throw Exception('Formato de respuesta no válido en /dashboard');
+    throw Exception('No fue posible interpretar los datos del panel.');
   }
 }

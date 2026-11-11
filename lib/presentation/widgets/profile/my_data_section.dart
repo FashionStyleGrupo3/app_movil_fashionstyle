@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
@@ -79,7 +80,10 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir imagen: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo subir la imagen de perfil.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     }
@@ -97,7 +101,10 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo quitar la foto: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible quitar la foto de perfil.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     }
@@ -123,7 +130,10 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar perfil: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible actualizar tus datos personales.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {
@@ -152,7 +162,10 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al solicitar cambio: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo solicitar el cambio de correo.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {
@@ -186,7 +199,10 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Código inválido o expirado: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'El código ingresado es incorrecto o ha expirado.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {
@@ -231,7 +247,10 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No fue posible actualizar la contraseña: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible actualizar la contraseña. Revisa la contraseña actual.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     } finally {

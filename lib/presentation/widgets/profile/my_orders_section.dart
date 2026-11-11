@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/order/order_model.dart';
@@ -101,7 +102,10 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No se pudo reanudar el pago: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible reanudar el proceso de pago.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     }
@@ -119,7 +123,10 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al cancelar: $e'), backgroundColor: FashionColors.peligro),
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cancelar el pedido.')),
+            backgroundColor: FashionColors.peligro,
+          ),
         );
       }
     }

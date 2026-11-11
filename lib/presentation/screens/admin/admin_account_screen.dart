@@ -1,6 +1,7 @@
 // @source-mirror: src/views/admin/VistaConfiguracionPagos.vue, src/views/admin/VistaUsuariosYClientes.vue, src/views/admin/VistaAuditoria.vue, src/views/admin/VistaEditarCuenta.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
 import 'package:fashion_style_mobile/data/services/user_service.dart';
@@ -87,7 +88,12 @@ class _AdminAccountScreenState extends ConsumerState<AdminAccountScreen> {
       _passConfirmCtrl.clear();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contraseña cambiada con éxito')));
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cambiar contraseña: $e'), backgroundColor: FashionColors.peligro));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar la contraseña. Verifica tu contraseña actual.')),
+          backgroundColor: FashionColors.peligro,
+        ));
+      }
     }
   }
 
