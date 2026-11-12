@@ -103,10 +103,11 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
         top: 12,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Center(
             child: Container(
               width: 44,
@@ -196,6 +197,7 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
                 : Text('Actualizar Despacho', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
           ),
         ],
+      ),
       ),
     );
   }

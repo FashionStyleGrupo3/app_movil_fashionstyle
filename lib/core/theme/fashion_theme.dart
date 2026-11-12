@@ -9,19 +9,26 @@ import 'package:google_fonts/google_fonts.dart';
 /// acentos jade de taller (#115E59) y negros entintados (#14161F).
 class FashionColors {
   // --- PALETA PRIMARIA MÓVIL (NEO-ATELIER MINERAL & TERRACOTTA) ---
-  static const Color canvasBackground = Color(0xFFF6F7F9);
+  static const Color canvasBackground = Color(0xFFF7F4EF); // #f7f4ef Fondo crema web oficial
   static const Color surfaceCard = Color(0xFFFFFFFF);
-  static const Color surfaceMuted = Color(0xFFEBEEF3);
-  static const Color inkPrimary = Color(0xFF14161F);
-  static const Color inkSecondary = Color(0xFF525866);
-  static const Color brandAccent = Color(0xFFB83A24); // Terracotta Couture
-  static const Color atelierJade = Color(0xFF115E59); // Verde Jade de Taller
+  static const Color surfaceMuted = Color(0xFFF3EEE6);
+  static const Color surfacePanel = Color(0xFFECE5DA);
+  static const Color inkPrimary = Color(0xFF111111);
+  static const Color inkSecondary = Color(0xFF555555);
+  static const Color inkMuted = Color(0xFF6F6F6F);
+  static const Color brandAccent = Color(0xFF111111); // Primario web oficial
+  static const Color brandAccentHover = Color(0xFF333333);
+  static const Color slateAccent = Color(0xFF56657A);
+  static const Color sandDark = Color(0xFFD4C2A8);
+  static const Color atelierJade = Color(0xFF56657A);
   static const Color editorialOchre = Color(0xFF9A6700);
   static const Color editorialGoldDark = Color(0xFFF59F00);
-  static const Color borderSubtle = Color(0xFFDFE3EC);
+  static const Color borderSubtle = Color(0xFFE4DDD2); // Borde tienda web
+  static const Color borderSoft = Color(0xFFF3EEE6);
+  static const Color borderStrong = Color(0xFFD4CBBD);
   static const Color statusSuccess = Color(0xFF157347);
   static const Color statusWarning = Color(0xFF9A6700);
-  static const Color statusDanger = Color(0xFFC92A2A);
+  static const Color statusDanger = Color(0xFFD9434B); // Rojo tienda web
 
   // --- ALIASES Y CONSTANTES LEGACY (COMPATIBILIDAD 100% RETROACTIVA) ---
   static const Color negro = inkPrimary;

@@ -9,6 +9,8 @@ import 'package:fashion_style_mobile/core/validators/garment_and_field_validator
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
 import 'package:fashion_style_mobile/data/services/user_service.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
+import 'package:fashion_style_mobile/core/utils/image_url_resolver.dart';
+import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SeccionMisDatos extends ConsumerStatefulWidget {
@@ -62,16 +64,95 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     super.dispose();
   }
 
+  bool _subiendoFoto = false;
+
+  Future<ImageSource?> _seleccionarOrigenImagen() async {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: FashionColors.surfaceCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: FashionColors.borderSubtle,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Text(
+                'Seleccionar Foto de Perfil',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: FashionColors.inkPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: FashionColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.camera_alt_outlined, color: FashionColors.inkPrimary),
+                ),
+                title: Text('Tomar foto con la cámara', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14)),
+                subtitle: Text('Abre la cámara para una nueva captura', style: GoogleFonts.inter(fontSize: 11.5, color: FashionColors.inkSecondary)),
+                onTap: () => Navigator.pop(ctx, ImageSource.camera),
+              ),
+              const SizedBox(height: 6),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: FashionColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.photo_library_outlined, color: FashionColors.inkPrimary),
+                ),
+                title: Text('Elegir de la galería', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14)),
+                subtitle: Text('Selecciona una imagen guardada en tu dispositivo', style: GoogleFonts.inter(fontSize: 11.5, color: FashionColors.inkSecondary)),
+                onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _subirNuevaFoto() async {
+    final origen = await _seleccionarOrigenImagen();
+    if (origen == null) return;
     final picker = ImagePicker();
-    final foto = await picker.pickImage(source: ImageSource.gallery, maxWidth: 800, imageQuality: 85);
+    final foto = await picker.pickImage(source: origen, maxWidth: 800, imageQuality: 85);
     if (foto == null) return;
 
+    setState(() => _subiendoFoto = true);
     try {
       final res = await UserService.instance.subirFotoPerfil(foto.path, foto.name);
-      final fotoUrl = res['foto'] ?? res['url'] ?? res['foto_url'];
+      final fotoUrl = res['foto_perfil'] ?? res['foto'] ?? res['url'] ?? res['foto_url'];
       if (fotoUrl != null) {
-        ref.read(authProvider.notifier).actualizarUsuario({'foto': fotoUrl});
+        ref.read(authProvider.notifier).actualizarUsuario({
+          'foto_perfil': fotoUrl,
+          'foto': fotoUrl,
+          ...res,
+        });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Foto de perfil actualizada correctamente')),
@@ -87,13 +168,19 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
           ),
         );
       }
+    } finally {
+      if (mounted) setState(() => _subiendoFoto = false);
     }
   }
 
   Future<void> _quitarFoto() async {
+    setState(() => _subiendoFoto = true);
     try {
       await UserService.instance.quitarFotoPerfil();
-      ref.read(authProvider.notifier).actualizarUsuario({'foto': null});
+      ref.read(authProvider.notifier).actualizarUsuario({
+        'foto_perfil': null,
+        'foto': null,
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Foto de perfil eliminada')),
@@ -108,6 +195,8 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
           ),
         );
       }
+    } finally {
+      if (mounted) setState(() => _subiendoFoto = false);
     }
   }
 
@@ -259,37 +348,144 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     }
   }
 
+  Widget _avatarFallback(AuthState authState) {
+    final inicial = (authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0] : 'U').toUpperCase();
+    return Center(
+      child: Text(
+        inicial,
+        style: GoogleFonts.inter(
+          fontSize: 32,
+          fontWeight: FontWeight.w700,
+          color: FashionColors.inkPrimary,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return ListView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 96), // Clearance para Floating Pill Dock
       children: [
-        // GESTIÓN DE FOTO
+        // GESTIÓN Y VISOR DE FOTO DE PERFIL
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: FashionColors.surfaceCard,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: FashionColors.borderSubtle),
           ),
-          child: Row(
+          child: Column(
             children: [
-              OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: FashionColors.inkPrimary,
-                  side: const BorderSide(color: FashionColors.borderSubtle),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              Center(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 92,
+                      height: 92,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: FashionColors.surfaceMuted,
+                        border: Border.all(color: FashionColors.borderSubtle, width: 2),
+                      ),
+                      child: ClipOval(
+                        child: _subiendoFoto
+                            ? const Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(strokeWidth: 2.5, color: FashionColors.inkPrimary),
+                                ),
+                              )
+                            : (authState.fotoUsuario != null && authState.fotoUsuario!.trim().isNotEmpty)
+                                ? Image.network(
+                                    ImageUrlResolver.resolve(authState.fotoUsuario!),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => _avatarFallback(authState),
+                                  )
+                                : _avatarFallback(authState),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Material(
+                        color: FashionColors.inkPrimary,
+                        shape: const CircleBorder(),
+                        elevation: 2,
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: _subiendoFoto ? null : _subirNuevaFoto,
+                          child: const Padding(
+                            padding: EdgeInsets.all(7),
+                            child: Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onPressed: _subirNuevaFoto,
-                icon: const Icon(Icons.camera_alt_outlined, size: 16),
-                label: Text('Cambiar foto', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13)),
               ),
-              const SizedBox(width: 12),
-              TextButton(
-                style: TextButton.styleFrom(foregroundColor: FashionColors.statusDanger),
-                onPressed: _quitarFoto,
-                child: Text('Quitar foto', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13)),
+              const SizedBox(height: 12),
+              Text(
+                authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Usuario FashionStyle',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                authState.correoUsuario,
+                style: GoogleFonts.inter(fontSize: 12.5, color: FashionColors.inkSecondary),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: FashionColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: FashionColors.borderSubtle),
+                ),
+                child: Text(
+                  authState.esAdmin
+                      ? 'Administrador General'
+                      : (authState.esEmpleado ? 'Personal Operativo Staff' : 'Cliente Registrado'),
+                  style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: FashionColors.inkPrimary,
+                      side: const BorderSide(color: FashionColors.borderSubtle),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    ),
+                    onPressed: _subiendoFoto ? null : _subirNuevaFoto,
+                    icon: const Icon(Icons.photo_camera_outlined, size: 16),
+                    label: Text(
+                      authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty ? 'Cambiar foto' : 'Subir foto',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 12.5),
+                    ),
+                  ),
+                  if (authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty) ...[
+                    const SizedBox(width: 10),
+                    TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: FashionColors.statusDanger,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      onPressed: _subiendoFoto ? null : _quitarFoto,
+                      icon: const Icon(Icons.delete_outline, size: 16),
+                      label: Text('Quitar foto', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 12.5)),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),

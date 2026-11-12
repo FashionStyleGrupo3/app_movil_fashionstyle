@@ -92,8 +92,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (mounted) {
         setState(() {
           _productos = resultados[0] as List<Product>;
-          _categorias = resultados[1] as List<Category>;
-          _colecciones = resultados[2] as List<Catalog>;
+          _categorias = {for (var c in resultados[1] as List<Category>) c.idCategoria: c}.values.toList();
+          _colecciones = {for (var c in resultados[2] as List<Catalog>) c.idCatalogo: c}.values.toList();
           _promociones = resultados[3] as List<Promotion>;
           _cargando = false;
         });
@@ -121,8 +121,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (mounted) {
         setState(() {
           _productos = resultados[0] as List<Product>;
-          _categorias = resultados[1] as List<Category>;
-          _colecciones = resultados[2] as List<Catalog>;
+          _categorias = {for (var c in resultados[1] as List<Category>) c.idCategoria: c}.values.toList();
+          _colecciones = {for (var c in resultados[2] as List<Catalog>) c.idCatalogo: c}.values.toList();
           _promociones = resultados[3] as List<Promotion>;
         });
       }

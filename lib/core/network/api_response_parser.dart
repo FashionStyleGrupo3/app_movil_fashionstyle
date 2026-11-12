@@ -71,7 +71,7 @@ class JsonParser {
 class ApiResponseParser {
   static dynamic extractData(dynamic responseOrData) {
     final raw = responseOrData is Response ? responseOrData.data : responseOrData;
-    if (raw is Map<String, dynamic>) {
+    if (raw is Map) {
       return raw['data'] ?? raw;
     }
     return raw;
@@ -83,8 +83,8 @@ class ApiResponseParser {
   ) {
     final raw = responseOrData is Response ? responseOrData.data : responseOrData;
     Map<String, dynamic> body = {};
-    if (raw is Map<String, dynamic>) {
-      body = raw;
+    if (raw is Map) {
+      body = raw.map((k, v) => MapEntry(k.toString(), v));
     }
 
     final rawData = body['data'] ?? body;
@@ -93,25 +93,25 @@ class ApiResponseParser {
 
     if (rawData is List) {
       rawList = rawData;
-      if (body['meta'] is Map<String, dynamic>) {
-        meta = body['meta'] as Map<String, dynamic>;
-      } else if (body['pagination'] is Map<String, dynamic>) {
-        meta = body['pagination'] as Map<String, dynamic>;
+      if (body['meta'] is Map) {
+        meta = (body['meta'] as Map).map((k, v) => MapEntry(k.toString(), v));
+      } else if (body['pagination'] is Map) {
+        meta = (body['pagination'] as Map).map((k, v) => MapEntry(k.toString(), v));
       } else {
         meta = body;
       }
-    } else if (rawData is Map<String, dynamic> && rawData['data'] is List) {
+    } else if (rawData is Map && rawData['data'] is List) {
       rawList = rawData['data'] as List;
-      if (rawData['meta'] is Map<String, dynamic>) {
-        meta = rawData['meta'] as Map<String, dynamic>;
+      if (rawData['meta'] is Map) {
+        meta = (rawData['meta'] as Map).map((k, v) => MapEntry(k.toString(), v));
       } else {
-        meta = rawData;
+        meta = rawData.map((k, v) => MapEntry(k.toString(), v));
       }
     }
 
     final items = rawList
-        .whereType<Map<String, dynamic>>()
-        .map((e) => fromJson(e))
+        .whereType<Map>()
+        .map((e) => fromJson(e.map((k, v) => MapEntry(k.toString(), v))))
         .toList();
 
     final currentPage = JsonParser.toInt(meta['current_page'], 1);

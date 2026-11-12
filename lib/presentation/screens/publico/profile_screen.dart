@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
+import 'package:fashion_style_mobile/core/utils/image_url_resolver.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
@@ -127,7 +128,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                       child: ClipOval(
                         child: (authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty)
                             ? Image.network(
-                                authState.fotoUsuario!,
+                                ImageUrlResolver.resolve(authState.fotoUsuario!),
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) => _avatarFallback(authState),
                               )

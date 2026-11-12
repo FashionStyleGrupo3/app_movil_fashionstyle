@@ -49,31 +49,32 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
 
   Future<void> _cargarTodo() async {
     setState(() => _cargando = true);
-    try {
-      final resultados = await Future.wait([
-        ProductionService.instance.cargarDatosCalculadora(),
-        ProductionService.instance.listarMateriasPrimas(),
-        ProductionService.instance.listarFormulas(),
-        ProductionService.instance.listarProveedores(),
-        ProductionService.instance.listarOrdenesProduccion(),
-      ]);
+    CalculatorDataset? calcData;
+    List<Map<String, dynamic>> materias = [];
+    List<Map<String, dynamic>> formulas = [];
+    List<Map<String, dynamic>> proveedores = [];
+    List<Map<String, dynamic>> ordenes = [];
 
-      if (mounted) {
-        final calcData = resultados[0] as CalculatorDataset;
-        setState(() {
-          _calculadoraData = calcData;
-          _materias = resultados[1] as List<Map<String, dynamic>>;
-          _formulas = resultados[2] as List<Map<String, dynamic>>;
-          _proveedores = resultados[3] as List<Map<String, dynamic>>;
-          _ordenes = resultados[4] as List<Map<String, dynamic>>;
-          if (calcData.formulas.isNotEmpty) {
-            _formulaSeleccionada = calcData.formulas.first;
-          }
-          _cargando = false;
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() => _cargando = false);
+    await Future.wait([
+      ProductionService.instance.cargarDatosCalculadora().then((v) => calcData = v).catchError((_) => calcData = CalculatorDataset(formulas: [], materiasPrimas: [])),
+      ProductionService.instance.listarMateriasPrimas().then((v) => materias = v).catchError((_) => materias = <Map<String, dynamic>>[]),
+      ProductionService.instance.listarFormulas().then((v) => formulas = v).catchError((_) => formulas = <Map<String, dynamic>>[]),
+      ProductionService.instance.listarProveedores().then((v) => proveedores = v).catchError((_) => proveedores = <Map<String, dynamic>>[]),
+      ProductionService.instance.listarOrdenesProduccion().then((v) => ordenes = v).catchError((_) => ordenes = <Map<String, dynamic>>[]),
+    ]);
+
+    if (mounted) {
+      setState(() {
+        _calculadoraData = calcData;
+        _materias = materias;
+        _formulas = formulas;
+        _proveedores = proveedores;
+        _ordenes = ordenes;
+        if (calcData != null && calcData!.formulas.isNotEmpty) {
+          _formulaSeleccionada = calcData!.formulas.first;
+        }
+        _cargando = false;
+      });
     }
   }
 
@@ -303,109 +304,185 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
 
   // 2. MATERIAS PRIMAS
   Widget _construirMateriasPrimas() {
-    return ListView.builder(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
-      itemCount: _materias.length,
-      itemBuilder: (context, index) {
-        final m = _materias[index];
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.only(bottom: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
-          child: ListTile(
-            leading: const Icon(Icons.layers, color: Color(0xFF2563EB)),
-            title: Text(m['nombre']?.toString() ?? 'Insumo', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
-            subtitle: Text(
-              'Stock: ${m['stock_actual']} ${m['unidad_medida']?['codigo'] ?? ''} · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(m['costo_unitario']))}',
-              style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+    if (_materias.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _cargarTodo,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(32),
+          children: [
+            const SizedBox(height: 48),
+            Icon(Icons.layers_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.5)),
+            const SizedBox(height: 12),
+            Center(child: Text('No hay materias primas registradas', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 14))),
+          ],
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _cargarTodo,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
+        itemCount: _materias.length,
+        itemBuilder: (context, index) {
+          final m = _materias[index];
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+            child: ListTile(
+              leading: const Icon(Icons.layers, color: Color(0xFF2563EB)),
+              title: Text(m['nombre']?.toString() ?? 'Insumo', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+              subtitle: Text(
+                'Stock: ${m['stock_actual']} ${m['unidad_medida']?['codigo'] ?? ''} · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(m['costo_unitario']))}',
+                style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
   // 3. FÓRMULAS
   Widget _construirFormulas() {
-    return ListView.builder(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
-      itemCount: _formulas.length,
-      itemBuilder: (context, index) {
-        final f = _formulas[index];
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.only(bottom: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
-          child: ListTile(
-            leading: const Icon(Icons.format_list_bulleted, color: Color(0xFF7C3AED)),
-            title: Text(f['nombre']?.toString() ?? 'Fórmula', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
-            subtitle: Text('${(f['consumos'] as List?)?.length ?? 0} insumos configurados', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
-          ),
-        );
-      },
+    if (_formulas.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _cargarTodo,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(32),
+          children: [
+            const SizedBox(height: 48),
+            Icon(Icons.format_list_bulleted_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.5)),
+            const SizedBox(height: 12),
+            Center(child: Text('No hay fórmulas configuradas', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 14))),
+          ],
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _cargarTodo,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
+        itemCount: _formulas.length,
+        itemBuilder: (context, index) {
+          final f = _formulas[index];
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+            child: ListTile(
+              leading: const Icon(Icons.format_list_bulleted, color: Color(0xFF7C3AED)),
+              title: Text(f['nombre']?.toString() ?? 'Fórmula', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+              subtitle: Text('${(f['consumos'] as List?)?.length ?? 0} insumos configurados', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
+            ),
+          );
+        },
+      ),
     );
   }
 
   // 4. PROVEEDORES
   Widget _construirProveedores() {
-    return ListView.builder(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
-      itemCount: _proveedores.length,
-      itemBuilder: (context, index) {
-        final p = _proveedores[index];
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.only(bottom: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
-          child: ListTile(
-            leading: const Icon(Icons.store, color: Color(0xFF0D9488)),
-            title: Text(p['nombre']?.toString() ?? 'Proveedor', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
-            subtitle: Text('Contacto: ${p['contacto'] ?? ''} · Tel: ${p['telefono'] ?? ''}', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
-          ),
-        );
-      },
+    if (_proveedores.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _cargarTodo,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(32),
+          children: [
+            const SizedBox(height: 48),
+            Icon(Icons.store_mall_directory_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.5)),
+            const SizedBox(height: 12),
+            Center(child: Text('No hay proveedores registrados', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 14))),
+          ],
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _cargarTodo,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
+        itemCount: _proveedores.length,
+        itemBuilder: (context, index) {
+          final p = _proveedores[index];
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+            child: ListTile(
+              leading: const Icon(Icons.store, color: Color(0xFF0D9488)),
+              title: Text(p['nombre']?.toString() ?? 'Proveedor', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+              subtitle: Text('Contacto: ${p['contacto'] ?? ''} · Tel: ${p['telefono'] ?? ''}', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
+            ),
+          );
+        },
+      ),
     );
   }
 
   // 5. ÓRDENES DE PRODUCCIÓN
   Widget _construirOrdenes() {
-    return ListView.builder(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
-      itemCount: _ordenes.length,
-      itemBuilder: (context, index) {
-        final o = _ordenes[index];
-        final id = o['id_orden'] ?? o['id'];
-        final estado = o['estado']?.toString() ?? 'planificada';
+    if (_ordenes.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _cargarTodo,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(32),
+          children: [
+            const SizedBox(height: 48),
+            Icon(Icons.assignment_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.5)),
+            const SizedBox(height: 12),
+            Center(child: Text('No hay órdenes de producción registradas', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 14))),
+          ],
+        ),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _cargarTodo,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
+        itemCount: _ordenes.length,
+        itemBuilder: (context, index) {
+          final o = _ordenes[index];
+          final id = o['id_orden'] ?? o['id'];
+          final estado = o['estado']?.toString() ?? 'planificada';
 
-        return Card(
-          elevation: 0,
-          margin: const EdgeInsets.only(bottom: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
-          child: ListTile(
-            title: Text('Orden #$id · ${o['formula']?['nombre'] ?? "Lote"}', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
-            subtitle: Text(
-              'Volumen: ${o['cantidad']} prendas · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(o['costo_estimado']))}',
-              style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+            child: ListTile(
+              title: Text('Orden #$id · ${o['formula']?['nombre'] ?? "Lote"}', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+              subtitle: Text(
+                'Volumen: ${o['cantidad']} prendas · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(o['costo_estimado']))}',
+                style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+              ),
+              trailing: estado != 'completada'
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: FashionColors.statusSuccess, foregroundColor: Colors.white),
+                      onPressed: () async {
+                        try {
+                          await ProductionService.instance.completarOrdenProduccion(id);
+                          _cargarTodo();
+                        } catch (_) {}
+                      },
+                      child: Text('Completar', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
+                    )
+                  : Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(color: FashionColors.statusSuccess.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
+                      child: Text('Completada', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: FashionColors.statusSuccess)),
+                    ),
             ),
-            trailing: estado != 'completada'
-                ? ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: FashionColors.statusSuccess, foregroundColor: Colors.white),
-                    onPressed: () async {
-                      try {
-                        await ProductionService.instance.completarOrdenProduccion(id);
-                        _cargarTodo();
-                      } catch (_) {}
-                    },
-                    child: Text('Completar', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
-                  )
-                : Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: FashionColors.statusSuccess.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
-                    child: Text('Completada', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: FashionColors.statusSuccess)),
-                  ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

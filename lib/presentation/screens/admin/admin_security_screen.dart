@@ -1,6 +1,7 @@
 // @source-mirror: src/views/admin/VistaConfiguracionPagos.vue, src/views/admin/VistaUsuariosYClientes.vue, src/views/admin/VistaAuditoria.vue, src/views/admin/VistaEditarCuenta.vue
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/services/security_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
@@ -66,52 +67,165 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setMState) => Padding(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(ctx).viewInsets.bottom + 20),
+        builder: (ctx, setMState) => Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.88,
+          ),
+          decoration: const BoxDecoration(
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Registrar Colaborador Staff', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 12),
-              TextField(controller: nomCtrl, decoration: const InputDecoration(labelText: 'Nombre completo *', border: OutlineInputBorder())),
-              const SizedBox(height: 10),
-              TextField(controller: emailCtrl, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Correo corporativo *', border: OutlineInputBorder())),
-              const SizedBox(height: 10),
-              TextField(controller: telCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Teléfono', border: OutlineInputBorder())),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                initialValue: rol,
-                decoration: const InputDecoration(labelText: 'Rol asignado', border: OutlineInputBorder()),
-                items: const [
-                  DropdownMenuItem(value: 'empleado', child: Text('Empleado / Ventas POS')),
-                  DropdownMenuItem(value: 'administrador', child: Text('Administrador General')),
-                ],
-                onChanged: (v) => setMState(() => rol = v ?? 'empleado'),
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: FashionColors.borderSubtle,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               ),
-              const SizedBox(height: 10),
-              TextField(controller: passCtrl, obscureText: true, decoration: const InputDecoration(labelText: 'Contraseña temporal *', border: OutlineInputBorder())),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
-                onPressed: () async {
-                  if (nomCtrl.text.isEmpty || emailCtrl.text.isEmpty || passCtrl.text.isEmpty) return;
-                  try {
-                    await SecurityService.instance.crearUsuario({
-                      'nombre': nomCtrl.text.trim(),
-                      'email': emailCtrl.text.trim(),
-                      'telefono': telCtrl.text.trim(),
-                      'password': passCtrl.text,
-                      'rol': rol,
-                    });
-                    _cargarTodo();
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  } catch (_) {}
-                },
-                child: const Text('Crear Usuario'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+                child: Row(
+                  children: [
+                    Text(
+                      'Registrar Colaborador Staff',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20, color: FashionColors.inkSecondary),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: FashionColors.borderSubtle),
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 16,
+                    bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: nomCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'Nombre completo *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: emailCtrl,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Correo corporativo *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: telCtrl,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Teléfono',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: rol,
+                        decoration: InputDecoration(
+                          labelText: 'Rol asignado',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'empleado', child: Text('Empleado / Ventas POS')),
+                          DropdownMenuItem(value: 'administrador', child: Text('Administrador General')),
+                        ],
+                        onChanged: (v) => setMState(() => rol = v ?? 'empleado'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: passCtrl,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Contraseña temporal *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FashionColors.inkPrimary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () async {
+                          if (nomCtrl.text.trim().isEmpty || emailCtrl.text.trim().isEmpty || passCtrl.text.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Por favor completa los campos requeridos (*)')),
+                            );
+                            return;
+                          }
+                          try {
+                            await SecurityService.instance.crearUsuario({
+                              'nombre': nomCtrl.text.trim(),
+                              'email': emailCtrl.text.trim(),
+                              'telefono': telCtrl.text.trim(),
+                              'password': passCtrl.text,
+                              'rol': rol,
+                            });
+                            _cargarTodo();
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Usuario registrado con éxito'),
+                                  backgroundColor: FashionColors.statusSuccess,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible registrar al usuario.')),
+                                  backgroundColor: FashionColors.statusDanger,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: Text('Crear Usuario', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14)),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

@@ -31,6 +31,18 @@ class AuditTextFormatter {
     'Venta': {'nombre': 'venta', 'articulo': 'la', 'plural': 'Ventas'},
     'Inventario': {'nombre': 'movimiento de inventario', 'articulo': 'el', 'plural': 'Inventario'},
     'User': {'nombre': 'usuario', 'articulo': 'el', 'plural': 'Usuarios'},
+    'Pedido': {'nombre': 'pedido', 'articulo': 'el', 'plural': 'Pedidos'},
+    'Factura': {'nombre': 'factura', 'articulo': 'la', 'plural': 'Facturas'},
+    'Cliente': {'nombre': 'cliente', 'articulo': 'el', 'plural': 'Clientes'},
+    'OrdenProduccion': {'nombre': 'orden de producción', 'articulo': 'la', 'plural': 'Producción'},
+    'FormulaProduccion': {'nombre': 'fórmula de producción', 'articulo': 'la', 'plural': 'Fórmulas'},
+    'MateriaPrima': {'nombre': 'materia prima', 'articulo': 'la', 'plural': 'Materias Primas'},
+    'Promocion': {'nombre': 'promoción', 'articulo': 'la', 'plural': 'Promociones'},
+    'Categoria': {'nombre': 'categoría', 'articulo': 'la', 'plural': 'Categorías'},
+    'Catalogo': {'nombre': 'colección', 'articulo': 'la', 'plural': 'Colecciones'},
+    'ConfiguracionAlertaStock': {'nombre': 'alerta de stock', 'articulo': 'la', 'plural': 'Alertas de Stock'},
+    'Proveedor': {'nombre': 'proveedor', 'articulo': 'el', 'plural': 'Proveedores'},
+    'Pago': {'nombre': 'pago', 'articulo': 'el', 'plural': 'Pagos'},
   };
 
   static const Map<String, String> modeloGenerico = {
@@ -43,6 +55,10 @@ class AuditTextFormatter {
     'created': {'etiqueta': 'Creado', 'verbo': 'creó'},
     'updated': {'etiqueta': 'Modificado', 'verbo': 'modificó'},
     'deleted': {'etiqueta': 'Eliminado', 'verbo': 'eliminó'},
+    'INICIO_SESION': {'etiqueta': 'Inicio de Sesión', 'verbo': 'inició sesión'},
+    'login': {'etiqueta': 'Inicio de Sesión', 'verbo': 'inició sesión'},
+    'anulado': {'etiqueta': 'Anulado', 'verbo': 'anuló'},
+    'cancelado': {'etiqueta': 'Cancelado', 'verbo': 'canceló'},
   };
 
   static const Map<String, String> etiquetas = {
@@ -208,11 +224,11 @@ class AuditTextFormatter {
       verbo: accionDef['verbo']!,
     );
 
-    final Map<String, dynamic> antes = item['datos_anteriores'] is Map<String, dynamic>
-        ? item['datos_anteriores'] as Map<String, dynamic>
+    final Map<String, dynamic> antes = item['datos_anteriores'] is Map
+        ? (item['datos_anteriores'] as Map).map((k, v) => MapEntry(k.toString(), v))
         : {};
-    final Map<String, dynamic> nuevos = item['datos_nuevos'] is Map<String, dynamic>
-        ? item['datos_nuevos'] as Map<String, dynamic>
+    final Map<String, dynamic> nuevos = item['datos_nuevos'] is Map
+        ? (item['datos_nuevos'] as Map).map((k, v) => MapEntry(k.toString(), v))
         : {};
 
     final Map<String, dynamic> referencia = {...antes, ...nuevos};

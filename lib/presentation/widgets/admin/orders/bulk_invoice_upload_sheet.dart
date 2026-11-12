@@ -80,10 +80,11 @@ class _ModalCargaMasivaFacturasSheetState extends State<ModalCargaMasivaFacturas
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(left: 20, right: 20, top: 12, bottom: MediaQuery.of(context).viewInsets.bottom + 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Center(
             child: Container(
               width: 44,
@@ -144,6 +145,7 @@ class _ModalCargaMasivaFacturasSheetState extends State<ModalCargaMasivaFacturas
             child: Text('Subir y Procesar', style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14)),
           ),
         ],
+      ),
       ),
     );
   }

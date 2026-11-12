@@ -111,8 +111,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
       if (mounted) {
         setState(() {
           _productos = resultados[0] as List<Product>;
-          _categorias = resultados[1] as List<Category>;
-          _catalogos = resultados[2] as List<Catalog>;
+          _categorias = {for (var c in resultados[1] as List<Category>) c.idCategoria: c}.values.toList();
+          _catalogos = {for (var c in resultados[2] as List<Catalog>) c.idCatalogo: c}.values.toList();
           _promociones = resultados[3] as List<Promotion>;
           _cargando = false;
         });
@@ -139,8 +139,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
       if (mounted) {
         setState(() {
           _productos = resultados[0] as List<Product>;
-          _categorias = resultados[1] as List<Category>;
-          _catalogos = resultados[2] as List<Catalog>;
+          _categorias = {for (var c in resultados[1] as List<Category>) c.idCategoria: c}.values.toList();
+          _catalogos = {for (var c in resultados[2] as List<Catalog>) c.idCatalogo: c}.values.toList();
           _promociones = resultados[3] as List<Promotion>;
         });
       }

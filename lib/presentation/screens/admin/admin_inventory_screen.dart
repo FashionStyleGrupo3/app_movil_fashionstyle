@@ -133,28 +133,61 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.88,
               ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'Registrar Movimiento de Kárdex',
-                      style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+              decoration: const BoxDecoration(
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: FashionColors.borderSubtle,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Registrar Movimiento de Kárdex',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20, color: FashionColors.inkSecondary),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1, color: FashionColors.borderSubtle),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 16,
+                        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
 
                     // Selector de prenda y variante
                     DropdownButtonFormField<_VarianteInventario>(
@@ -262,7 +295,10 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                   ],
                 ),
               ),
-            );
+            ),
+          ],
+        ),
+      );
           },
         );
       },

@@ -37,7 +37,8 @@ class PosSaleService {
   Future<PosSalesSummary> obtenerResumenVentas() async {
     final response = await ApiClient.instance.dio.get('$ruta/resumen');
     final data = ApiResponseParser.extractData(response);
-    return PosSalesSummary.fromJson(data is Map<String, dynamic> ? data : {});
+    final map = data is Map ? data.map((k, v) => MapEntry(k.toString(), v)) : <String, dynamic>{};
+    return PosSalesSummary.fromJson(map);
   }
 
   Future<PosSaleModel> registrarVenta({

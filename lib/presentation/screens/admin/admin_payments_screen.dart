@@ -60,52 +60,157 @@ class _AdminPaymentsConfigScreenState extends ConsumerState<AdminPaymentsConfigS
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(ctx).viewInsets.bottom + 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(cuentaEditar != null ? 'Editar Cuenta de Dispersión' : 'Agregar Cuenta Bancaria', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 12),
-            TextField(controller: bancoCtrl, decoration: const InputDecoration(labelText: 'Entidad Bancaria *', border: OutlineInputBorder())),
-            const SizedBox(height: 10),
-            TextField(controller: titularCtrl, decoration: const InputDecoration(labelText: 'Titular de la cuenta *', border: OutlineInputBorder())),
-            const SizedBox(height: 10),
-            TextField(controller: numCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Número de cuenta *', border: OutlineInputBorder())),
-            const SizedBox(height: 10),
-            TextField(controller: porcCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Porcentaje de dispersión (%) *', border: OutlineInputBorder())),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: FashionColors.negroElegante, foregroundColor: Colors.white),
-              onPressed: () {
-                final porc = double.tryParse(porcCtrl.text) ?? 0;
-                final nueva = BankAccountConfig(
-                  id: cuentaEditar?.id ?? (_cuentas.isEmpty ? 1 : (_cuentas.map((c) => c.id).reduce((a, b) => a > b ? a : b) + 1)),
-                  banco: bancoCtrl.text.trim(),
-                  tipoCuenta: tipo,
-                  numeroCuenta: numCtrl.text.trim(),
-                  titular: titularCtrl.text.trim(),
-                  concepto: 'Dispersión de fondos',
-                  porcentaje: porc,
-                  activa: cuentaEditar?.activa ?? true,
-                );
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setMState) => Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.88,
+          ),
+          decoration: const BoxDecoration(
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: FashionColors.borderSubtle,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+                child: Row(
+                  children: [
+                    Text(
+                      cuentaEditar != null ? 'Editar Cuenta de Dispersión' : 'Agregar Cuenta Bancaria',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20, color: FashionColors.inkSecondary),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: FashionColors.borderSubtle),
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 16,
+                    bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: bancoCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'Entidad Bancaria *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: titularCtrl,
+                        decoration: InputDecoration(
+                          labelText: 'Titular de la cuenta *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: tipo,
+                        decoration: InputDecoration(
+                          labelText: 'Tipo de cuenta',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 'ahorros', child: Text('Cuenta de Ahorros')),
+                          DropdownMenuItem(value: 'corriente', child: Text('Cuenta Corriente')),
+                        ],
+                        onChanged: (v) => setMState(() => tipo = v ?? 'ahorros'),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: numCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Número de cuenta *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: porcCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Porcentaje de dispersión (%) *',
+                          filled: true,
+                          fillColor: FashionColors.surfaceMuted,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FashionColors.inkPrimary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          final porc = double.tryParse(porcCtrl.text) ?? 0;
+                          final nueva = BankAccountConfig(
+                            id: cuentaEditar?.id ?? (_cuentas.isEmpty ? 1 : (_cuentas.map((c) => c.id).reduce((a, b) => a > b ? a : b) + 1)),
+                            banco: bancoCtrl.text.trim(),
+                            tipoCuenta: tipo,
+                            numeroCuenta: numCtrl.text.trim(),
+                            titular: titularCtrl.text.trim(),
+                            concepto: 'Dispersión de fondos',
+                            porcentaje: porc,
+                            activa: cuentaEditar?.activa ?? true,
+                          );
 
-                setState(() {
-                  if (cuentaEditar != null) {
-                    final idx = _cuentas.indexOf(cuentaEditar);
-                    if (idx != -1) _cuentas[idx] = nueva;
-                  } else {
-                    _cuentas.add(nueva);
-                  }
-                });
-                Navigator.pop(ctx);
-              },
-              child: const Text('Aceptar'),
-            ),
-          ],
+                          setState(() {
+                            if (cuentaEditar != null) {
+                              final idx = _cuentas.indexOf(cuentaEditar);
+                              if (idx != -1) _cuentas[idx] = nueva;
+                            } else {
+                              _cuentas.add(nueva);
+                            }
+                          });
+                          Navigator.pop(ctx);
+                        },
+                        child: Text(
+                          cuentaEditar != null ? 'Guardar Cambios' : 'Agregar Cuenta',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
