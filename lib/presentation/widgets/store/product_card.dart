@@ -12,7 +12,6 @@ import 'package:fashion_style_mobile/data/services/promotion_service.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/favorites_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 
 /// Tarjeta de prenda editorial lookbook con proporción 3:4, estética Neo-Atelier
 /// y tipografía Space Grotesk / Plus Jakarta Sans / JetBrains Mono.
@@ -374,7 +373,7 @@ class _ProductCardWidgetState extends ConsumerState<ProductCardWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const AtelierMonogram(size: 38),
+            const Icon(Icons.checkroom_rounded, size: 36, color: FashionColors.inkMuted),
             const SizedBox(height: 6),
             Text(
               'COLECCIÓN',

@@ -49,8 +49,6 @@ class CartDrawerWidget extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    const AtelierMonogram(size: 28),
-                    const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -226,11 +224,11 @@ class CartDrawerWidget extends ConsumerWidget {
                                               imageUrl: item.imagen,
                                               fit: BoxFit.cover,
                                               errorWidget: (_, __, ___) => const Center(
-                                                child: AtelierMonogram(size: 24),
+                                                child: Icon(Icons.checkroom_rounded, size: 24, color: FashionColors.inkMuted),
                                               ),
                                             )
                                           : const Center(
-                                              child: AtelierMonogram(size: 24),
+                                              child: Icon(Icons.checkroom_rounded, size: 24, color: FashionColors.inkMuted),
                                             ),
                                     ),
                                     const SizedBox(width: 14),

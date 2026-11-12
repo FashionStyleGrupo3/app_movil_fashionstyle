@@ -54,13 +54,6 @@ class AuthBrandBanner extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const AtelierMonogram(
-                      size: 38,
-                      primaryColor: FashionColors.surfaceCard,
-                      accentColor: FashionColors.brandAccent,
-                      surfaceColor: FashionColors.inkPrimary,
-                    ),
-                    const SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

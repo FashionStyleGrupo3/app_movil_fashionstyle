@@ -16,7 +16,6 @@ class FashionStyleApp extends ConsumerStatefulWidget {
 
 class _FashionStyleAppState extends ConsumerState<FashionStyleApp> {
   AppLifecycleListener? _lifecycleListener;
-  Timer? _sessionRefreshTimer;
   StreamSubscription? _changeBusSub;
 
   @override
@@ -49,17 +48,11 @@ class _FashionStyleAppState extends ConsumerState<FashionStyleApp> {
         ref.read(authProvider.notifier).refrescarSesion();
       }
     });
-
-    // 4. Sondeo periódico de sesión cada 30 segundos (paridad estricta con Web PR #64)
-    _sessionRefreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      ref.read(authProvider.notifier).refrescarSesion();
-    });
   }
 
   @override
   void dispose() {
     _lifecycleListener?.dispose();
-    _sessionRefreshTimer?.cancel();
     _changeBusSub?.cancel();
     super.dispose();
   }

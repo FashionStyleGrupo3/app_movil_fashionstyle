@@ -88,16 +88,8 @@ class ApiClient {
             }
           }
 
-          if (error.response?.statusCode == 401) {
-            try {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('fs_token');
-              await prefs.remove('fs_user');
-              await prefs.remove('fs_roles');
-            } catch (_) {}
-
-            onUnauthorizedCallback?.call();
-          }
+          // Nota: No se limpia la sesión en solicitudes transitorias fallidas.
+          // Solo el cierre de sesión explícito por parte del usuario (cerrarSesion) invalida el token.
 
           return handler.next(error);
         },

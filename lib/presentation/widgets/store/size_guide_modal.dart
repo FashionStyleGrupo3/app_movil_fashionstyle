@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 
 class SizeGuideModal {
   static const List<Map<String, String>> medidas = [
@@ -41,8 +40,6 @@ class SizeGuideModal {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
                 children: [
-                  const AtelierMonogram(size: 28),
-                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

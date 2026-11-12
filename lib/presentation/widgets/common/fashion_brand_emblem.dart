@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 
 /// Emblema e isotipo oficial de FashionStyle Boutique & Atelier (Neo-Atelier).
 ///
@@ -27,32 +26,11 @@ class FashionBrandEmblem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: conSombra
-          ? BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withValues(alpha: 0.08),
-                  blurRadius: size * 0.2,
-                  offset: Offset(0, size * 0.06),
-                ),
-              ],
-            )
-          : null,
-      child: AtelierMonogram(
-        size: size,
-        primaryColor: primaryColor,
-        accentColor: accentColor,
-        surfaceColor: fillColor,
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }
 
-/// Cabecera de marca con isotipo y tipografía editorial Neo-Atelier (Space Grotesk + Plus Jakarta Sans).
+/// Cabecera de marca con tipografía editorial oficial (Space Grotesk).
 class FashionBrandHeader extends StatelessWidget {
   final double emblemSize;
   final bool compacto;
@@ -70,26 +48,15 @@ class FashionBrandHeader extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FashionBrandEmblem(
-            size: emblemSize,
-            conSombra: false,
-          ),
-          const SizedBox(width: 10),
-          Text(
-            'FASHIONSTYLE',
-            style: GoogleFonts.spaceGrotesk(
-              fontWeight: FontWeight.w700,
-              fontSize: compacto ? 15 : 17,
-              letterSpacing: -0.4,
-              color: FashionColors.inkPrimary,
-              height: 1.1,
-            ),
-          ),
-        ],
+      child: Text(
+        'FASHIONSTYLE',
+        style: GoogleFonts.spaceGrotesk(
+          fontWeight: FontWeight.w700,
+          fontSize: compacto ? 15 : 18,
+          letterSpacing: -0.4,
+          color: FashionColors.inkPrimary,
+          height: 1.1,
+        ),
       ),
     );
   }

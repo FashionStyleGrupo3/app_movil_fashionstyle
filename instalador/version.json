@@ -1,8 +1,8 @@
 {
-  "version": "1.5.1",
-  "buildNumber": 10,
-  "commit": "v1.5.1-emulator-ui-fixes",
-  "updatedAt": "2026-11-12T15:00:00Z",
+  "version": "1.5.2",
+  "buildNumber": 11,
+  "commit": "v1.5.2-fs-icon-cleanup-pos-sizes",
+  "updatedAt": "2026-11-12T17:00:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.5.1: Corrección de 4 observaciones de UI en emulador (limpieza de AppBar pública y badge de carrito, contraste de iconos activos en barra inferior de Admin con píldora crema, reorganización en dos filas de filtros y botón + Nueva Venta en POS Mostrador evitando overflow de precio/$, y validación completa de variantes/precios con diálogo de confirmación en Creación de Prendas)."
+  "notes": "Lanzamiento oficial v1.5.2: Eliminación total del isotipo octagonal FS en toda la UI, eliminación del badge • FASHIONSTYLE · 2026 y cierre de gap inferior en LoginScreen, adición de doble interruptor (Activa/Inactiva y En tienda/Oculta) en Gestión de Prendas, rediseño de Caja Mostrador (POS) con ventana dedicada de selección de tallas/precios/stock e ícono de eliminación en ticket, y corrección definitiva del cierre de sesión inesperado al eliminar timer periódico y blindar refrescarSesion."
 }

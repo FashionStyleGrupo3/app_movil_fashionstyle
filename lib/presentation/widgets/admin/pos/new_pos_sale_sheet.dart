@@ -1,4 +1,5 @@
 // @source-mirror: src/views/admin/VistaGestionPrendas.vue, src/composables/useGestionPrendas.js, src/views/admin/VistaVentasPOS.vue
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fashion_style_mobile/core/constants/payment_constants.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
@@ -99,6 +100,173 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
         content: Text('Agregado: ${p.nombre} (${v.talla}) · ${CurrencyFormatter.formatearCOP(precioItem)}'),
         duration: const Duration(milliseconds: 900),
         backgroundColor: FashionColors.verdeExito,
+      ),
+    );
+  }
+
+  void _abrirDialogoSeleccionTalla(Product p) {
+    showDialog(
+      context: context,
+      builder: (dlgCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 44,
+                height: 56,
+                child: p.primeraImagenUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: p.primeraImagenUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: (_, __, ___) => Container(
+                          color: FashionColors.surfaceMuted,
+                          child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary, size: 20),
+                        ),
+                      )
+                    : Container(
+                        color: FashionColors.surfaceMuted,
+                        child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary, size: 20),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    p.nombre,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                  ),
+                  Text(
+                    '${p.categoria?.nombre ?? "Prenda"} · Selecciona una talla',
+                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 20),
+              onPressed: () => Navigator.pop(dlgCtx),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: p.variantes.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Text(
+                      'Esta prenda no tiene tallas configuradas.',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkMuted),
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: p.variantes.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, idx) {
+                    final v = p.variantes[idx];
+                    final disponible = v.stock > 0;
+                    final precio = v.precioVenta > 0 ? v.precioVenta : p.precioMinimo;
+
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: disponible ? FashionColors.surfaceMuted : FashionColors.surfaceMuted.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: disponible ? FashionColors.borderSubtle : FashionColors.borderSubtle.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: InkWell(
+                        onTap: disponible
+                            ? () {
+                                Navigator.pop(dlgCtx);
+                                _agregarPrenda(p, v);
+                              }
+                            : null,
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: disponible ? FashionColors.inkPrimary : FashionColors.borderSubtle,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    v.talla.toUpperCase(),
+                                    style: GoogleFonts.jetBrainsMono(
+                                      color: disponible ? Colors.white : FashionColors.inkMuted,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      CurrencyFormatter.formatearCOP(precio),
+                                      style: GoogleFonts.jetBrainsMono(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: FashionColors.inkPrimary,
+                                      ),
+                                    ),
+                                    Text(
+                                      disponible ? 'Stock: ${v.stock} uds disponibles' : 'Agotado (0 uds)',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: disponible ? FashionColors.statusSuccess : FashionColors.statusDanger,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: disponible ? FashionColors.inkPrimary : FashionColors.surfacePanel,
+                                  foregroundColor: disponible ? Colors.white : FashionColors.inkMuted,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  elevation: 0,
+                                ),
+                                onPressed: disponible
+                                    ? () {
+                                        Navigator.pop(dlgCtx);
+                                        _agregarPrenda(p, v);
+                                      }
+                                    : null,
+                                child: Text(
+                                  disponible ? '+ Agregar' : 'Agotado',
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
       ),
     );
   }
@@ -208,9 +376,9 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
           ),
           const SizedBox(height: 8),
 
-          // Catálogo rápido de selección
+          // Catálogo rápido de selección con modal de tallas
           SizedBox(
-            height: 130,
+            height: 120,
             child: _cargandoProds
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
@@ -222,58 +390,111 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                         return const SizedBox.shrink();
                       }
                       return Container(
-                        width: 160,
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.all(8),
+                        width: 156,
+                        margin: const EdgeInsets.only(right: 10),
                         decoration: BoxDecoration(
-                          color: FashionColors.surfaceSecondary,
-                          border: Border.all(color: FashionColors.bordeClaro),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              p.nombre,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 11.5, color: FashionColors.textoPrincipal),
-                            ),
-                            Text(
-                              CurrencyFormatter.formatearCOP(p.precioMinimo),
-                              style: GoogleFonts.poppins(fontSize: 10.5, color: FashionColors.primaryCorporate, fontWeight: FontWeight.bold),
-                            ),
-                            const Spacer(),
-                            Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              children: p.variantes.map((v) {
-                                final disponible = v.stock > 0;
-                                return Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () => _agregarPrenda(p, v),
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: disponible ? FashionColors.primaryCorporate : FashionColors.bordeClaro.withValues(alpha: 0.4),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        v.talla.toUpperCase(),
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 10,
-                                          color: disponible ? Colors.white : FashionColors.textoMuted,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                          color: FashionColors.surfaceCard,
+                          border: Border.all(color: FashionColors.borderSubtle),
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
                           ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _abrirDialogoSeleccionTalla(p),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: SizedBox(
+                                          width: 38,
+                                          height: 48,
+                                          child: p.primeraImagenUrl.isNotEmpty
+                                              ? CachedNetworkImage(
+                                                  imageUrl: p.primeraImagenUrl,
+                                                  fit: BoxFit.cover,
+                                                  errorWidget: (_, __, ___) => Container(
+                                                    color: FashionColors.surfaceMuted,
+                                                    child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary, size: 18),
+                                                  ),
+                                                )
+                                              : Container(
+                                                  color: FashionColors.surfaceMuted,
+                                                  child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary, size: 18),
+                                                ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              p.nombre,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.plusJakartaSans(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 11,
+                                                color: FashionColors.inkPrimary,
+                                                height: 1.15,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              CurrencyFormatter.formatearCOP(p.precioMinimo),
+                                              style: GoogleFonts.jetBrainsMono(
+                                                fontSize: 10.5,
+                                                color: FashionColors.inkPrimary,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: FashionColors.inkPrimary,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(Icons.touch_app_outlined, size: 12, color: Colors.white),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Elegir talla',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 10.5,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -288,7 +509,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
             child: _bolsa.isEmpty
                 ? Center(
                     child: Text(
-                      'Toca una talla arriba para agregar a la venta de mostrador',
+                      'Toca una prenda arriba para elegir talla y agregar a la venta',
                       style: GoogleFonts.poppins(color: FashionColors.textoMuted, fontSize: 13),
                       textAlign: TextAlign.center,
                     ),
@@ -318,7 +539,9 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.remove, size: 16),
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.remove_circle_outline, size: 18),
                                 onPressed: () {
                                   setState(() {
                                     if (it['cantidad'] > 1) {
@@ -329,9 +552,14 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                                   });
                                 },
                               ),
-                              Text('${it['cantidad']}', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13)),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: Text('${it['cantidad']}', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13)),
+                              ),
                               IconButton(
-                                icon: const Icon(Icons.add, size: 16),
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.add_circle_outline, size: 18),
                                 onPressed: () {
                                   if (it['cantidad'] < it['max_stock']) {
                                     setState(() => it['cantidad'] += 1);
@@ -344,6 +572,18 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                                       ),
                                     );
                                   }
+                                },
+                              ),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(Icons.delete_outline, size: 20, color: FashionColors.peligro),
+                                tooltip: 'Quitar de la venta',
+                                onPressed: () {
+                                  setState(() {
+                                    _bolsa.removeAt(index);
+                                  });
                                 },
                               ),
                             ],

@@ -460,24 +460,6 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                                     ),
                                                   ),
                                                 ),
-                                                InkWell(
-                                                  onTap: () => _togglePublicado(p),
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Icon(
-                                                        p.publicado ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                                                        size: 14,
-                                                        color: p.publicado ? FashionColors.statusSuccess : FashionColors.inkSecondary,
-                                                      ),
-                                                      const SizedBox(width: 3),
-                                                      Text(
-                                                        p.publicado ? 'Ocultar' : 'Publicar',
-                                                        style: const TextStyle(fontSize: 10, decoration: TextDecoration.underline),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
                                               ],
                                             ),
                                             const SizedBox(height: 6),
@@ -503,38 +485,84 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
                                         ),
                                       ),
                                       Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
-                                          Switch(
-                                            value: p.activo,
-                                            activeThumbColor: FashionColors.verdeExito,
-                                            activeTrackColor: FashionColors.verdeExito.withValues(alpha: 0.3),
-                                            inactiveThumbColor: FashionColors.textoMuted,
-                                            onChanged: (val) => _toggleActivo(p, val),
+                                          // Switch 1: Activa / Inactiva
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                p.activo ? 'Activa' : 'Inactiva',
+                                                style: TextStyle(
+                                                  fontSize: 9.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: p.activo ? FashionColors.verdeExito : FashionColors.textoMuted,
+                                                ),
+                                              ),
+                                              Transform.scale(
+                                                scale: 0.72,
+                                                child: Switch(
+                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  value: p.activo,
+                                                  activeThumbColor: FashionColors.verdeExito,
+                                                  activeTrackColor: FashionColors.verdeExito.withValues(alpha: 0.3),
+                                                  inactiveThumbColor: FashionColors.textoMuted,
+                                                  onChanged: (val) => _toggleActivo(p, val),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            p.activo ? 'Activa' : 'Inactiva',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w600,
-                                              color: p.activo ? FashionColors.verdeExito : FashionColors.textoMuted,
-                                            ),
+                                          const SizedBox(height: 2),
+                                          // Switch 2: En tienda / Oculta
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                p.publicado ? 'En tienda' : 'Oculta',
+                                                style: TextStyle(
+                                                  fontSize: 9.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: p.publicado ? const Color(0xFF2563EB) : FashionColors.textoMuted,
+                                                ),
+                                              ),
+                                              Transform.scale(
+                                                scale: 0.72,
+                                                child: Switch(
+                                                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  value: p.publicado,
+                                                  activeThumbColor: const Color(0xFF2563EB),
+                                                  activeTrackColor: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                                  inactiveThumbColor: FashionColors.textoMuted,
+                                                  onChanged: (val) => _togglePublicado(p),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                           const SizedBox(height: 4),
                                           Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               IconButton(
-                                                icon: const Icon(Icons.copy_outlined, size: 17),
+                                                visualDensity: VisualDensity.compact,
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                                                icon: const Icon(Icons.copy_outlined, size: 16),
                                                 tooltip: 'Duplicar prenda',
                                                 onPressed: () => _duplicarPrenda(p),
                                               ),
                                               IconButton(
-                                                icon: const Icon(Icons.edit_outlined, size: 18),
+                                                visualDensity: VisualDensity.compact,
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                                                icon: const Icon(Icons.edit_outlined, size: 16),
                                                 tooltip: 'Editar prenda',
                                                 onPressed: () => _abrirFormularioPrenda(p),
                                               ),
                                               IconButton(
-                                                icon: const Icon(Icons.delete_outline, size: 18, color: FashionColors.peligro),
+                                                visualDensity: VisualDensity.compact,
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
+                                                icon: const Icon(Icons.delete_outline, size: 16, color: FashionColors.peligro),
                                                 tooltip: 'Eliminar prenda',
                                                 onPressed: () => _eliminarPrenda(p),
                                               ),

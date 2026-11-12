@@ -152,54 +152,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Badge ATELIER ARCHIVE · 2026
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: FashionColors.brandAccent.withValues(alpha: 0.22),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: FashionColors.brandAccent.withValues(alpha: 0.55),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 5,
-                                decoration: const BoxDecoration(
-                                  color: FashionColors.brandAccent,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'FASHIONSTYLE · 2026',
-                                style: GoogleFonts.jetBrainsMono(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.4,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-
                         // Titular principal Space Grotesk
                         Text(
                           'FashionStyle',
                           style: GoogleFonts.spaceGrotesk(
-                            fontSize: 30,
+                            fontSize: 32,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(
                           'Moda que se ajusta a ti · Calidad y estilo',
                           style: GoogleFonts.plusJakartaSans(
@@ -224,6 +187,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     SizedBox(height: heroHeight),
                     Container(
                       width: double.infinity,
+                      constraints: BoxConstraints(
+                        minHeight: (size.height - heroHeight).clamp(0.0, double.infinity),
+                      ),
                       decoration: const BoxDecoration(
                         color: FashionColors.surfaceCard,
                         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -235,7 +201,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
+                      padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(context).padding.bottom + 32),
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 440),
                         child: Column(

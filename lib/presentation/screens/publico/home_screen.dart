@@ -342,13 +342,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               // Kicker superior con Monograma y Badge de Colección
                               Row(
                                 children: [
-                                  const AtelierMonogram(
-                                    size: 32,
-                                    primaryColor: FashionColors.surfaceCard,
-                                    accentColor: FashionColors.brandAccent,
-                                    surfaceColor: FashionColors.inkPrimary,
-                                  ),
-                                  const SizedBox(width: 10),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
                                     decoration: BoxDecoration(

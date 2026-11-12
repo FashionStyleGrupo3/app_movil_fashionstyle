@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
 
 class AdminShellLayout extends ConsumerWidget {
   final Widget child;
@@ -67,8 +66,6 @@ class AdminShellLayout extends ConsumerWidget {
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                 child: Row(
                   children: [
-                    const AtelierMonogram(size: 28),
-                    const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -437,9 +434,9 @@ class AdminShellLayout extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     ref.listen<AuthState>(authProvider, (previous, next) {
-      final antesTeniaAcceso = previous?.esPersonal ?? true;
-      final ahoraSinAcceso = (!next.esPersonal || !next.estaAutenticado) && !next.cargando;
-      if (antesTeniaAcceso && ahoraSinAcceso) {
+      final antesTeniaSesion = previous?.estaAutenticado ?? true;
+      final ahoraSinSesion = !next.estaAutenticado && !next.cargando;
+      if (antesTeniaSesion && ahoraSinSesion) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
             context.go('/');
@@ -458,22 +455,8 @@ class AdminShellLayout extends ConsumerWidget {
         elevation: 0,
         backgroundColor: FashionColors.inkPrimary,
         foregroundColor: Colors.white,
-        titleSpacing: 16,
-        leadingWidth: 46,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: Center(
-            child: GestureDetector(
-              onTap: () => context.go('/admin'),
-              child: const AtelierMonogram(
-                size: 30,
-                primaryColor: Colors.white,
-                accentColor: FashionColors.brandAccent,
-                surfaceColor: Colors.transparent,
-              ),
-            ),
-          ),
-        ),
+        automaticallyImplyLeading: false,
+        titleSpacing: 20,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -529,7 +512,7 @@ class AdminShellLayout extends ConsumerWidget {
             Row(
               children: [
                 Text(
-                  'ROLES: ',
+                  'ROL: ',
                   style: GoogleFonts.plusJakartaSans(
                     color: Colors.white54,
                     fontSize: 9,
@@ -539,9 +522,10 @@ class AdminShellLayout extends ConsumerWidget {
                 Text(
                   authState.esAdmin ? 'ADMINISTRADOR' : 'STAFF OPERATIVO',
                   style: GoogleFonts.plusJakartaSans(
-                    color: FashionColors.brandAccent,
+                    color: FashionColors.sandDark,
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
                   ),
                 ),
               ],

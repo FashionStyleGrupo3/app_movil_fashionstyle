@@ -49,10 +49,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> inicializarDesdeStorage() async {
-    ApiClient.instance.onUnauthorizedCallback = () {
-      cerrarSesion();
-    };
-
     try {
       final prefs = await SharedPreferences.getInstance();
       final tokenGuardado = prefs.getString('fs_token');
@@ -279,10 +275,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         List<String> nuevosRoles = _extraerRoles(rawRoles, userMap);
 
-        // 2. Si /me omite los roles y no vinieron en la respuesta, preservar los roles previos existentes
-        if (nuevosRoles.isEmpty && rawRoles == null && state.roles.isNotEmpty) {
+        // 2. Si /me retorna roles vacíos u omitidos, SIEMPRE preservar los roles existentes
+        if (nuevosRoles.isEmpty && state.roles.isNotEmpty) {
           nuevosRoles = List<String>.from(state.roles);
         }
+
+        // Si el userMap vino nulo o incompleto, preservar el usuario existente
+        final finalUserMap = userMap ?? state.usuario;
 
         // 3. Comparar ID de usuario, estado activo y roles ordenados para evitar rebuilds innecesarios
         final currentUserId = state.usuario?['id_usuario'] ?? state.usuario?['id'];
@@ -311,13 +310,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         // 4. Solo si cambiaron roles o estado activo se actualiza el estado (sin activar cargando)
         state = state.copyWith(
-          usuario: userMap,
+          usuario: finalUserMap,
           roles: nuevosRoles,
           sesionHidratada: true,
           cargando: false,
         );
 
-        await _persistirEnStorage(state.token, userMap, nuevosRoles);
+        await _persistirEnStorage(state.token, finalUserMap, nuevosRoles);
         return true;
       }
       return false;
