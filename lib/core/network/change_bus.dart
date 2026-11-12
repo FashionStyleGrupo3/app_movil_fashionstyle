@@ -84,6 +84,12 @@ class ChangeBus {
     }
   }
 
+  void notifyAll(List<String> recursos) {
+    for (final r in recursos) {
+      emitirCambio(r);
+    }
+  }
+
   void recibirCambioRemoto(Map<String, dynamic> cambio) {
     final recurso = cambio['recurso']?.toString() ?? '';
     if (recurso.isEmpty || rutasIgnoradas.contains(recurso)) return;

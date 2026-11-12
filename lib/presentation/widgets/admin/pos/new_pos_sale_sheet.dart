@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fashion_style_mobile/core/constants/payment_constants.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/product/product.dart';
@@ -27,7 +28,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
   bool _cargandoProds = true;
   String _busqueda = '';
 
-  final List<Map<String, dynamic>> _bolsa = [];
+  final List<Map<String, dynamic>> _ticket = [];
   String _medioPago = 'efectivo';
   final TextEditingController _nombreCtrl = TextEditingController(text: 'Consumidor Final');
   final TextEditingController _docCtrl = TextEditingController(text: '222222222222');
@@ -48,17 +49,18 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
     if (mounted) setState(() => _cargandoProds = false);
   }
 
-  double get _totalBolsa {
-    return _bolsa.fold(0.0, (sum, it) => sum + (it['precio'] * it['cantidad']));
+  double get _totalTicket {
+    return _ticket.fold(0.0, (sum, it) => sum + (it['precio'] * it['cantidad']));
   }
 
   void _agregarPrenda(Product p, ProductVariant v) {
     if (v.stock <= 0) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('La talla "${v.talla}" de "${p.nombre}" no tiene stock disponible'),
           backgroundColor: FashionColors.peligro,
-          duration: const Duration(seconds: 2),
+          duration: const Duration(milliseconds: 1600),
         ),
       );
       return;
@@ -68,22 +70,23 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
     final precioItem = v.precioVenta > 0 ? v.precioVenta : p.precioMinimo;
 
     setState(() {
-      final idx = _bolsa.indexWhere((it) => it['variante_id'] == idVariante);
+      final idx = _ticket.indexWhere((it) => it['variante_id'] == idVariante);
       if (idx != -1) {
-        if (_bolsa[idx]['cantidad'] < v.stock) {
-          _bolsa[idx]['cantidad'] += 1;
+        if (_ticket[idx]['cantidad'] < v.stock) {
+          _ticket[idx]['cantidad'] += 1;
         } else {
+          ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Stock máximo alcanzado para talla "${v.talla}" (${v.stock} disponibles)'),
               backgroundColor: FashionColors.peligro,
-              duration: const Duration(seconds: 2),
+              duration: const Duration(milliseconds: 1600),
             ),
           );
           return;
         }
       } else {
-        _bolsa.add({
+        _ticket.add({
           'variante_id': idVariante,
           'nombre': p.nombre,
           'talla': v.talla,
@@ -272,7 +275,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
   }
 
   Future<void> _cobrarVenta() async {
-    if (_bolsa.isEmpty) return;
+    if (_ticket.isEmpty) return;
 
     setState(() => _procesandoCobro = true);
     try {
@@ -281,7 +284,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
         'cliente_nombre': _nombreCtrl.text.trim(),
         'cliente_documento': _docCtrl.text.trim(),
         'cliente_telefono': _telCtrl.text.trim(),
-        'items': _bolsa.map((it) => {
+        'items': _ticket.map((it) => {
           'variante_id': it['variante_id'],
           'cantidad': it['cantidad'],
           'precio_unitario': it['precio'],
@@ -294,6 +297,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
         clienteNombre: _nombreCtrl.text.trim(),
         clienteDocumento: _docCtrl.text.trim(),
       );
+      ChangeBus.instance.notifyAll(['ventas', 'productos', 'inventarios', 'dashboard']);
       widget.onCobrada();
 
       if (mounted) {
@@ -426,6 +430,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                                               ? CachedNetworkImage(
                                                   imageUrl: p.primeraImagenUrl,
                                                   fit: BoxFit.cover,
+                                                  memCacheWidth: 600,
                                                   errorWidget: (_, __, ___) => Container(
                                                     color: FashionColors.surfaceMuted,
                                                     child: const Icon(Icons.checkroom, color: FashionColors.inkPrimary, size: 18),
@@ -504,9 +509,9 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
           const SizedBox(height: 10),
           const Divider(color: FashionColors.bordeClaro),
 
-          // Bolsa de mostrador
+          // Ticket de mostrador
           Expanded(
-            child: _bolsa.isEmpty
+            child: _ticket.isEmpty
                 ? Center(
                     child: Text(
                       'Toca una prenda arriba para elegir talla y agregar a la venta',
@@ -515,9 +520,9 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: _bolsa.length,
+                    itemCount: _ticket.length,
                     itemBuilder: (context, index) {
-                      final it = _bolsa[index];
+                      final it = _ticket[index];
                       return Container(
                         margin: const EdgeInsets.only(bottom: 6),
                         decoration: BoxDecoration(
@@ -547,7 +552,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                                     if (it['cantidad'] > 1) {
                                       it['cantidad'] -= 1;
                                     } else {
-                                      _bolsa.removeAt(index);
+                                      _ticket.removeAt(index);
                                     }
                                   });
                                 },
@@ -564,11 +569,12 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                                   if (it['cantidad'] < it['max_stock']) {
                                     setState(() => it['cantidad'] += 1);
                                   } else {
+                                    ScaffoldMessenger.of(context).clearSnackBars();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text('Stock máximo alcanzado (${it['max_stock']})'),
                                         backgroundColor: FashionColors.peligro,
-                                        duration: const Duration(seconds: 1),
+                                        duration: const Duration(milliseconds: 1600),
                                       ),
                                     );
                                   }
@@ -582,7 +588,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                                 tooltip: 'Quitar de la venta',
                                 onPressed: () {
                                   setState(() {
-                                    _bolsa.removeAt(index);
+                                    _ticket.removeAt(index);
                                   });
                                 },
                               ),
@@ -622,7 +628,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerRight,
                       child: Text(
-                        CurrencyFormatter.formatearCOP(_totalBolsa),
+                        CurrencyFormatter.formatearCOP(_totalTicket),
                         style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.textoPrincipal),
                       ),
                     ),
@@ -641,7 +647,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              onPressed: _procesandoCobro || _bolsa.isEmpty ? null : _cobrarVenta,
+              onPressed: _procesandoCobro || _ticket.isEmpty ? null : _cobrarVenta,
               icon: _procesandoCobro ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.check),
               label: Text(
                 _procesandoCobro ? 'Procesando...' : 'Cobrar e Imprimir Comprobante',

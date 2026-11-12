@@ -1,6 +1,7 @@
 // @source-mirror: src/services/tiempoReal.js, src/composables/useRecargaAutomatica.js
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
@@ -18,6 +19,7 @@ class ReverbService {
   AppLifecycleListener? _lifecycleListener;
   bool _conectando = false;
   Timer? _reintentadorTimer;
+  int _reintentosConsecutivos = 0;
 
   static const String appKey = String.fromEnvironment('REVERB_APP_KEY', defaultValue: 'k4nfvk20k6kwtiw5nbpe');
   static const String host = String.fromEnvironment('REVERB_HOST', defaultValue: 'fashionstyle.api.adsocidm.com');
@@ -31,6 +33,7 @@ class ReverbService {
     _lifecycleListener ??= AppLifecycleListener(
       onResume: () {
         ChangeBus.instance.emitirCambio('app_resumed');
+        _reintentosConsecutivos = 0;
         if (_channel == null && appKey.isNotEmpty) {
           _conectarWebSocket();
         }
@@ -55,9 +58,18 @@ class ReverbService {
         '$wsScheme://$host:$port/app/$appKey?protocol=7&client=js&version=8.4.0-reverb&flash=false',
       );
 
-      _channel = WebSocketChannel.connect(uri);
+      final channel = WebSocketChannel.connect(uri);
+      _channel = channel;
 
-      _subscription = _channel!.stream.listen(
+      // Capturar la promesa ready para evitar excepciones no controladas en el hilo de Dart
+      channel.ready.then((_) {
+        _reintentosConsecutivos = 0;
+      }).catchError((Object err) {
+        debugPrint('[ReverbService] Conexión WebSocket no completada en el servidor: $err');
+        _desconectarYReintentar();
+      });
+
+      _subscription = channel.stream.listen(
         (mensaje) {
           _procesarMensaje(mensaje);
         },
@@ -66,9 +78,10 @@ class ReverbService {
           _desconectarYReintentar();
         },
         onDone: () {
-          debugPrint('[ReverbService] Conexión WebSocket cerrada.');
+          debugPrint('[ReverbService] Conexión WebSocket finalizada.');
           _desconectarYReintentar();
         },
+        cancelOnError: true,
       );
       _conectando = false;
     } catch (e) {
@@ -96,6 +109,7 @@ class ReverbService {
       }
 
       if (evento == 'pusher:connection_established') {
+        _reintentosConsecutivos = 0;
         _socketId = data['socket_id']?.toString();
         if (_socketId != null && _socketId!.isNotEmpty) {
           ApiClient.instance.socketIdProvider = () => _socketId;
@@ -127,7 +141,16 @@ class ReverbService {
     _socketId = null;
 
     _reintentadorTimer?.cancel();
-    _reintentadorTimer = Timer(const Duration(seconds: 8), () {
+    _reintentosConsecutivos++;
+
+    // Si los reintentos continuos superan 4, usar backoff exponencial hasta 120s
+    if (_reintentosConsecutivos > 8) {
+      debugPrint('[ReverbService] WebSocket en pausa tras múltiples intentos fallidos; se reanudará al volver a la app.');
+      return;
+    }
+
+    final segundosEspera = math.min(10 * math.pow(1.8, _reintentosConsecutivos).toInt(), 120);
+    _reintentadorTimer = Timer(Duration(seconds: segundosEspera), () {
       if (appKey.isNotEmpty) {
         _conectarWebSocket();
       }

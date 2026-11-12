@@ -19,7 +19,7 @@ class WompiService {
       final idVariante = JsonParser.toInt(rawVar);
 
       if (idVariante <= 0) {
-        throw ArgumentError('Un producto de la bolsa no tiene una variante válida.');
+        throw ArgumentError('Un producto del carrito no tiene una variante válida.');
       }
 
       final rawCant = JsonParser.toInt(item['cantidad'], 1);

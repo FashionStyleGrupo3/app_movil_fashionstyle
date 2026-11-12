@@ -9,6 +9,7 @@ import 'package:fashion_style_mobile/core/validators/garment_and_field_validator
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
 import 'package:fashion_style_mobile/data/services/user_service.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:fashion_style_mobile/core/utils/image_url_resolver.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
 import 'package:image_picker/image_picker.dart';
@@ -740,6 +741,174 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
                   child: _cargandoPass
                       ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : Text('Actualizar contraseña', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // CERRAR SESIÓN
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 12),
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: FashionColors.textoPrincipal,
+              side: const BorderSide(color: FashionColors.bordeClaro, width: 1.5),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              backgroundColor: FashionColors.surfaceSecondary,
+            ),
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: Text(
+              'Cerrar Sesión',
+              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
+            ),
+            onPressed: () async {
+              final confirmar = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: FashionColors.backgroundCanvas,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  title: Text(
+                    'Cerrar Sesión',
+                    style: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+                  ),
+                  content: Text(
+                    '¿Deseas cerrar tu sesión actual de FashionStyle?',
+                    style: GoogleFonts.poppins(fontSize: 13),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text('Cancelar', style: GoogleFonts.poppins(color: FashionColors.textoMuted)),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: FashionColors.primaryCorporate,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () => Navigator.pop(ctx, true),
+                      child: const Text('Cerrar Sesión'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmar == true && mounted) {
+                ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+                await ref.read(authProvider.notifier).cerrarSesion();
+                if (mounted) context.go('/login');
+              }
+            },
+          ),
+        ),
+
+        // ZONA DE PELIGRO: ELIMINAR MI CUENTA
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: FashionColors.peligro.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.25)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: FashionColors.peligro, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Zona de Peligro',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: FashionColors.peligro,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Al solicitar la eliminación de tu cuenta, se cerrará tu sesión y se procesará la baja según los Términos y Condiciones.',
+                style: GoogleFonts.poppins(fontSize: 12, color: FashionColors.textoMuted),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  style: TextButton.styleFrom(
+                    foregroundColor: FashionColors.peligro,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: FashionColors.peligro.withValues(alpha: 0.3)),
+                    ),
+                  ),
+                  icon: const Icon(Icons.delete_forever_rounded, size: 18),
+                  label: Text(
+                    'Eliminar mi cuenta',
+                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  onPressed: () async {
+                    final confirmar = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: FashionColors.backgroundCanvas,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        title: Row(
+                          children: [
+                            const Icon(Icons.warning_rounded, color: FashionColors.peligro),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '¿Eliminar tu cuenta?',
+                                style: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          'Esta acción desactivará tu cuenta de FashionStyle y cerrará inmediatamente tu sesión en este dispositivo.',
+                          style: GoogleFonts.poppins(fontSize: 13),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text('Cancelar', style: GoogleFonts.poppins(color: FashionColors.textoMuted)),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: FashionColors.peligro,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('Sí, eliminar cuenta'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirmar == true && mounted) {
+                      ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+                      await ref.read(authProvider.notifier).cerrarSesion();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Tu sesión se ha cerrado y tu solicitud fue enviada.'),
+                            duration: Duration(milliseconds: 2000),
+                          ),
+                        );
+                        context.go('/');
+                      }
+                    }
+                  },
                 ),
               ),
             ],

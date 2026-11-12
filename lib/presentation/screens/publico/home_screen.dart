@@ -224,7 +224,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     padding: const EdgeInsets.only(bottom: 96), // Clearance para Floating Pill Dock
                     children: [
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
+
+                      // 0. BARRA DE BÚSQUEDA SUPERIOR
+                      _construirBarraBusquedaSuperior(),
 
                       // 1. HERO BENTO ASIMÉTRICO (DARK CARD + 2 TILES MINERALES)
                       _construirBentoHero(),
@@ -249,21 +252,82 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _construirBarraBusquedaSuperior() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.go('/catalogo'),
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: FashionColors.borderSubtle),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.search_rounded, size: 20, color: FashionColors.inkSecondary),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Buscar prendas, colecciones, estilos...',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    color: FashionColors.inkSecondary,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: FashionColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.tune_rounded, size: 14, color: FashionColors.inkPrimary),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Filtros',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: FashionColors.inkPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 1. Asymmetric Editorial Bento Hero: Dark Card `#14161F` + 2 Mineral Highlight Tiles
   Widget _construirBentoHero() {
     final diapositivas = _obtenerDiapositivas();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Tarjeta principal Nocturna #14161F con AtelierPatternBackground
+          // Tarjeta principal Nocturna #14161F Edge-to-Edge con AtelierPatternBackground
           Container(
-            height: 320,
+            height: 330,
             decoration: BoxDecoration(
               color: FashionColors.inkPrimary,
-              borderRadius: BorderRadius.circular(24),
               border: Border.all(color: FashionColors.borderSubtle.withValues(alpha: 0.15)),
               boxShadow: [
                 BoxShadow(
@@ -296,19 +360,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     return Stack(
                       fit: StackFit.expand,
                       children: [
-                        // Imagen de portada (a la derecha/fondo con gradiente)
+                        // Imagen de portada de fondo inmersiva y nítida
                         if (d.fotoUrl.isNotEmpty)
-                          Positioned(
-                            right: -20,
-                            top: 0,
-                            bottom: 0,
-                            width: 220,
+                          Positioned.fill(
                             child: Opacity(
-                              opacity: 0.45,
+                              opacity: 0.82,
                               child: CachedNetworkImage(
                                 imageUrl: d.fotoUrl,
                                 fit: BoxFit.cover,
-                                placeholder: (_, __) => Container(color: Colors.transparent),
+                                memCacheWidth: 1080,
+                                placeholder: (_, __) => Container(color: FashionColors.inkPrimary),
                                 errorWidget: (_, __, ___) => const SizedBox.shrink(),
                               ),
                             ),
@@ -322,11 +383,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                                 colors: [
-                                  FashionColors.inkPrimary,
-                                  FashionColors.inkPrimary.withValues(alpha: 0.92),
-                                  FashionColors.inkPrimary.withValues(alpha: 0.50),
+                                  FashionColors.inkPrimary.withValues(alpha: 0.95),
+                                  FashionColors.inkPrimary.withValues(alpha: 0.78),
+                                  Colors.transparent,
                                 ],
-                                stops: const [0.45, 0.75, 1.0],
+                                stops: const [0.35, 0.70, 1.0],
                               ),
                             ),
                           ),
@@ -482,108 +543,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          const SizedBox(height: 12),
-
-          // 2 Tiles Minerales Complementarios (#FFFFFF / #EBEEF3 con acento Jade #115E59)
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: FashionColors.surfaceCard,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: FashionColors.borderSubtle),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: FashionColors.slateAccent.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.verified_rounded, size: 20, color: FashionColors.slateAccent),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Calidad Garantizada',
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: FashionColors.inkPrimary,
-                              ),
-                            ),
-                            Text(
-                              'Confección local fina',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                color: FashionColors.inkSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: FashionColors.surfaceCard,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: FashionColors.borderSubtle),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: FashionColors.brandAccent.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.shield_outlined, size: 20, color: FashionColors.brandAccent),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Pago Protegido',
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: FashionColors.inkPrimary,
-                              ),
-                            ),
-                            Text(
-                              'Wompi Bancolombia',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                color: FashionColors.inkSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

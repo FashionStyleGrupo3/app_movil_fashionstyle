@@ -196,15 +196,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           infoPrecio.precioOriginal,
         );
 
+    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('¡Se agregó ${_producto!.nombre} (${_varianteSeleccionada!.talla}) x$_cantidad a tu bolsa!'),
+        content: Text('¡Se agregó ${_producto!.nombre} (${_varianteSeleccionada!.talla}) x$_cantidad a tu carrito!'),
         backgroundColor: FashionColors.inkPrimary,
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
+        duration: const Duration(milliseconds: 1600),
         action: SnackBarAction(
-          label: 'VER BOLSA',
-          textColor: FashionColors.brandAccent,
+          label: 'VER CARRITO',
+          textColor: FashionColors.arena,
           onPressed: () {
             ref.read(cartProvider.notifier).abrirCajon();
           },
@@ -365,6 +366,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   child: CachedNetworkImage(
                                     imageUrl: listaImagenes[index],
                                     fit: BoxFit.contain,
+                                    memCacheWidth: 1080,
                                     placeholder: (_, __) => Container(
                                       color: FashionColors.surfaceMuted,
                                       child: const Center(
@@ -792,7 +794,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total bolsa:', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
+                    Text('Total carrito:', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
                     Text(
                       CurrencyFormatter.formatearCOP(precioFinal * _cantidad),
                       style: FashionTheme.priceTextStyle(
@@ -817,7 +819,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     onPressed: agotado ? null : _agregarAlCarrito,
                     icon: const Icon(Icons.shopping_bag_outlined, size: 20),
                     label: Text(
-                      agotado ? 'Agotado' : 'Añadir a la bolsa',
+                      agotado ? 'Agotado' : 'Añadir al carrito',
                       style: GoogleFonts.plusJakartaSans(
                         fontWeight: FontWeight.w700,
                         fontSize: 14,

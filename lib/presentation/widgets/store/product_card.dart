@@ -45,13 +45,14 @@ class _ProductCardWidgetState extends ConsumerState<ProductCardWidget> {
             variantes.first,
             1,
           );
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${widget.producto.nombre} agregada a la bolsa'),
-          duration: const Duration(seconds: 2),
+          content: Text('¡Se agregó ${widget.producto.nombre} a tu carrito!'),
+          duration: const Duration(milliseconds: 1600),
           action: SnackBarAction(
-            label: 'VER BOLSA',
-            textColor: FashionColors.brandAccent,
+            label: 'VER CARRITO',
+            textColor: FashionColors.arena,
             onPressed: () => context.go('/carrito'),
           ),
         ),
@@ -111,6 +112,7 @@ class _ProductCardWidgetState extends ConsumerState<ProductCardWidget> {
                         ? CachedNetworkImage(
                             imageUrl: widget.producto.primeraImagenUrl,
                             fit: BoxFit.cover,
+                            memCacheWidth: 600,
                             placeholder: (context, url) => Container(
                               color: FashionColors.surfaceMuted,
                               child: const Center(

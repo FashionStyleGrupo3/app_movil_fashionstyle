@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
@@ -190,7 +191,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
         final crudo = cuerpo is Map ? (cuerpo['message'] ?? datosError['message'] ?? mensaje) : mensaje;
         mensaje = ApiClient.sanitizarTextoError(
           crudo,
-          'Algunas prendas seleccionadas ya no tienen stock suficiente. Se actualizó tu bolsa.',
+          'Algunas prendas seleccionadas ya no tienen stock suficiente. Se actualizó tu carrito.',
         );
       } else {
         mensaje = ApiClient.obtenerMensajeError(
@@ -229,7 +230,9 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
         );
       } catch (_) {}
 
+      ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
       ref.read(cartProvider.notifier).limpiarCarrito();
+      ChangeBus.instance.notifyAll(['pedidos', 'productos', 'inventarios', 'ventas', 'dashboard']);
       setState(() => _reciboConfirmado = outcome);
     } else if (outcome.status == 'revision') {
       setState(() {
@@ -255,7 +258,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
     }).join('\n');
 
     final mensaje = '''
-¡Hola Fashion Style! Deseo consultar la disponibilidad y apartar las siguientes prendas de mi bolsa:
+¡Hola Fashion Style! Deseo consultar la disponibilidad y apartar las siguientes prendas de mi carrito:
 
 $lineas
 
@@ -278,7 +281,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
         backgroundColor: FashionColors.surfaceCard,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          '¿Vaciar bolsa de compras?',
+          '¿Vaciar carrito de compras?',
           style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         content: Text(
@@ -303,7 +306,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
               ref.read(cartProvider.notifier).limpiarCarrito();
               Navigator.pop(ctx);
             },
-            child: const Text('Vaciar bolsa'),
+            child: const Text('Vaciar carrito'),
           ),
         ],
       ),
@@ -337,7 +340,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Bolsa de Compras (${cartState.totalPrendas})',
+                    'Carrito de Compras (${cartState.totalPrendas})',
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
@@ -349,7 +352,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
                     onPressed: _confirmarVaciarCarrito,
                     icon: const Icon(Icons.delete_outline, size: 16),
                     label: Text(
-                      'Vaciar bolsa',
+                      'Vaciar carrito',
                       style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -357,7 +360,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
               ),
               const SizedBox(height: 12),
 
-              // LISTA DE PRENDAS EN BOLSA
+              // LISTA DE PRENDAS EN CARRITO
               ...cartState.items.map((item) => _construirTarjetaItem(item)),
 
               const SizedBox(height: 20),
@@ -838,7 +841,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
             ),
             const SizedBox(height: 20),
             Text(
-              'Tu bolsa de compras está vacía',
+              'Tu carrito de compras está vacío',
               style: GoogleFonts.spaceGrotesk(
                 fontWeight: FontWeight.w700,
                 fontSize: 18,

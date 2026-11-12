@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/order/order_model.dart';
 import 'package:fashion_style_mobile/data/services/order_service.dart';
@@ -35,13 +36,40 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
     _notasCtrl.text = widget.pedido.notas;
   }
 
+  List<MapEntry<String, String>> _obtenerEstadosPermitidos(String estadoActual) {
+    const jerarquia = {
+      'Pendiente_Pago': 0,
+      'Pagado': 1,
+      'En_Preparacion': 2,
+      'Enviado': 3,
+      'Entregado': 4,
+    };
+    final nivelActual = jerarquia[estadoActual] ?? -1;
+
+    final permitidos = OrderService.estadosPedido.entries.where((e) {
+      if (e.key == 'Cancelado') {
+        return estadoActual != 'Enviado' && estadoActual != 'Entregado';
+      }
+      final nivel = jerarquia[e.key] ?? -1;
+      return nivel >= nivelActual;
+    }).toList();
+
+    if (!permitidos.any((e) => e.key == _estado)) {
+      _estado = estadoActual;
+    }
+
+    return permitidos;
+  }
+
   Future<void> _guardar() async {
     final est = widget.pedido.estado.toLowerCase();
     if (est == 'cancelado' || est == 'rechazado' || est == 'entregado') {
+      ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Un pedido en estado "${widget.pedido.estado}" no puede ser modificado.'),
           backgroundColor: FashionColors.peligro,
+          duration: const Duration(milliseconds: 1600),
         ),
       );
       return;
@@ -50,8 +78,12 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
     if ((_estado == 'Enviado' || _estado == 'Entregado')) {
       final guia = _guiaCtrl.text.trim();
       if (!RegExp(r'^[A-Za-z0-9-]{4,40}$').hasMatch(guia)) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Para pedidos enviados o entregados, el número de guía es obligatorio (4-40 caracteres alfanuméricos)')),
+          const SnackBar(
+            content: Text('Para pedidos enviados o entregados, el número de guía es obligatorio (4-40 caracteres alfanuméricos)'),
+            duration: Duration(milliseconds: 1600),
+          ),
         );
         return;
       }
@@ -86,14 +118,27 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
         numeroGuia: _guiaCtrl.text.trim(),
         notas: _notasCtrl.text.trim(),
       );
+      ChangeBus.instance.notifyAll(['pedidos', 'dashboard']);
       widget.onActualizado();
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pedido ${widget.pedido.referencia} actualizado a ${OrderService.estadosPedido[_estado] ?? _estado}'),
+            backgroundColor: FashionColors.verdeExito,
+            duration: const Duration(milliseconds: 1600),
+          ),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo actualizar el estado de despacho.')),
             backgroundColor: FashionColors.peligro,
+            duration: const Duration(milliseconds: 1600),
           ),
         );
       }
@@ -106,6 +151,7 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
   Widget build(BuildContext context) {
     final est = widget.pedido.estado.toLowerCase();
     final bool bloqueado = est == 'cancelado' || est == 'rechazado' || est == 'entregado';
+    final estadosDisponibles = _obtenerEstadosPermitidos(widget.pedido.estado);
 
     return Container(
       decoration: const BoxDecoration(
@@ -180,7 +226,7 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
               ),
 
             DropdownButtonFormField<String>(
-              initialValue: _estado,
+              initialValue: estadosDisponibles.any((e) => e.key == _estado) ? _estado : estadosDisponibles.first.key,
               style: GoogleFonts.poppins(fontSize: 13, color: FashionColors.textoPrincipal),
               decoration: InputDecoration(
                 labelText: 'Estado del pedido',
@@ -188,7 +234,7 @@ class _ModalGestionDespachoSheetState extends State<ModalGestionDespachoSheet> {
                 fillColor: FashionColors.surfaceSecondary,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
               ),
-              items: OrderService.estadosPedido.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+              items: estadosDisponibles.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
               onChanged: bloqueado ? null : (v) => setState(() => _estado = v ?? _estado),
             ),
             const SizedBox(height: 12),

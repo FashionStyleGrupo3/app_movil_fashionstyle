@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/order/order_model.dart';
@@ -31,11 +32,23 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
   int _totalPaginas = 1;
   List<OrderModel> _pedidos = [];
   int? _pedidoExpandido;
+  StreamSubscription<DataChangeEvent>? _busSub;
 
   @override
   void initState() {
     super.initState();
     _cargarPedidos();
+    _busSub = ChangeBus.instance.stream.listen((evento) {
+      if (evento.recurso == 'pedidos' || evento.recurso == 'app_resumed') {
+        _cargarPedidos();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _busSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _cargarPedidos({bool reiniciar = true}) async {
@@ -152,12 +165,14 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
     }
 
     if (mounted) {
+      ScaffoldMessenger.of(context).clearSnackBars();
       if (agregados > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Se agregaron $agregados prendas disponibles a tu bolsa.'),
+            content: Text('Se agregaron $agregados prendas disponibles a tu carrito.'),
+            duration: const Duration(milliseconds: 1600),
             action: SnackBarAction(
-              label: 'Ir a bolsa',
+              label: 'Ir a carrito',
               textColor: FashionColors.brandAccent,
               onPressed: () => context.go('/carrito'),
             ),
@@ -165,7 +180,10 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Las prendas de este pedido no tienen stock disponible actualmente.')),
+          const SnackBar(
+            content: Text('Las prendas de este pedido no tienen stock disponible actualmente.'),
+            duration: Duration(milliseconds: 1600),
+          ),
         );
       }
     }

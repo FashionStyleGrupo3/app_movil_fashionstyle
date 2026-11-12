@@ -1,8 +1,8 @@
 {
-  "version": "1.5.2",
-  "buildNumber": 11,
-  "commit": "v1.5.2-fs-icon-cleanup-pos-sizes",
-  "updatedAt": "2026-11-12T17:00:00Z",
+  "version": "1.5.3",
+  "buildNumber": 12,
+  "commit": "v1.5.3-qa-runtime-fixes-orders-home",
+  "updatedAt": "2026-11-12T17:30:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.5.2: Eliminación total del isotipo octagonal FS en toda la UI, eliminación del badge • FASHIONSTYLE · 2026 y cierre de gap inferior en LoginScreen, adición de doble interruptor (Activa/Inactiva y En tienda/Oculta) en Gestión de Prendas, rediseño de Caja Mostrador (POS) con ventana dedicada de selección de tallas/precios/stock e ícono de eliminación en ticket, y corrección definitiva del cierre de sesión inesperado al eliminar timer periódico y blindar refrescarSesion."
+  "notes": "Lanzamiento oficial v1.5.3: Corrección de errores de tiempo de ejecución en adb logcat (blindaje de WebSocket Reverb contra excepciones no controladas y mitigación de AGTM en decodificación de imágenes en Android 17), eliminación total de avisos pegados de bolsa/carrito en transiciones de rutas y modales, sincronización en tiempo real de estados de pedidos en modo prueba y avance de despacho en Pedidos y Facturas con recálculo dinámico de KPIs, barra de búsqueda superior y carrusel hero full-width en portada, botones de Cerrar Sesión y Eliminar Cuenta con confirmación en Mi Perfil, y corrección del pipeline CI en develop."
 }

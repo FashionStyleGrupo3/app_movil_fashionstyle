@@ -321,7 +321,7 @@ class _EmptyStatePainter extends CustomPainter {
   }
 
   void _paintEmptyBag(Canvas canvas) {
-    // Bolsa sartorial
+    // Carrito sartorial
     final bagPath = Path()
       ..moveTo(42, 54)
       ..lineTo(98, 54)
@@ -339,7 +339,7 @@ class _EmptyStatePainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(bagPath, bagStroke);
 
-    // Asas de la bolsa
+    // Asas del carrito
     final handlePath = Path()
       ..moveTo(55, 54)
       ..cubicTo(55, 34, 85, 34, 85, 54);

@@ -131,6 +131,7 @@ class AdminShellLayout extends ConsumerWidget {
                       ],
                       onSelect: (ruta) {
                         Navigator.pop(sheetCtx);
+                        ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
                         if (currentPath != ruta) context.go(ruta);
                       },
                     ),
@@ -166,6 +167,7 @@ class AdminShellLayout extends ConsumerWidget {
                       ],
                       onSelect: (ruta) {
                         Navigator.pop(sheetCtx);
+                        ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
                         if (currentPath != ruta) context.go(ruta);
                       },
                     ),
@@ -209,6 +211,7 @@ class AdminShellLayout extends ConsumerWidget {
                       ],
                       onSelect: (ruta) {
                         Navigator.pop(sheetCtx);
+                        ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
                         if (currentPath != ruta) context.go(ruta);
                       },
                     ),
@@ -536,12 +539,18 @@ class AdminShellLayout extends ConsumerWidget {
           IconButton(
             tooltip: 'Ir a la Tienda Pública',
             icon: const Icon(Icons.storefront_outlined, color: Colors.white, size: 22),
-            onPressed: () => context.go('/'),
+            onPressed: () {
+              ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+              context.go('/');
+            },
           ),
           IconButton(
             tooltip: 'Ver todos los módulos',
             icon: const Icon(Icons.grid_view_rounded, color: Colors.white, size: 22),
-            onPressed: () => _abrirBentoModulos(context, ref, authState),
+            onPressed: () {
+              ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+              _abrirBentoModulos(context, ref, authState);
+            },
           ),
           const SizedBox(width: 4),
         ],
@@ -566,6 +575,7 @@ class AdminShellLayout extends ConsumerWidget {
                 label: 'Dashboard',
                 activo: slotActivo == 0,
                 onTap: () {
+                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
                   if (currentPath != '/admin') context.go('/admin');
                 },
               ),
@@ -575,6 +585,7 @@ class AdminShellLayout extends ConsumerWidget {
                 label: 'Ventas POS',
                 activo: slotActivo == 1,
                 onTap: () {
+                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
                   if (currentPath != '/admin/ventas') context.go('/admin/ventas');
                 },
               ),
@@ -584,6 +595,7 @@ class AdminShellLayout extends ConsumerWidget {
                 label: 'Pedidos',
                 activo: slotActivo == 2,
                 onTap: () {
+                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
                   if (currentPath != '/admin/pedidos') context.go('/admin/pedidos');
                 },
               ),

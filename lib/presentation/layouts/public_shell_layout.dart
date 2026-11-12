@@ -26,7 +26,7 @@ class PublicShellLayout extends ConsumerStatefulWidget {
 
 class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  bool _modalBolsaAbierto = false;
+  bool _modalCarritoAbierto = false;
 
   @override
   void initState() {
@@ -53,6 +53,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
   }
 
   void _navegarAIndice(int idx) {
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
     switch (idx) {
       case 0:
         ref.read(favoritesProvider.notifier).setSoloFavoritos(false);
@@ -77,9 +78,10 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
     }
   }
 
-  void _abrirBolsaComprasModal(BuildContext context) {
-    if (_modalBolsaAbierto) return;
-    _modalBolsaAbierto = true;
+  void _abrirCarritoComprasModal(BuildContext context) {
+    if (_modalCarritoAbierto) return;
+    _modalCarritoAbierto = true;
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
 
     showModalBottomSheet(
       context: context,
@@ -112,7 +114,8 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
         );
       },
     ).whenComplete(() {
-      _modalBolsaAbierto = false;
+      _modalCarritoAbierto = false;
+      ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
       if (ref.read(cartProvider).cajonAbierto) {
         ref.read(cartProvider.notifier).cerrarCajon();
       }
@@ -184,7 +187,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
 
     ref.listen<CartState>(cartProvider, (prev, next) {
       if (next.cajonAbierto && !(prev?.cajonAbierto ?? false)) {
-        _abrirBolsaComprasModal(context);
+        _abrirCarritoComprasModal(context);
       }
     });
 
@@ -208,7 +211,10 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
               child: InkWell(
-                onTap: () => context.go('/admin'),
+                onTap: () {
+                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+                  context.go('/admin');
+                },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -248,7 +254,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
               ),
               child: const Icon(Icons.shopping_bag_outlined, size: 24, color: FashionColors.inkPrimary),
             ),
-            onPressed: () => _abrirBolsaComprasModal(context),
+            onPressed: () => _abrirCarritoComprasModal(context),
           ),
           const SizedBox(width: 8),
         ],

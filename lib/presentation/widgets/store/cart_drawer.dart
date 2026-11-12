@@ -98,7 +98,7 @@ class CartDrawerWidget extends ConsumerWidget {
                           const AtelierEmptyStateIllustration(
                             type: AtelierEmptyStateType.emptyBag,
                             size: 130,
-                            title: 'Tu bolsa está vacía',
+                            title: 'Tu carrito está vacío',
                             subtitle: 'Explora las piezas exclusivas de nuestro catálogo y viste tu propio estilo.',
                           ),
                           const SizedBox(height: 24),
@@ -185,10 +185,11 @@ class CartDrawerWidget extends ConsumerWidget {
                               ),
                               onDismissed: (_) {
                                 ref.read(cartProvider.notifier).eliminarPrenda(item.varianteId);
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                ScaffoldMessenger.of(context).clearSnackBars();
+                                  ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('"${item.nombre}" retirada de la bolsa'),
-                                    duration: const Duration(seconds: 2),
+                                    content: Text('"${item.nombre}" retirada del carrito'),
+                                    duration: const Duration(milliseconds: 1600),
                                     action: SnackBarAction(
                                       label: 'DESHACER',
                                       textColor: FashionColors.brandAccent,
@@ -223,6 +224,7 @@ class CartDrawerWidget extends ConsumerWidget {
                                           ? CachedNetworkImage(
                                               imageUrl: item.imagen,
                                               fit: BoxFit.cover,
+                                              memCacheWidth: 600,
                                               errorWidget: (_, __, ___) => const Center(
                                                 child: Icon(Icons.checkroom_rounded, size: 24, color: FashionColors.inkMuted),
                                               ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fashion_style_mobile/core/network/change_bus.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/models/payment/wompi_checkout_data.dart';
 import 'package:fashion_style_mobile/data/services/wompi_service.dart';
@@ -33,6 +34,8 @@ class WompiCheckoutModal {
     required Map<String, dynamic> cliente,
     bool cancelarAlCerrar = false,
   }) async {
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+
     // 1. Manejo de checkout simulado (pruebas / local sin llaves reales)
     if (pedido.simulado) {
       final simId = 'SIM-${DateTime.now().millisecondsSinceEpoch}';
@@ -42,10 +45,13 @@ class WompiCheckoutModal {
         final String statusFinal;
         if (estado == 'Pagado') {
           statusFinal = 'aprobado';
+          ChangeBus.instance.notifyAll(['pedidos', 'productos', 'inventarios', 'ventas', 'dashboard']);
         } else if (estado == 'Revision_Pago') {
           statusFinal = 'revision';
+          ChangeBus.instance.notifyAll(['pedidos', 'dashboard']);
         } else if (estado == 'Pendiente_Pago') {
           statusFinal = 'pendiente';
+          ChangeBus.instance.notifyAll(['pedidos', 'dashboard']);
         } else {
           statusFinal = 'error';
         }
@@ -140,10 +146,13 @@ class WompiCheckoutModal {
       final String statusFinal;
       if (estado == 'Pagado') {
         statusFinal = 'aprobado';
+        ChangeBus.instance.notifyAll(['pedidos', 'productos', 'inventarios', 'ventas', 'dashboard']);
       } else if (estado == 'Revision_Pago') {
         statusFinal = 'revision';
+        ChangeBus.instance.notifyAll(['pedidos', 'dashboard']);
       } else if (estado == 'Pendiente_Pago') {
         statusFinal = 'pendiente';
+        ChangeBus.instance.notifyAll(['pedidos', 'dashboard']);
       } else {
         statusFinal = 'error';
       }
