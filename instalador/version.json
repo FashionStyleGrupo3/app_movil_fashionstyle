@@ -1,8 +1,8 @@
 {
-  "version": "1.5.0",
-  "buildNumber": 9,
-  "commit": "v1.5.0-qa14fixes-webparity",
-  "updatedAt": "2026-11-12T12:00:00Z",
+  "version": "1.5.1",
+  "buildNumber": 10,
+  "commit": "v1.5.1-emulator-ui-fixes",
+  "updatedAt": "2026-11-12T15:00:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.5.0: Unificación de paleta corporativa y tipografía con Frontend Web, eliminación de marcas Atelier, resolución de los 14 bugs de QA (creación/edición y toggle de prendas con variantes y selector de fotos, exclusión mutua y eliminación de promociones, nuevo empleado y cambio de rol en vivo, bitácora de auditoría con filtros alineados, subida y refresco de foto de perfil, bloqueo de pedidos/órdenes canceladas, corrección de crash POS y chips de tallas, exportaciones reales en PDF/Excel, cálculo de promociones y stepper de carrito, y conexión Wompi segura)."
+  "notes": "Lanzamiento oficial v1.5.1: Corrección de 4 observaciones de UI en emulador (limpieza de AppBar pública y badge de carrito, contraste de iconos activos en barra inferior de Admin con píldora crema, reorganización en dos filas de filtros y botón + Nueva Venta en POS Mostrador evitando overflow de precio/$, y validación completa de variantes/precios con diálogo de confirmación en Creación de Prendas)."
 }

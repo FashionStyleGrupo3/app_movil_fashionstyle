@@ -404,17 +404,25 @@ class AdminShellLayout extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              activo ? iconoActivo : icono,
-              color: activo ? FashionColors.brandAccent : Colors.white70,
-              size: 22,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              decoration: BoxDecoration(
+                color: activo ? FashionColors.crema : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                activo ? iconoActivo : icono,
+                color: activo ? FashionColors.negro : Colors.white70,
+                size: 20,
+              ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               label,
               style: GoogleFonts.plusJakartaSans(
-                color: activo ? Colors.white : Colors.white60,
-                fontSize: 11,
+                color: activo ? FashionColors.crema : Colors.white60,
+                fontSize: 10,
                 fontWeight: activo ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
@@ -559,7 +567,7 @@ class AdminShellLayout extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         top: false,
         child: Container(
-          height: 60,
+          height: 64,
           decoration: const BoxDecoration(
             color: FashionColors.inkPrimary,
             border: Border(

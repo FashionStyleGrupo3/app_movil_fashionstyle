@@ -41,6 +41,7 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
   int? _categoriaId;
   int? _catalogoId;
   bool _guardando = false;
+  String? _errorMensaje;
   List<Map<String, dynamic>> _variantes = [];
   late List<Category> _categoriasLocales;
   late List<Catalog> _catalogosLocales;
@@ -211,31 +212,44 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
   }
 
   Future<void> _guardarPrenda() async {
+    setState(() => _errorMensaje = null);
     final nombre = _nombreCtrl.text.trim();
     if (nombre.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('El nombre de la prenda es obligatorio')));
+      setState(() => _errorMensaje = 'El nombre de la prenda es obligatorio.');
       return;
     }
 
     if (_variantes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Debes registrar al menos una talla para la prenda')));
+      setState(() => _errorMensaje = 'Debes registrar al menos una talla para la prenda.');
       return;
     }
 
+    final tallasVistas = <String>{};
     for (int i = 0; i < _variantes.length; i++) {
       final v = _variantes[i];
       final talla = v['talla']?.toString().trim() ?? '';
-      final precio = double.tryParse(v['precio']?.toString() ?? v['precio_venta']?.toString() ?? '') ?? 0;
+      final precioStr = v['precio']?.toString() ?? v['precio_venta']?.toString() ?? '';
+      final precio = double.tryParse(precioStr) ?? 0.0;
+
       if (talla.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('La talla en la fila #${i + 1} es obligatoria')),
-        );
+        setState(() => _errorMensaje = 'La talla en la fila #${i + 1} es obligatoria.');
         return;
       }
+
+      final tallaNorm = talla.toLowerCase();
+      if (tallasVistas.contains(tallaNorm)) {
+        setState(() => _errorMensaje = 'La talla "$talla" está repetida en varias filas. Cada variante debe tener una talla única.');
+        return;
+      }
+      tallasVistas.add(tallaNorm);
+
       if (precio <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('El precio de venta en la fila #${i + 1} debe ser mayor a 0')),
-        );
+        setState(() => _errorMensaje = 'El precio de venta para la talla "$talla" debe ser mayor a 0.');
+        return;
+      }
+
+      if (precio > 99999999) {
+        setState(() => _errorMensaje = 'El precio para la talla "$talla" excede el límite máximo permitido (\$99.999.999 COP).');
         return;
       }
     }
@@ -246,11 +260,16 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
 
       if (widget.prenda == null) {
         // --- 1. CREACIÓN ---
-        final variantesPayload = _variantes.map((v) {
+        final codigoAuto = 'FS-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+        final nombreSlug = nombre.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toUpperCase();
+
+        final variantesPayload = _variantes.asMap().entries.map((entry) {
+          final i = entry.key;
+          final v = entry.value;
           final talla = v['talla']?.toString().trim() ?? 'U';
           final sku = (v['sku'] != null && v['sku'].toString().trim().isNotEmpty)
               ? v['sku'].toString().trim()
-              : '${nombre.replaceAll(RegExp(r'\s+'), '-').toUpperCase()}-$talla-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+              : 'FS-$nombreSlug-$talla-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}-$i';
           final precio = double.tryParse(v['precio']?.toString() ?? v['precio_venta']?.toString() ?? '0') ?? 0.0;
           return {
             'talla': talla,
@@ -260,13 +279,14 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
         }).toList();
 
         final payload = {
+          'codigo': codigoAuto,
           'nombre': nombre,
           'descripcion': _descCtrl.text.trim(),
           'color': color,
           'activo': true,
           'publicado': true,
-          'categoria_id': _categoriaId,
-          'catalogo_id': _catalogoId,
+          if (_categoriaId != null) 'categoria_id': _categoriaId,
+          if (_catalogoId != null) 'catalogo_id': _catalogoId,
           'variantes': variantesPayload,
         };
 
@@ -275,7 +295,7 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
         final idProducto = dataRes is Map<String, dynamic> ? (dataRes['id_producto'] ?? dataRes['id']) : null;
 
         if (idProducto != null) {
-          // Ajuste de stock inicial en inventarios
+          // Ajuste de stock inicial en inventarios (lowercase tipo_movimiento y concepto requerido)
           final varsCreadas = (dataRes is Map && dataRes['variantes'] is List) ? dataRes['variantes'] as List : [];
           for (int i = 0; i < _variantes.length; i++) {
             final cant = int.tryParse(_variantes[i]['stock']?.toString() ?? '0') ?? 0;
@@ -286,9 +306,9 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
                   await ApiClient.instance.dio.post('/inventarios', data: {
                     'producto_id': idProducto,
                     'variante_id': varId,
-                    'tipo_movimiento': 'ENTRADA',
+                    'tipo_movimiento': 'entrada',
+                    'concepto': 'Stock inicial al registrar prenda',
                     'cantidad': cant,
-                    'motivo': 'Stock inicial al registrar prenda',
                   });
                 } catch (_) {}
               }
@@ -327,12 +347,14 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
         });
 
         // Actualizar o crear variantes
-        for (final v in _variantes) {
+        final nombreSlug = nombre.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toUpperCase();
+        for (int i = 0; i < _variantes.length; i++) {
+          final v = _variantes[i];
           final varId = v['id_variante'];
           final talla = v['talla']?.toString().trim() ?? 'U';
           final sku = (v['sku'] != null && v['sku'].toString().trim().isNotEmpty)
               ? v['sku'].toString().trim()
-              : '${nombre.replaceAll(RegExp(r'\s+'), '-').toUpperCase()}-$talla-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}';
+              : 'FS-$nombreSlug-$talla-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}-$i';
           final precio = double.tryParse(v['precio']?.toString() ?? v['precio_venta']?.toString() ?? '0') ?? 0.0;
           final cant = int.tryParse(v['stock']?.toString() ?? '0') ?? 0;
 
@@ -357,9 +379,9 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
                 await ApiClient.instance.dio.post('/inventarios', data: {
                   'producto_id': idProducto,
                   'variante_id': newVarId,
-                  'tipo_movimiento': 'ENTRADA',
+                  'tipo_movimiento': 'entrada',
+                  'concepto': 'Stock inicial de nueva variante',
                   'cantidad': cant,
-                  'motivo': 'Stock inicial de nueva variante',
                 });
               }
             } catch (_) {}
@@ -392,15 +414,12 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
       }
 
       widget.onGuardado();
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible guardar la prenda. Verifica los datos ingresados.')),
-            backgroundColor: FashionColors.peligro,
-          ),
-        );
+        setState(() {
+          _errorMensaje = ApiClient.obtenerMensajeError(e, 'No fue posible guardar la prenda. Verifica los datos ingresados.');
+        });
       }
     } finally {
       if (mounted) setState(() => _guardando = false);
@@ -440,7 +459,34 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
               widget.prenda != null ? 'Editar Prenda' : 'Nueva Prenda de Catálogo',
               style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            if (_errorMensaje != null)
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: FashionColors.statusDanger.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline_rounded, color: FashionColors.statusDanger, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMensaje!,
+                        style: const TextStyle(color: FashionColors.statusDanger, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => setState(() => _errorMensaje = null),
+                      child: const Icon(Icons.close, color: FashionColors.statusDanger, size: 16),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 4),
 
             // SECCIÓN DE FOTOGRAFÍAS / IMÁGENES
             Row(
@@ -662,6 +708,33 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
                   label: const Text('Agregar talla'),
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  const Text('Tallas sugeridas: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkMuted)),
+                  ...['XS', 'S', 'M', 'L', 'XL', 'Única'].map((t) => ActionChip(
+                    visualDensity: VisualDensity.compact,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: EdgeInsets.zero,
+                    label: Text(t, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      setState(() {
+                        final existeVacia = _variantes.indexWhere((v) => (v['talla']?.toString().trim() ?? '').isEmpty);
+                        if (existeVacia != -1) {
+                          _variantes[existeVacia]['talla'] = t;
+                        } else {
+                          _variantes.add({'talla': t, 'sku': '', 'precio': null, 'stock': 0});
+                        }
+                      });
+                    },
+                  )),
+                ],
+              ),
             ),
             ..._variantes.asMap().entries.map((entry) {
               final idx = entry.key;

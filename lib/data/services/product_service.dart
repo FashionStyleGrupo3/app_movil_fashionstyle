@@ -144,4 +144,22 @@ class ProductService {
       return [];
     }
   }
+
+  Future<Map<String, dynamic>> crearProducto(Map<String, dynamic> datos) async {
+    final response = await ApiClient.instance.dio.post('/productos', data: datos);
+    final data = ApiResponseParser.extractData(response);
+    if (data is Map<String, dynamic>) {
+      return data;
+    }
+    return {'id': data};
+  }
+
+  Future<Map<String, dynamic>> actualizarProducto(int id, Map<String, dynamic> datos) async {
+    final response = await ApiClient.instance.dio.patch('/productos/$id', data: datos);
+    final data = ApiResponseParser.extractData(response);
+    if (data is Map<String, dynamic>) {
+      return data;
+    }
+    return {};
+  }
 }

@@ -189,8 +189,8 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     );
   }
 
-  void _abrirFormularioPrenda([Product? prendaEditar]) {
-    showModalBottomSheet(
+  Future<void> _abrirFormularioPrenda([Product? prendaEditar]) async {
+    final guardado = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -202,6 +202,52 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
         onGuardado: _cargarDatos,
       ),
     );
+
+    if (guardado == true && mounted) {
+      _cargarDatos();
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: FashionColors.statusSuccess.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check_circle_rounded, color: FashionColors.statusSuccess, size: 24),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  prendaEditar != null ? '¡Prenda actualizada!' : '¡Prenda creada con éxito!',
+                  style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            prendaEditar != null
+                ? 'Los cambios en la prenda y sus variantes han sido guardados correctamente.'
+                : 'La prenda y sus variantes han sido creadas exitosamente en el catálogo.',
+            style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: FashionColors.inkPrimary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Entendido'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _chipFiltro(String valor, String etiqueta) {

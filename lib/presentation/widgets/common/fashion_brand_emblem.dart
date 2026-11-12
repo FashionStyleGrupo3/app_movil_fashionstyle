@@ -79,31 +79,15 @@ class FashionBrandHeader extends StatelessWidget {
             conSombra: false,
           ),
           const SizedBox(width: 10),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'FASHIONSTYLE',
-                style: GoogleFonts.spaceGrotesk(
-                  fontWeight: FontWeight.w700,
-                  fontSize: compacto ? 15 : 17,
-                  letterSpacing: -0.4,
-                  color: FashionColors.inkPrimary,
-                  height: 1.1,
-                ),
-              ),
-              Text(
-                'FASHIONSTYLE',
-                style: GoogleFonts.plusJakartaSans(
-                  fontWeight: FontWeight.w600,
-                  fontSize: compacto ? 8 : 9,
-                  letterSpacing: 1.6,
-                  color: FashionColors.brandAccent,
-                  height: 1.2,
-                ),
-              ),
-            ],
+          Text(
+            'FASHIONSTYLE',
+            style: GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.w700,
+              fontSize: compacto ? 15 : 17,
+              letterSpacing: -0.4,
+              color: FashionColors.inkPrimary,
+              height: 1.1,
+            ),
           ),
         ],
       ),

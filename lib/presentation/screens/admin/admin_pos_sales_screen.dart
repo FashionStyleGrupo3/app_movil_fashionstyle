@@ -171,35 +171,44 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
+                // FILA 1: Chips de medios de pago en ancho completo
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _chipMedio('', 'Todos'),
+                      ...mediosPagoPos.entries.map((e) => _chipMedio(e.key, e.value)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // FILA 2: Botón + Nueva Venta expandido y Exportar compacto
                 Row(
                   children: [
                     Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _chipMedio('', 'Todos'),
-                            ...mediosPagoPos.entries.map((e) => _chipMedio(e.key, e.value)),
-                          ],
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FashionColors.primaryCorporate,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
+                        onPressed: _abrirModalNuevaVenta,
+                        icon: const Icon(Icons.point_of_sale, size: 18),
+                        label: Text('+ Nueva Venta', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700)),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.file_download_outlined),
-                      tooltip: 'Exportar Reporte (PDF / Excel)',
-                      onPressed: _exportarVentasPos,
-                    ),
-                    const SizedBox(width: 4),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.primaryCorporate,
-                        foregroundColor: Colors.white,
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: FashionColors.inkPrimary,
+                        side: const BorderSide(color: FashionColors.borderSubtle),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: _abrirModalNuevaVenta,
-                      icon: const Icon(Icons.point_of_sale, size: 16),
-                      label: Text('Nueva Venta', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700)),
+                      icon: const Icon(Icons.file_download_outlined, size: 18),
+                      label: Text('Exportar', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
+                      onPressed: _exportarVentasPos,
                     ),
                   ],
                 ),
@@ -230,30 +239,59 @@ class _AdminPosSalesScreenState extends ConsumerState<AdminPosSalesScreen> {
                                   side: const BorderSide(color: FashionColors.borderSubtle),
                                 ),
                                 child: ExpansionTile(
+                                  tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                                   title: Row(
                                     children: [
-                                      Text(v.codigo, style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary)),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: esActiva ? FashionColors.statusSuccess.withValues(alpha: 0.12) : FashionColors.statusDanger.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: esActiva ? FashionColors.statusSuccess.withValues(alpha: 0.3) : FashionColors.statusDanger.withValues(alpha: 0.3)),
-                                        ),
-                                        child: Text(
-                                          v.medioPago.toUpperCase(),
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: esActiva ? FashionColors.statusSuccess : FashionColors.statusDanger,
-                                          ),
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                v.codigo,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.jetBrainsMono(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 12,
+                                                  color: FashionColors.inkPrimary,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: esActiva
+                                                    ? FashionColors.statusSuccess.withValues(alpha: 0.12)
+                                                    : FashionColors.statusDanger.withValues(alpha: 0.12),
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: esActiva
+                                                      ? FashionColors.statusSuccess.withValues(alpha: 0.3)
+                                                      : FashionColors.statusDanger.withValues(alpha: 0.3),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                v.medioPago.toUpperCase(),
+                                                style: TextStyle(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: esActiva ? FashionColors.statusSuccess : FashionColors.statusDanger,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const Spacer(),
+                                      const SizedBox(width: 8),
                                       Text(
                                         CurrencyFormatter.formatearCOP(v.total),
-                                        style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary),
+                                        style: GoogleFonts.jetBrainsMono(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                          color: FashionColors.inkPrimary,
+                                        ),
                                       ),
                                     ],
                                   ),

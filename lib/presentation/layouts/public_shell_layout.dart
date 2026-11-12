@@ -137,7 +137,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
             ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
             : const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: activo ? FashionColors.brandAccent : Colors.transparent,
+          color: activo ? Colors.white.withValues(alpha: 0.18) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -204,141 +204,41 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
           onTap: () => context.go('/'),
         ),
         actions: [
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-            icon: const Icon(Icons.search_rounded, size: 22, color: FashionColors.inkPrimary),
-            tooltip: 'Buscar en catálogo',
-            onPressed: () => context.go('/catalogo'),
-          ),
-          if (authState.tieneAccesoAdmin)
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-              icon: const Icon(Icons.admin_panel_settings_outlined, size: 22, color: FashionColors.atelierJade),
-              tooltip: 'Panel Administrativo',
-              onPressed: () => context.go('/admin'),
-            ),
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-            tooltip: 'Favoritos',
-            icon: Badge(
-              isLabelVisible: favsState.total > 0,
-              backgroundColor: FashionColors.brandAccent,
-              label: Text('${favsState.total}', style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
-              child: Icon(
-                favsState.soloFavoritos ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                size: 22,
-                color: favsState.soloFavoritos ? FashionColors.statusDanger : FashionColors.inkPrimary,
+          if (authState.esPersonal)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: InkWell(
+                onTap: () => context.go('/admin'),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: FashionColors.inkPrimary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.admin_panel_settings_rounded, size: 16, color: FashionColors.crema),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Admin',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: FashionColors.crema,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            onPressed: () {
-              final nuevo = !favsState.soloFavoritos;
-              ref.read(favoritesProvider.notifier).setSoloFavoritos(nuevo);
-              context.go('/catalogo');
-            },
-          ),
-          if (authState.estaAutenticado)
-            PopupMenuButton<String>(
-              tooltip: 'Mi cuenta',
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-              icon: CircleAvatar(
-                radius: 14,
-                backgroundColor: FashionColors.surfaceMuted,
-                child: Text(
-                  authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0].toUpperCase() : 'U',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: FashionColors.inkPrimary),
-                ),
-              ),
-              offset: const Offset(0, 48),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              onSelected: (valor) {
-                switch (valor) {
-                  case 'perfil':
-                    context.go('/perfil');
-                    break;
-                  case 'admin':
-                    context.go('/admin');
-                    break;
-                  case 'logout':
-                    ref.read(authProvider.notifier).cerrarSesion();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Sesión cerrada exitosamente')),
-                    );
-                    context.go('/');
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  enabled: false,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        authState.nombreUsuario,
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: FashionColors.inkPrimary),
-                      ),
-                      Text(
-                        authState.correoUsuario,
-                        style: const TextStyle(fontSize: 12, color: FashionColors.inkSecondary),
-                      ),
-                      const Divider(),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'perfil',
-                  child: Row(
-                    children: [
-                      Icon(Icons.person_outline, size: 20, color: FashionColors.inkPrimary),
-                      SizedBox(width: 10),
-                      Text('Mi perfil'),
-                    ],
-                  ),
-                ),
-                if (authState.tieneAccesoAdmin)
-                  const PopupMenuItem(
-                    value: 'admin',
-                    child: Row(
-                      children: [
-                        Icon(Icons.dashboard_outlined, size: 20, color: FashionColors.atelierJade),
-                        SizedBox(width: 10),
-                        Text('Panel de control'),
-                      ],
-                    ),
-                  ),
-                const PopupMenuItem(
-                  value: 'logout',
-                  child: Row(
-                    children: [
-                      Icon(Icons.logout, size: 20, color: FashionColors.statusDanger),
-                      SizedBox(width: 10),
-                      Text('Cerrar sesión', style: TextStyle(color: FashionColors.statusDanger)),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          else
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-              icon: const Icon(Icons.person_outline_rounded, size: 22, color: FashionColors.inkPrimary),
-              tooltip: 'Iniciar sesión',
-              onPressed: () => context.go('/login'),
-            ),
           IconButton(
             visualDensity: VisualDensity.compact,
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
-            tooltip: 'Bolsa de compras',
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+            tooltip: 'Carrito de compras',
             icon: Badge(
               isLabelVisible: cartState.totalPrendas > 0,
               backgroundColor: FashionColors.brandAccent,
@@ -346,7 +246,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
                 '${cartState.totalPrendas}',
                 style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
               ),
-              child: const Icon(Icons.shopping_bag_outlined, size: 22, color: FashionColors.inkPrimary),
+              child: const Icon(Icons.shopping_bag_outlined, size: 24, color: FashionColors.inkPrimary),
             ),
             onPressed: () => _abrirBolsaComprasModal(context),
           ),
