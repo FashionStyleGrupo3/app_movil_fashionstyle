@@ -29,7 +29,7 @@ class PasswordRequirementsWidget extends StatelessWidget {
               const Icon(Icons.shield_outlined, size: 16, color: FashionColors.inkPrimary),
               const SizedBox(width: 6),
               Text(
-                'Requisitos de seguridad atelier:',
+                'Requisitos de seguridad:',
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,

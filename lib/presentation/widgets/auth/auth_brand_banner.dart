@@ -74,7 +74,7 @@ class AuthBrandBanner extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'ATELIER MÓVIL OFICIAL',
+                          'FASHIONSTYLE OFICIAL',
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w600,

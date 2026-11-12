@@ -53,28 +53,54 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
 
   void _agregarPrenda(Product p, ProductVariant v) {
     if (v.stock <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Esta talla no tiene stock disponible')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('La talla "${v.talla}" de "${p.nombre}" no tiene stock disponible'),
+          backgroundColor: FashionColors.peligro,
+          duration: const Duration(seconds: 2),
+        ),
+      );
       return;
     }
 
+    final idVariante = v.idVariante > 0 ? v.idVariante : (v.id > 0 ? v.id : 0);
+    final precioItem = v.precioVenta > 0 ? v.precioVenta : p.precioMinimo;
+
     setState(() {
-      final idx = _bolsa.indexWhere((it) => it['variante_id'] == v.idVariante);
+      final idx = _bolsa.indexWhere((it) => it['variante_id'] == idVariante);
       if (idx != -1) {
         if (_bolsa[idx]['cantidad'] < v.stock) {
           _bolsa[idx]['cantidad'] += 1;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Stock máximo alcanzado para talla "${v.talla}" (${v.stock} disponibles)'),
+              backgroundColor: FashionColors.peligro,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          return;
         }
       } else {
         _bolsa.add({
-          'variante_id': v.idVariante,
+          'variante_id': idVariante,
           'nombre': p.nombre,
           'talla': v.talla,
           'sku': v.sku,
-          'precio': v.precioVenta > 0 ? v.precioVenta : p.precioMinimo,
+          'precio': precioItem,
           'cantidad': 1,
           'max_stock': v.stock,
         });
       }
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Agregado: ${p.nombre} (${v.talla}) · ${CurrencyFormatter.formatearCOP(precioItem)}'),
+        duration: const Duration(milliseconds: 900),
+        backgroundColor: FashionColors.verdeExito,
+      ),
+    );
   }
 
   Future<void> _cobrarVenta() async {
@@ -105,7 +131,10 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Venta POS registrada: ${venta.codigo}')),
+          SnackBar(
+            content: Text('Venta POS registrada: ${venta.codigo}'),
+            backgroundColor: FashionColors.verdeExito,
+          ),
         );
         InvoicePdfGenerator.generarYCompartirReciboPos(venta);
       }
@@ -128,7 +157,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.92,
       decoration: const BoxDecoration(
-        color: FashionColors.surfaceCard,
+        color: FashionColors.backgroundCanvas,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
@@ -146,7 +175,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: FashionColors.borderSubtle,
+                color: FashionColors.bordeClaro,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -156,7 +185,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
             children: [
               Text(
                 'Caja Mostrador (POS)',
-                style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.textoPrincipal),
               ),
               IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
             ],
@@ -165,11 +194,15 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
 
           // Buscador de prendas
           TextField(
-            decoration: const InputDecoration(
+            style: GoogleFonts.poppins(fontSize: 13),
+            decoration: InputDecoration(
               hintText: 'Buscar prendas para agregar a la venta...',
-              prefixIcon: Icon(Icons.search, size: 20),
-              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-              border: OutlineInputBorder(),
+              hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: FashionColors.textoMuted),
+              prefixIcon: const Icon(Icons.search, size: 20),
+              contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+              filled: true,
+              fillColor: FashionColors.surfaceSecondary,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
             ),
             onChanged: (val) => setState(() => _busqueda = val),
           ),
@@ -177,7 +210,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
 
           // Catálogo rápido de selección
           SizedBox(
-            height: 120,
+            height: 130,
             child: _cargandoProds
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
@@ -189,32 +222,56 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
                         return const SizedBox.shrink();
                       }
                       return Container(
-                        width: 140,
+                        width: 160,
                         margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(border: Border.all(color: FashionColors.grisBorde), borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: FashionColors.surfaceSecondary,
+                          border: Border.all(color: FashionColors.bordeClaro),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(p.nombre, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                            Text(CurrencyFormatter.formatearCOP(p.precioMinimo), style: const TextStyle(fontSize: 10, color: FashionColors.rosaCorporativo, fontWeight: FontWeight.bold)),
+                            Text(
+                              p.nombre,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 11.5, color: FashionColors.textoPrincipal),
+                            ),
+                            Text(
+                              CurrencyFormatter.formatearCOP(p.precioMinimo),
+                              style: GoogleFonts.poppins(fontSize: 10.5, color: FashionColors.primaryCorporate, fontWeight: FontWeight.bold),
+                            ),
                             const Spacer(),
                             Wrap(
-                              spacing: 2,
-                              children: p.variantes.map((v) => InkWell(
-                                onTap: () => _agregarPrenda(p, v),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: v.stock > 0 ? FashionColors.negroElegante : FashionColors.fondoClaro,
-                                    borderRadius: BorderRadius.circular(4),
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: p.variantes.map((v) {
+                                final disponible = v.stock > 0;
+                                return Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () => _agregarPrenda(p, v),
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: disponible ? FashionColors.primaryCorporate : FashionColors.bordeClaro.withValues(alpha: 0.4),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        v.talla.toUpperCase(),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 10,
+                                          color: disponible ? Colors.white : FashionColors.textoMuted,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  child: Text(
-                                    v.talla,
-                                    style: TextStyle(fontSize: 9, color: v.stock > 0 ? Colors.white : FashionColors.textoMuted, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              )).toList(),
+                                );
+                              }).toList(),
                             ),
                           ],
                         ),
@@ -224,45 +281,73 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
           ),
 
           const SizedBox(height: 10),
-          const Divider(),
+          const Divider(color: FashionColors.bordeClaro),
 
           // Bolsa de mostrador
           Expanded(
             child: _bolsa.isEmpty
-                ? const Center(child: Text('Toca una talla arriba para agregar a la venta de mostrador'))
+                ? Center(
+                    child: Text(
+                      'Toca una talla arriba para agregar a la venta de mostrador',
+                      style: GoogleFonts.poppins(color: FashionColors.textoMuted, fontSize: 13),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: _bolsa.length,
                     itemBuilder: (context, index) {
                       final it = _bolsa[index];
-                      return ListTile(
-                        dense: true,
-                        title: Text('${it['nombre']} (${it['talla']})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                        subtitle: Text('${CurrencyFormatter.formatearCOP(it['precio'])} x${it['cantidad']}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove, size: 16),
-                              onPressed: () {
-                                setState(() {
-                                  if (it['cantidad'] > 1) {
-                                    it['cantidad'] -= 1;
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        decoration: BoxDecoration(
+                          color: FashionColors.surfaceSecondary,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: FashionColors.bordeClaro),
+                        ),
+                        child: ListTile(
+                          dense: true,
+                          title: Text(
+                            '${it['nombre']} (${it['talla']})',
+                            style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 12.5, color: FashionColors.textoPrincipal),
+                          ),
+                          subtitle: Text(
+                            '${CurrencyFormatter.formatearCOP(it['precio'])} x${it['cantidad']}',
+                            style: GoogleFonts.poppins(fontSize: 11, color: FashionColors.textoMuted),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove, size: 16),
+                                onPressed: () {
+                                  setState(() {
+                                    if (it['cantidad'] > 1) {
+                                      it['cantidad'] -= 1;
+                                    } else {
+                                      _bolsa.removeAt(index);
+                                    }
+                                  });
+                                },
+                              ),
+                              Text('${it['cantidad']}', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13)),
+                              IconButton(
+                                icon: const Icon(Icons.add, size: 16),
+                                onPressed: () {
+                                  if (it['cantidad'] < it['max_stock']) {
+                                    setState(() => it['cantidad'] += 1);
                                   } else {
-                                    _bolsa.removeAt(index);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Stock máximo alcanzado (${it['max_stock']})'),
+                                        backgroundColor: FashionColors.peligro,
+                                        duration: const Duration(seconds: 1),
+                                      ),
+                                    );
                                   }
-                                });
-                              },
-                            ),
-                            Text('${it['cantidad']}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                            IconButton(
-                              icon: const Icon(Icons.add, size: 16),
-                              onPressed: () {
-                                if (it['cantidad'] < it['max_stock']) {
-                                  setState(() => it['cantidad'] += 1);
-                                }
-                              },
-                            ),
-                          ],
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -275,24 +360,30 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   initialValue: _medioPago,
-                  decoration: const InputDecoration(labelText: 'Medio de pago', border: OutlineInputBorder()),
+                  style: GoogleFonts.poppins(fontSize: 13, color: FashionColors.textoPrincipal),
+                  decoration: InputDecoration(
+                    labelText: 'Medio de pago',
+                    filled: true,
+                    fillColor: FashionColors.surfaceSecondary,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
+                  ),
                   items: mediosPagoPos.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value, style: const TextStyle(fontSize: 12)))).toList(),
                   onChanged: (v) => setState(() => _medioPago = v ?? 'efectivo'),
                 ),
               ),
               const SizedBox(width: 12),
               ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 120),
+                constraints: const BoxConstraints(maxWidth: 130),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Total:', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary)),
+                    Text('Total:', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.textoMuted)),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerRight,
                       child: Text(
                         CurrencyFormatter.formatearCOP(_totalBolsa),
-                        style: GoogleFonts.jetBrainsMono(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                        style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.textoPrincipal),
                       ),
                     ),
                   ],
@@ -306,7 +397,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
             height: 48,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: FashionColors.brandAccent,
+                backgroundColor: FashionColors.primaryCorporate,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
@@ -314,7 +405,7 @@ class _ModalNuevaVentaPosState extends State<ModalNuevaVentaPos> {
               icon: _procesandoCobro ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Icon(Icons.check),
               label: Text(
                 _procesandoCobro ? 'Procesando...' : 'Cobrar e Imprimir Comprobante',
-                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 14),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 13),
               ),
             ),
           ),

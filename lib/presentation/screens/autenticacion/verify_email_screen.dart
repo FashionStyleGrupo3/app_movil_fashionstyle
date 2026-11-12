@@ -136,10 +136,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                     height: 60,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: FashionColors.atelierJade.withValues(alpha: 0.12),
+                      color: FashionColors.slateAccent.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.mark_email_read_outlined, size: 32, color: FashionColors.atelierJade),
+                    child: const Icon(Icons.mark_email_read_outlined, size: 32, color: FashionColors.slateAccent),
                   ),
                   const SizedBox(height: 18),
                   Text(
@@ -153,7 +153,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Hemos enviado un código de 6 dígitos a $correo. Ingrésalo para activar tu cuenta atelier.',
+                    'Hemos enviado un código de 6 dígitos a $correo. Ingrésalo para activar tu cuenta.',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary),
                   ),

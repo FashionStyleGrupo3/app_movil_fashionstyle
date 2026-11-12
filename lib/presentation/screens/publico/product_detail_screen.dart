@@ -179,10 +179,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       return;
     }
 
+    final precioBase = _varianteSeleccionada!.precioVenta > 0
+        ? _varianteSeleccionada!.precioVenta
+        : _producto!.precioMinimo;
+    final infoPrecio = PromotionService.instance.calcularPrecioPromocional(
+      _producto!,
+      precioBase,
+      _promociones,
+    );
+
     ref.read(cartProvider.notifier).agregarPrenda(
           _producto!,
           _varianteSeleccionada!,
           _cantidad,
+          infoPrecio.precioFinal,
+          infoPrecio.precioOriginal,
         );
 
     ScaffoldMessenger.of(context).showSnackBar(

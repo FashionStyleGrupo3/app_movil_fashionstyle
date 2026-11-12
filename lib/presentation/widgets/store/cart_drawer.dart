@@ -16,7 +16,7 @@ class CartDrawerWidget extends ConsumerWidget {
 
   Future<void> _abrirWhatsApp(BuildContext context, List<CartItem> items) async {
     const numero = '573001234567';
-    var texto = 'Hola Servicio al Cliente FashionStyle Atelier, requiero asistencia con mi selección:\n';
+    var texto = 'Hola Servicio al Cliente FashionStyle, requiero asistencia con mi selección:\n';
     if (items.isNotEmpty) {
       for (final item in items) {
         texto += '- ${item.nombre} (Talla: ${item.talla}) x${item.cantidad}\n';
@@ -40,7 +40,7 @@ class CartDrawerWidget extends ConsumerWidget {
       color: FashionColors.canvasBackground,
       child: Column(
         children: [
-          // Header de la Bolsa Atelier
+          // Header del Carrito de Compras
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             color: FashionColors.surfaceCard,
@@ -55,7 +55,7 @@ class CartDrawerWidget extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Bolsa Atelier',
+                          'Carrito de Compras',
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -78,7 +78,10 @@ class CartDrawerWidget extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.close_rounded, color: FashionColors.inkPrimary, size: 22),
                   tooltip: 'Cerrar',
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    ref.read(cartProvider.notifier).cerrarCajon();
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             ),
@@ -98,7 +101,7 @@ class CartDrawerWidget extends ConsumerWidget {
                             type: AtelierEmptyStateType.emptyBag,
                             size: 130,
                             title: 'Tu bolsa está vacía',
-                            subtitle: 'Explora las piezas exclusivas de nuestro atelier y confecciona tu propio estilo.',
+                            subtitle: 'Explora las piezas exclusivas de nuestro catálogo y viste tu propio estilo.',
                           ),
                           const SizedBox(height: 24),
                           ElevatedButton.icon(
@@ -117,6 +120,7 @@ class CartDrawerWidget extends ConsumerWidget {
                               ),
                             ),
                             onPressed: () {
+                              ref.read(cartProvider.notifier).cerrarCajon();
                               Navigator.pop(context);
                               context.go('/catalogo');
                             },
@@ -285,6 +289,22 @@ class CartDrawerWidget extends ConsumerWidget {
                                                     color: FashionColors.inkSecondary,
                                                   ),
                                                 ),
+                                                const SizedBox(width: 6),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                                  decoration: BoxDecoration(
+                                                    color: FashionColors.statusDanger.withValues(alpha: 0.12),
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                  child: Text(
+                                                    '-${item.porcentajeDescuento}%',
+                                                    style: GoogleFonts.jetBrainsMono(
+                                                      fontSize: 9.5,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: FashionColors.statusDanger,
+                                                    ),
+                                                  ),
+                                                ),
                                               ],
                                             ],
                                           ),
@@ -304,12 +324,14 @@ class CartDrawerWidget extends ConsumerWidget {
                                                       icon: const Icon(Icons.remove_rounded, size: 16),
                                                       padding: const EdgeInsets.all(4),
                                                       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                                      onPressed: () {
-                                                        ref.read(cartProvider.notifier).actualizarCantidad(
-                                                              item.varianteId,
-                                                              item.cantidad - 1,
-                                                            );
-                                                      },
+                                                      onPressed: item.cantidad > 1
+                                                          ? () {
+                                                              ref.read(cartProvider.notifier).actualizarCantidad(
+                                                                    item.varianteId,
+                                                                    item.cantidad - 1,
+                                                                  );
+                                                            }
+                                                          : null,
                                                     ),
                                                     Padding(
                                                       padding: const EdgeInsets.symmetric(horizontal: 8),

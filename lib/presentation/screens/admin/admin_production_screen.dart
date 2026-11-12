@@ -451,7 +451,8 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
         itemBuilder: (context, index) {
           final o = _ordenes[index];
           final id = o['id_orden'] ?? o['id'];
-          final estado = o['estado']?.toString() ?? 'planificada';
+          final estado = (o['estado']?.toString() ?? 'planificada').toLowerCase();
+          final esTerminada = estado == 'completada' || estado == 'cancelada' || estado == 'cancelado' || estado == 'rechazada';
 
           return Card(
             elevation: 0,
@@ -463,21 +464,35 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                 'Volumen: ${o['cantidad']} prendas · Costo: ${CurrencyFormatter.formatearCOP(JsonParser.toDouble(o['costo_estimado']))}',
                 style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
               ),
-              trailing: estado != 'completada'
+              trailing: !esTerminada
                   ? ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: FashionColors.statusSuccess, foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(backgroundColor: FashionColors.verdeExito, foregroundColor: Colors.white),
                       onPressed: () async {
                         try {
                           await ProductionService.instance.completarOrdenProduccion(id);
                           _cargarTodo();
                         } catch (_) {}
                       },
-                      child: Text('Completar', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
+                      child: Text('Completar', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700)),
                     )
                   : Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: FashionColors.statusSuccess.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
-                      child: Text('Completada', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w700, color: FashionColors.statusSuccess)),
+                      decoration: BoxDecoration(
+                        color: estado.contains('cancel') || estado.contains('rechaz')
+                            ? FashionColors.peligro.withValues(alpha: 0.12)
+                            : FashionColors.verdeExito.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        estado.toUpperCase(),
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: estado.contains('cancel') || estado.contains('rechaz')
+                              ? FashionColors.peligro
+                              : FashionColors.verdeExito,
+                        ),
+                      ),
                     ),
             ),
           );

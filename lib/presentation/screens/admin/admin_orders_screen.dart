@@ -12,6 +12,7 @@ import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dar
 import 'package:fashion_style_mobile/presentation/widgets/admin/orders/bulk_invoice_upload_sheet.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/orders/create_invoice_sheet.dart';
 import 'package:fashion_style_mobile/presentation/widgets/admin/orders/dispatch_sheet.dart';
+import 'package:fashion_style_mobile/core/utils/admin_export_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AdminOrdersAndInvoicesScreen extends ConsumerStatefulWidget {
@@ -100,8 +101,8 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) => ModalGestionDespachoSheet(
         pedido: pedido,
         onActualizado: _cargarPedidos,
@@ -113,8 +114,8 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) => ModalCrearFacturaSheet(onCreada: _cargarFacturas),
     );
   }
@@ -123,9 +124,39 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) => ModalCargaMasivaFacturasSheet(onCompletada: _cargarFacturas),
+    );
+  }
+
+  void _exportarPedidos() {
+    if (_pedidos.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay pedidos para exportar')),
+      );
+      return;
+    }
+
+    final encabezados = ['Referencia', 'Fecha', 'Cliente', 'Estado', 'Total', 'Transportadora', 'Guía'];
+    final filas = _pedidos.map((p) {
+      return [
+        p.referencia,
+        p.fechaPedido ?? '',
+        p.clienteNombre,
+        OrderService.estadosPedido[p.estado] ?? p.estado,
+        CurrencyFormatter.formatearCOP(p.total),
+        p.empresaTransportadora,
+        p.numeroGuia,
+      ];
+    }).toList();
+
+    AdminExportDialog.mostrarDialogoExportacion(
+      context,
+      titulo: 'Reporte de Pedidos y Despachos',
+      encabezados: encabezados,
+      filas: filas,
+      nombreArchivo: 'pedidos_despacho_${DateTime.now().millisecondsSinceEpoch}',
     );
   }
 
@@ -187,17 +218,29 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
                 ],
               ),
               const SizedBox(height: 10),
-              TextField(
-                decoration: const InputDecoration(
-                  hintText: 'Buscar por referencia, cliente o guía...',
-                  prefixIcon: Icon(Icons.search, size: 18),
-                  contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (val) {
-                  _busquedaPedido = val;
-                  _cargarPedidos();
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        hintText: 'Buscar por referencia, cliente o guía...',
+                        prefixIcon: Icon(Icons.search, size: 18),
+                        contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (val) {
+                        _busquedaPedido = val;
+                        _cargarPedidos();
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.file_download_outlined),
+                    tooltip: 'Exportar Pedidos (PDF / Excel)',
+                    onPressed: _exportarPedidos,
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               SingleChildScrollView(
@@ -298,15 +341,24 @@ class _AdminOrdersAndInvoicesScreenState extends ConsumerState<AdminOrdersAndInv
                               const SizedBox(height: 10),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: FashionColors.brandAccent,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () => _abrirModalGestionDespacho(p),
-                                  icon: const Icon(Icons.local_shipping, size: 16),
-                                  label: Text('Gestionar Despacho', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
+                                child: Builder(
+                                  builder: (context) {
+                                    final est = p.estado.toLowerCase();
+                                    final estaBloqueado = est == 'cancelado' || est == 'rechazado' || est == 'entregado';
+                                    return ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: estaBloqueado ? FashionColors.textoMuted.withValues(alpha: 0.3) : FashionColors.primaryCorporate,
+                                        foregroundColor: estaBloqueado ? FashionColors.textoMuted : Colors.white,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      onPressed: estaBloqueado ? null : () => _abrirModalGestionDespacho(p),
+                                      icon: Icon(estaBloqueado ? Icons.lock_outline : Icons.local_shipping, size: 16),
+                                      label: Text(
+                                        estaBloqueado ? 'Pedido ${p.estado}' : 'Gestionar Despacho',
+                                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             ],

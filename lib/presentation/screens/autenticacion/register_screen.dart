@@ -164,7 +164,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Únete a Fashion Style y disfruta de confección atelier y lanzamientos exclusivos.',
+                          'Únete a Fashion Style y disfruta de lanzamientos exclusivos y calidad garantizada.',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             color: FashionColors.inkSecondary,

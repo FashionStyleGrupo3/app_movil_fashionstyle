@@ -69,6 +69,8 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
   Future<ImageSource?> _seleccionarOrigenImagen() async {
     return showModalBottomSheet<ImageSource>(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: FashionColors.surfaceCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -148,23 +150,27 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
       final res = await UserService.instance.subirFotoPerfil(foto.path, foto.name);
       final fotoUrl = res['foto_perfil'] ?? res['foto'] ?? res['url'] ?? res['foto_url'];
       if (fotoUrl != null) {
-        ref.read(authProvider.notifier).actualizarUsuario({
+        await ref.read(authProvider.notifier).actualizarUsuario({
           'foto_perfil': fotoUrl,
           'foto': fotoUrl,
           ...res,
         });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Foto de perfil actualizada correctamente')),
-          );
-        }
+      }
+      await ref.read(authProvider.notifier).refrescarSesion();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Foto de perfil actualizada correctamente'),
+            backgroundColor: FashionColors.verdeExito,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo subir la imagen de perfil.')),
-            backgroundColor: FashionColors.statusDanger,
+            backgroundColor: FashionColors.peligro,
           ),
         );
       }
@@ -177,13 +183,17 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     setState(() => _subiendoFoto = true);
     try {
       await UserService.instance.quitarFotoPerfil();
-      ref.read(authProvider.notifier).actualizarUsuario({
+      await ref.read(authProvider.notifier).actualizarUsuario({
         'foto_perfil': null,
         'foto': null,
       });
+      await ref.read(authProvider.notifier).refrescarSesion();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto de perfil eliminada')),
+          const SnackBar(
+            content: Text('Foto de perfil eliminada'),
+            backgroundColor: FashionColors.verdeExito,
+          ),
         );
       }
     } catch (e) {
@@ -191,7 +201,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible quitar la foto de perfil.')),
-            backgroundColor: FashionColors.statusDanger,
+            backgroundColor: FashionColors.peligro,
           ),
         );
       }
@@ -404,6 +414,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
                             : (authState.fotoUsuario != null && authState.fotoUsuario!.trim().isNotEmpty)
                                 ? Image.network(
                                     ImageUrlResolver.resolve(authState.fotoUsuario!),
+                                    key: ValueKey(authState.fotoUsuario),
                                     fit: BoxFit.cover,
                                     errorBuilder: (_, __, ___) => _avatarFallback(authState),
                                   )

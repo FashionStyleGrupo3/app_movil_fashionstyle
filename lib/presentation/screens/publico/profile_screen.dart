@@ -129,6 +129,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                         child: (authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty)
                             ? Image.network(
                                 ImageUrlResolver.resolve(authState.fotoUsuario!),
+                                key: ValueKey(authState.fotoUsuario),
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) => _avatarFallback(authState),
                               )
@@ -171,23 +172,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
                                 decoration: BoxDecoration(
                                   color: authState.tieneAccesoAdmin
                                       ? FashionColors.editorialGoldDark.withValues(alpha: 0.18)
-                                      : FashionColors.atelierJade.withValues(alpha: 0.18),
+                                      : FashionColors.slateAccent.withValues(alpha: 0.18),
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
                                     color: authState.tieneAccesoAdmin
                                         ? FashionColors.editorialGoldDark.withValues(alpha: 0.4)
-                                        : FashionColors.atelierJade.withValues(alpha: 0.4),
+                                        : FashionColors.slateAccent.withValues(alpha: 0.4),
                                   ),
                                 ),
                                 child: Text(
-                                  authState.tieneAccesoAdmin ? 'STAFF / ADMIN' : 'CLIENTE ATELIER',
+                                  authState.tieneAccesoAdmin ? 'STAFF / ADMIN' : 'CLIENTE',
                                   style: GoogleFonts.spaceGrotesk(
                                     fontSize: 9.5,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 1.1,
                                     color: authState.tieneAccesoAdmin
                                         ? FashionColors.editorialGoldDark
-                                        : FashionColors.atelierJade,
+                                        : FashionColors.slateAccent,
                                   ),
                                 ),
                               ),

@@ -96,7 +96,7 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
 
   Future<void> _toggleActivo(Product p, bool nuevoValor) async {
     try {
-      await ApiClient.instance.dio.patch('/productos/${p.idProducto}/toggle-activo');
+      await ProductService.instance.toggleActivo(p.idProducto);
       _cargarDatos();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -106,27 +106,14 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
           ),
         );
       }
-    } catch (_) {
-      try {
-        await ApiClient.instance.dio.put('/productos/${p.idProducto}', data: {'activo': nuevoValor});
-        _cargarDatos();
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(nuevoValor ? 'Prenda "${p.nombre}" activada' : 'Prenda "${p.nombre}" desactivada'),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar el estado de la prenda.')),
-              backgroundColor: FashionColors.peligro,
-            ),
-          );
-        }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar el estado de la prenda.')),
+            backgroundColor: FashionColors.peligro,
+          ),
+        );
       }
     }
   }
@@ -196,8 +183,8 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) => ModalPromocionesSheet(productos: _productos),
     );
   }
@@ -206,8 +193,8 @@ class _AdminGarmentsScreenState extends ConsumerState<AdminGarmentsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) => ModalFormularioPrenda(
         prenda: prendaEditar,
         categorias: _categorias,

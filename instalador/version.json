@@ -1,8 +1,8 @@
 {
-  "version": "1.4.0",
-  "buildNumber": 8,
-  "commit": "v1.4.0-sqa-editorial",
-  "updatedAt": "2026-11-11T16:30:31Z",
+  "version": "1.5.0",
+  "buildNumber": 9,
+  "commit": "v1.5.0-qa14fixes-webparity",
+  "updatedAt": "2026-11-12T12:00:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.4.0: Login Screen editorial de pagina completa, resolucion del 100% de desbordamientos RenderFlex en dispositivos compactos (360x780, escala 1.15), paridad con funciones web (+Categoria/+Coleccion in-modal, copia rapida de guias) y unificacion de perfil de administrador."
+  "notes": "Lanzamiento oficial v1.5.0: Unificación de paleta corporativa y tipografía con Frontend Web, eliminación de marcas Atelier, resolución de los 14 bugs de QA (creación/edición y toggle de prendas con variantes y selector de fotos, exclusión mutua y eliminación de promociones, nuevo empleado y cambio de rol en vivo, bitácora de auditoría con filtros alineados, subida y refresco de foto de perfil, bloqueo de pedidos/órdenes canceladas, corrección de crash POS y chips de tallas, exportaciones reales en PDF/Excel, cálculo de promociones y stepper de carrito, y conexión Wompi segura)."
 }

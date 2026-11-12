@@ -19,6 +19,8 @@ class PosSaleModel {
   final List<PosSaleDetail> detalles;
   final Map<String, dynamic> original;
 
+  String get usuarioNombre => original['usuario']?['nombre']?.toString() ?? original['vendedor']?['nombre']?.toString() ?? 'Cajero';
+
   const PosSaleModel({
     required this.id,
     required this.codigo,

@@ -72,7 +72,7 @@ class FashionPlaceholderScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Módulo en proceso de integración en el Cockpit Atelier.',
+                'Módulo en proceso de integración en el Panel de Control.',
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13,
                   color: FashionColors.inkSecondary,

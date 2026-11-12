@@ -208,7 +208,7 @@ class _CartCheckoutScreenState extends ConsumerState<CartCheckoutScreen> {
       context,
       pedido: pedido,
       cliente: datosCliente,
-      cancelarAlCerrar: true,
+      cancelarAlCerrar: false,
     );
 
     if (!mounted) return;
@@ -477,8 +477,8 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
                 height: 48,
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: FashionColors.atelierJade,
-                    side: const BorderSide(color: FashionColors.atelierJade),
+                    foregroundColor: FashionColors.slateAccent,
+                    side: const BorderSide(color: FashionColors.slateAccent),
                     backgroundColor: FashionColors.surfaceCard,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
@@ -593,6 +593,34 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
                         color: FashionColors.inkPrimary,
                       ),
                     ),
+                    if (item.precioOriginal > item.precio) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        CurrencyFormatter.formatearCOP(item.precioOriginal),
+                        style: FashionTheme.priceTextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.lineThrough,
+                          color: FashionColors.inkSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: FashionColors.statusDanger.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '-${item.porcentajeDescuento}%',
+                          style: GoogleFonts.jetBrainsMono(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: FashionColors.statusDanger,
+                          ),
+                        ),
+                      ),
+                    ],
                     const Spacer(),
                     Container(
                       decoration: BoxDecoration(

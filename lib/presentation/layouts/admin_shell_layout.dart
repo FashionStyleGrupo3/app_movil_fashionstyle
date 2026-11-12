@@ -43,10 +43,11 @@ class AdminShellLayout extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (sheetCtx) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.85,
+          height: MediaQuery.of(context).size.height * 0.92,
           decoration: const BoxDecoration(
             color: FashionColors.surfaceCard,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -142,7 +143,7 @@ class AdminShellLayout extends ConsumerWidget {
                     // SECCIÓN 2: CATÁLOGO, BODEGA & PRODUCCIÓN
                     _buildBentoSection(
                       titulo: 'Catálogo, Bodega & Taller',
-                      colorAcento: FashionColors.atelierJade,
+                      colorAcento: FashionColors.slateAccent,
                       items: [
                         _BentoItem(
                           titulo: 'Gestión de Prendas',
@@ -489,7 +490,7 @@ class AdminShellLayout extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
-                    color: FashionColors.atelierJade,
+                    color: FashionColors.slateAccent,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Row(

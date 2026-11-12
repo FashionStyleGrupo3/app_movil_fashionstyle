@@ -8,8 +8,8 @@ import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/data/services/product_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/admin_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/widgets/common/atelier_vector_art.dart';
+import 'package:fashion_style_mobile/core/utils/admin_export_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:share_plus/share_plus.dart';
 
 class AdminInventoryScreen extends ConsumerStatefulWidget {
   const AdminInventoryScreen({super.key});
@@ -305,7 +305,7 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
     );
   }
 
-  void _exportarKardexCsv() {
+  void _exportarKardex() {
     if (_movimientos.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No hay movimientos de kárdex para exportar')),
@@ -313,20 +313,26 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
       return;
     }
 
-    final buffer = StringBuffer('ID,Fecha,Tipo,Concepto,Prenda,Talla,Cantidad,Observaciones\n');
-    for (final m in _movimientos) {
+    final encabezados = ['ID', 'Fecha', 'Tipo', 'Concepto', 'Prenda', 'Talla', 'Cantidad', 'Observaciones'];
+    final filas = _movimientos.map((m) {
       final id = m['id_movimiento'] ?? m['id'] ?? '';
       final fecha = m['created_at'] ?? m['fecha'] ?? '';
       final tipo = m['tipo_movimiento'] ?? '';
-      final concepto = (m['concepto'] ?? '').toString().replaceAll(',', ';');
-      final prenda = (m['producto']?['nombre'] ?? m['prenda'] ?? '').toString().replaceAll(',', ';');
+      final concepto = m['concepto'] ?? '';
+      final prenda = m['producto']?['nombre'] ?? m['prenda'] ?? '';
       final talla = m['variante']?['talla'] ?? m['talla'] ?? '';
       final cant = m['cantidad'] ?? 0;
-      final obs = (m['observaciones'] ?? '').toString().replaceAll(',', ';');
-      buffer.writeln('$id,$fecha,$tipo,$concepto,$prenda,$talla,$cant,$obs');
-    }
+      final obs = m['observaciones'] ?? '';
+      return [id, fecha, tipo, concepto, prenda, talla, cant, obs];
+    }).toList();
 
-    Share.share(buffer.toString(), subject: 'Kardex_Inventario_FashionStyle.csv');
+    AdminExportDialog.mostrarDialogoExportacion(
+      context,
+      titulo: 'Kárdex de Movimientos de Inventario',
+      encabezados: encabezados,
+      filas: filas,
+      nombreArchivo: 'kardex_inventario_${DateTime.now().millisecondsSinceEpoch}',
+    );
   }
 
   @override
@@ -565,8 +571,8 @@ class _AdminInventoryScreenState extends ConsumerState<AdminInventoryScreen> wit
                   const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.file_download_outlined),
-                    tooltip: 'Exportar CSV',
-                    onPressed: _exportarKardexCsv,
+                    tooltip: 'Exportar Kárdex (PDF / Excel)',
+                    onPressed: _exportarKardex,
                   ),
                   IconButton(
                     icon: const Icon(Icons.add_circle, color: FashionColors.rosaCorporativo),

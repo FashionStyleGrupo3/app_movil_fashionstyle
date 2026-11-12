@@ -84,10 +84,11 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.90,
+          height: MediaQuery.of(context).size.height * 0.92,
           decoration: const BoxDecoration(
             color: FashionColors.surfaceCard,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),

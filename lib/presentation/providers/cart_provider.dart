@@ -83,11 +83,18 @@ class CartNotifier extends StateNotifier<CartState> {
     state = state.copyWith(cajonAbierto: false);
   }
 
-  void agregarPrenda(Product producto, ProductVariant variante, [int cantidad = 1]) {
+  void agregarPrenda(
+    Product producto,
+    ProductVariant variante, [
+    int cantidad = 1,
+    double? precioFinal,
+    double? precioOriginal,
+  ]) {
     final vId = variante.idVariante;
     final pId = producto.idProducto;
-    final precio = variante.precioVenta > 0 ? variante.precioVenta : producto.precioMinimo;
-    final precioOriginal = variante.precioOriginal > 0 ? variante.precioOriginal : precio;
+    final basePrecio = variante.precioVenta > 0 ? variante.precioVenta : producto.precioMinimo;
+    final pOriginal = precioOriginal ?? (variante.precioOriginal > 0 ? variante.precioOriginal : basePrecio);
+    final pFinal = precioFinal ?? basePrecio;
     final stock = variante.stock;
 
     final urlImagen = producto.primeraImagenUrl.isNotEmpty
@@ -101,7 +108,11 @@ class CartNotifier extends StateNotifier<CartState> {
       final itemActual = nuevosItems[index];
       final maxStock = stock > 0 ? stock : 999999;
       final nuevaCantidad = (itemActual.cantidad + cantidad).clamp(1, maxStock);
-      nuevosItems[index] = itemActual.copyWith(cantidad: nuevaCantidad);
+      nuevosItems[index] = itemActual.copyWith(
+        cantidad: nuevaCantidad,
+        precio: pFinal,
+        precioOriginal: pOriginal,
+      );
     } else {
       final cant = stock > 0 ? cantidad.clamp(1, stock) : cantidad;
       nuevosItems.add(
@@ -112,8 +123,8 @@ class CartNotifier extends StateNotifier<CartState> {
           varianteId: vId,
           talla: variante.talla,
           sku: variante.sku,
-          precio: precio,
-          precioOriginal: precioOriginal,
+          precio: pFinal,
+          precioOriginal: pOriginal,
           stockMaximo: stock,
           cantidad: cant,
           categoriaId: producto.categoriaId,

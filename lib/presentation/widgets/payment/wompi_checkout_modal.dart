@@ -31,7 +31,7 @@ class WompiCheckoutModal {
     BuildContext context, {
     required WompiCheckoutData pedido,
     required Map<String, dynamic> cliente,
-    bool cancelarAlCerrar = true,
+    bool cancelarAlCerrar = false,
   }) async {
     // 1. Manejo de checkout simulado (pruebas / local sin llaves reales)
     if (pedido.simulado) {
@@ -82,6 +82,7 @@ class WompiCheckoutModal {
     final resultadoModal = await showModalBottomSheet<_ModalWompiResult>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       enableDrag: false,
       isDismissible: true,
       backgroundColor: Colors.transparent,
@@ -118,25 +119,14 @@ class WompiCheckoutModal {
         }
       } catch (_) {}
 
-      // Si no fue pagado y el usuario cerró explícitamente y se solicitó cancelar
-      if (cancelarAlCerrar) {
-        try {
-          await WompiService.instance.cancelarCheckout(pedido.referencia);
-        } catch (_) {}
-        return WompiPaymentOutcome(
-          status: 'cancelado',
-          referencia: pedido.referencia,
-          monto: pedido.montoTotal,
-          mensaje: 'Pago cancelado por el usuario.',
-        );
-      } else {
-        return WompiPaymentOutcome(
-          status: 'pendiente',
-          referencia: pedido.referencia,
-          monto: pedido.montoTotal,
-          mensaje: 'El pago continúa pendiente en Mis Pedidos.',
-        );
-      }
+      // Al salir de Wompi o no completarse el pago, NO cancelar el pedido: se deja en estado Pendiente
+      // para permitir que el cliente lo reintente pagar desde "Mis Pedidos", coincidiendo con el flujo Web.
+      return WompiPaymentOutcome(
+        status: 'pendiente',
+        referencia: pedido.referencia,
+        monto: pedido.montoTotal,
+        mensaje: 'El pago continúa pendiente en Mis Pedidos para completarlo cuando desees.',
+      );
     }
 
     // 5. Transacción completada en el widget: confirmación contra el backend
@@ -304,7 +294,6 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
           reference: '${pedido.referencia}',
           publicKey: '${pedido.publicKey}',
           signature: { integrity: '${pedido.firmaIntegridad}' },
-          redirectUrl: 'fashionstyle://retorno-pago',
           customerData: {
             email: '${jsonEncode(emailCliente).replaceAll('"', '')}',
             fullName: '${jsonEncode(nombreCliente).replaceAll('"', '')}',
@@ -421,7 +410,7 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
           },
         ),
       )
-      ..loadHtmlString(htmlContent);
+      ..loadHtmlString(htmlContent, baseUrl: 'https://checkout.wompi.co');
   }
 
   @override
@@ -444,11 +433,11 @@ class _WompiWebViewSheetState extends State<_WompiWebViewSheet> {
             ),
             child: Row(
               children: [
-                // Pill Jade de Pago Seguro
+                // Pill Slate de Pago Seguro
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                   decoration: BoxDecoration(
-                    color: FashionColors.atelierJade,
+                    color: FashionColors.slateAccent,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Row(

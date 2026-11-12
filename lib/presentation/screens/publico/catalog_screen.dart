@@ -214,6 +214,8 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
   void _mostrarSelectorOrden(BuildContext context, FiltersState filtros) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: FashionColors.surfaceCard,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -329,7 +331,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         color: FashionColors.inkPrimary,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Buscar prendas, estilos, atelier...',
+                        hintText: 'Buscar prendas, estilos, colecciones...',
                         hintStyle: GoogleFonts.plusJakartaSans(
                           fontSize: 13.5,
                           color: FashionColors.inkSecondary,
@@ -448,16 +450,16 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 11.5,
                               fontWeight: _soloDisponibles ? FontWeight.w700 : FontWeight.w500,
-                              color: _soloDisponibles ? FashionColors.atelierJade : FashionColors.inkSecondary,
+                              color: _soloDisponibles ? FashionColors.slateAccent : FashionColors.inkSecondary,
                             ),
                           ),
                           selected: _soloDisponibles,
-                          selectedColor: FashionColors.atelierJade.withValues(alpha: 0.12),
+                          selectedColor: FashionColors.slateAccent.withValues(alpha: 0.12),
                           backgroundColor: FashionColors.surfaceCard,
                           side: BorderSide(
-                            color: _soloDisponibles ? FashionColors.atelierJade : FashionColors.borderSubtle,
+                            color: _soloDisponibles ? FashionColors.slateAccent : FashionColors.borderSubtle,
                           ),
-                          checkmarkColor: FashionColors.atelierJade,
+                          checkmarkColor: FashionColors.slateAccent,
                           onSelected: (val) {
                             setState(() {
                               _soloDisponibles = val;

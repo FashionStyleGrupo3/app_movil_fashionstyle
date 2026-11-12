@@ -357,7 +357,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       border: Border.all(color: FashionColors.brandAccent.withValues(alpha: 0.4)),
                                     ),
                                     child: Text(
-                                      'NEO-ATELIER',
+                                      'FASHIONSTYLE',
                                       style: GoogleFonts.spaceGrotesk(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w700,
@@ -507,10 +507,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: FashionColors.atelierJade.withValues(alpha: 0.12),
+                          color: FashionColors.slateAccent.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.verified_rounded, size: 20, color: FashionColors.atelierJade),
+                        child: const Icon(Icons.verified_rounded, size: 20, color: FashionColors.slateAccent),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -518,7 +518,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Atelier Original',
+                              'Calidad Garantizada',
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -827,7 +827,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       _PilarMarca(
         icono: Icons.verified_outlined,
-        titulo: 'Calidad Atelier',
+        titulo: 'Calidad Garantizada',
         descripcion: 'Telas seleccionadas y patronaje de alta costura.',
       ),
       _PilarMarca(

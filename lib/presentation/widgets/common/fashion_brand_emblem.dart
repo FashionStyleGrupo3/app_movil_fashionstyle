@@ -94,7 +94,7 @@ class FashionBrandHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                'ATELIER & COUTURE',
+                'FASHIONSTYLE',
                 style: GoogleFonts.plusJakartaSans(
                   fontWeight: FontWeight.w600,
                   fontSize: compacto ? 8 : 9,

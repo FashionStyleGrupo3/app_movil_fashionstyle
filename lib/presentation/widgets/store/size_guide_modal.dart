@@ -17,9 +17,10 @@ class SizeGuideModal {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.86,
+        height: MediaQuery.of(context).size.height * 0.92,
         decoration: const BoxDecoration(
           color: FashionColors.surfaceCard,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -52,7 +53,7 @@ class SizeGuideModal {
                             const SizedBox(width: 5),
                             Expanded(
                               child: Text(
-                                'GUÍA DE TALLAS ATELIER',
+                                'GUÍA DE TALLAS Y MEDIDAS',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.spaceGrotesk(

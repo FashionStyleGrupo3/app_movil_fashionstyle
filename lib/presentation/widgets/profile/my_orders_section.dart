@@ -142,6 +142,8 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
         if (prod != null) {
           final variante = prod.variantes.where((v) => v.idVariante == it.varianteId).firstOrNull;
           if (variante != null && variante.stock > 0) {
+            // Eliminar si ya estaba en el carrito para no duplicar cantidades (1 + 1 = 2)
+            ref.read(cartProvider.notifier).eliminarPrenda(variante.idVariante);
             ref.read(cartProvider.notifier).agregarPrenda(prod, variante, it.cantidad);
             agregados++;
           }

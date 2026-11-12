@@ -4,10 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
+import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
+import 'package:fashion_style_mobile/presentation/providers/favorites_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(const AuthState()) {
+  final Ref? _ref;
+
+  AuthNotifier([this._ref]) : super(const AuthState()) {
     inicializarDesdeStorage();
   }
 
@@ -293,9 +297,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final rolesCambiaron = jsonEncode(currentSorted) != jsonEncode(newSorted);
         final userCambio = (currentUserId != null && newUserId != null && currentUserId != newUserId) ||
             (currentActivo != newActivo);
+        final currentFoto = state.usuario?['foto_perfil'] ?? state.usuario?['foto'];
+        final newFoto = userMap?['foto_perfil'] ?? userMap?['foto'];
+        final fotoCambio = currentFoto != newFoto;
+        final currentNombre = state.usuario?['nombre'];
+        final newNombre = userMap?['nombre'];
+        final nombreCambio = currentNombre != newNombre;
 
-        if (!rolesCambiaron && !userCambio) {
-          // No hubo cambios relevantes en roles ni en identidad: evitar emitir nuevo estado
+        if (!rolesCambiaron && !userCambio && !fotoCambio && !nombreCambio) {
+          // No hubo cambios relevantes en roles, foto, nombre ni identidad: evitar emitir nuevo estado
           return false;
         }
 
@@ -333,6 +343,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       await prefs.remove('favoritos');
       await prefs.remove('fs_carrito');
     } catch (_) {}
+
+    try {
+      if (_ref != null) {
+        _ref.read(cartProvider.notifier).limpiarCarrito();
+        _ref.read(favoritesProvider.notifier).limpiar();
+      }
+    } catch (_) {}
   }
 
   Future<Map<String, dynamic>> solicitarRecuperacion(String email) async {
@@ -360,5 +377,5 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier();
+  return AuthNotifier(ref);
 });

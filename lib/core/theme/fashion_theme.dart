@@ -3,42 +3,44 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Paleta de color oficial FashionStyle Mobile "Neo-Atelier Mineral & Terracotta".
+/// Paleta de color oficial FashionStyle Mobile (Paridad 100% con Frontend Web).
 ///
-/// Combina un fondo mineral ultra-limpio con la calidez sartorial del Terracotta Couture (#B83A24),
-/// acentos jade de taller (#115E59) y negros entintados (#14161F).
+/// Colores corporativos oficiales:
+/// Negro corporativo (#111111), Fondo crema (#F7F4EF), Arena suave (#F3EEE6),
+/// Arena (#ECE5DA), Arena oscura (#D4C2A8), Pizarra (#56657A), Borde (#E4DDD2),
+/// Texto principal (#2B2B2B), Gris tenue (#6F6F6F), Rojo (#D9434B), Verde éxito (#2E7D32).
 class FashionColors {
-  // --- PALETA PRIMARIA MÓVIL (NEO-ATELIER MINERAL & TERRACOTTA) ---
-  static const Color canvasBackground = Color(0xFFF7F4EF); // #f7f4ef Fondo crema web oficial
-  static const Color surfaceCard = Color(0xFFFFFFFF);
-  static const Color surfaceMuted = Color(0xFFF3EEE6);
-  static const Color surfacePanel = Color(0xFFECE5DA);
-  static const Color inkPrimary = Color(0xFF111111);
-  static const Color inkSecondary = Color(0xFF555555);
-  static const Color inkMuted = Color(0xFF6F6F6F);
-  static const Color brandAccent = Color(0xFF111111); // Primario web oficial
-  static const Color brandAccentHover = Color(0xFF333333);
-  static const Color slateAccent = Color(0xFF56657A);
-  static const Color sandDark = Color(0xFFD4C2A8);
-  static const Color atelierJade = Color(0xFF56657A);
+  // --- PALETA PRIMARIA MÓVIL (FASHIONSTYLE WEB OFICIAL) ---
+  static const Color canvasBackground = Color(0xFFF7F4EF); // #F7F4EF Fondo crema web oficial
+  static const Color surfaceCard = Color(0xFFFFFFFF); // #FFFFFF
+  static const Color surfaceMuted = Color(0xFFF3EEE6); // #F3EEE6 Arena suave
+  static const Color surfacePanel = Color(0xFFECE5DA); // #ECE5DA Arena panel
+  static const Color inkPrimary = Color(0xFF111111); // #111111 Negro corporativo
+  static const Color inkSecondary = Color(0xFF2B2B2B); // #2B2B2B Texto principal
+  static const Color inkMuted = Color(0xFF6F6F6F); // #6F6F6F Gris tenue
+  static const Color brandAccent = Color(0xFF111111); // #111111 Primario web oficial
+  static const Color brandAccentHover = Color(0xFF333333); // #333333
+  static const Color slateAccent = Color(0xFF56657A); // #56657A Pizarra
+  static const Color sandDark = Color(0xFFD4C2A8); // #D4C2A8 Arena oscura
+  static const Color atelierJade = Color(0xFF56657A); // Alias de compatibilidad con Pizarra #56657A
   static const Color editorialOchre = Color(0xFF9A6700);
   static const Color editorialGoldDark = Color(0xFFF59F00);
-  static const Color borderSubtle = Color(0xFFE4DDD2); // Borde tienda web
+  static const Color borderSubtle = Color(0xFFE4DDD2); // #E4DDD2 Borde tienda web
   static const Color borderSoft = Color(0xFFF3EEE6);
   static const Color borderStrong = Color(0xFFD4CBBD);
-  static const Color statusSuccess = Color(0xFF157347);
+  static const Color statusSuccess = Color(0xFF2E7D32); // #2E7D32 Verde éxito
   static const Color statusWarning = Color(0xFF9A6700);
-  static const Color statusDanger = Color(0xFFD9434B); // Rojo tienda web
+  static const Color statusDanger = Color(0xFFD9434B); // #D9434B Rojo tienda web
 
   // --- ALIASES Y CONSTANTES LEGACY (COMPATIBILIDAD 100% RETROACTIVA) ---
   static const Color negro = inkPrimary;
-  static const Color texto = inkPrimary;
-  static const Color gris = inkSecondary;
+  static const Color texto = inkSecondary;
+  static const Color gris = inkMuted;
   static const Color crema = canvasBackground;
-  static const Color arena = surfaceMuted;
+  static const Color arena = surfacePanel;
   static const Color arenaSuave = surfaceMuted;
-  static const Color arenaOscura = borderSubtle;
-  static const Color pizarra = inkSecondary;
+  static const Color arenaOscura = sandDark;
+  static const Color pizarra = slateAccent;
   static const Color borde = borderSubtle;
   static const Color rojo = statusDanger;
   static const Color rosaCorporativo = brandAccent;
@@ -46,8 +48,8 @@ class FashionColors {
   static const Color verdeExito = statusSuccess;
 
   static const Color fondoClaro = canvasBackground;
-  static const Color textoOscuro = inkPrimary;
-  static const Color textoMuted = inkSecondary;
+  static const Color textoOscuro = inkSecondary;
+  static const Color textoMuted = inkMuted;
   static const Color grisBorde = borderSubtle;
   static const Color negroElegante = inkPrimary;
   static const Color peligro = statusDanger;
@@ -56,7 +58,14 @@ class FashionColors {
   static const Color rosaOscuro = brandAccent;
   static const Color exito = statusSuccess;
   static const Color cremaSuave = surfaceMuted;
-  static const Color azulInfo = atelierJade;
+  static const Color azulInfo = slateAccent;
+
+  // Aliases de diseño unificado
+  static const Color backgroundCanvas = canvasBackground;
+  static const Color primaryCorporate = inkPrimary;
+  static const Color surfaceSecondary = surfaceMuted;
+  static const Color bordeClaro = borderSubtle;
+  static const Color textoPrincipal = inkSecondary;
 }
 
 class FashionTheme {
@@ -93,76 +102,76 @@ class FashionTheme {
   }
 
   static ThemeData get lightTheme {
-    // Tríada tipográfica: Space Grotesk (Titulares) + Plus Jakarta Sans (Cuerpo) + JetBrains Mono (Precios)
+    // Tipografía oficial Web: Montserrat (Titulares) + Poppins (Cuerpo e Interfaz) + JetBrains Mono (Precios)
     final textTheme = TextTheme(
-      displayLarge: GoogleFonts.spaceGrotesk(
+      displayLarge: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
       ),
-      displayMedium: GoogleFonts.spaceGrotesk(
+      displayMedium: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
       ),
-      displaySmall: GoogleFonts.spaceGrotesk(
+      displaySmall: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
       ),
-      headlineLarge: GoogleFonts.spaceGrotesk(
+      headlineLarge: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
       ),
-      headlineMedium: GoogleFonts.spaceGrotesk(
+      headlineMedium: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
       ),
-      headlineSmall: GoogleFonts.spaceGrotesk(
+      headlineSmall: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
       ),
-      titleLarge: GoogleFonts.spaceGrotesk(
+      titleLarge: GoogleFonts.montserrat(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.5,
       ),
-      titleMedium: GoogleFonts.plusJakartaSans(
+      titleMedium: GoogleFonts.poppins(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
       ),
-      titleSmall: GoogleFonts.plusJakartaSans(
+      titleSmall: GoogleFonts.poppins(
         color: FashionColors.inkSecondary,
         fontWeight: FontWeight.w500,
       ),
-      bodyLarge: GoogleFonts.plusJakartaSans(
+      bodyLarge: GoogleFonts.poppins(
         color: FashionColors.inkPrimary,
         fontSize: 16,
         fontWeight: FontWeight.w400,
       ),
-      bodyMedium: GoogleFonts.plusJakartaSans(
+      bodyMedium: GoogleFonts.poppins(
         color: FashionColors.inkPrimary,
         fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
-      bodySmall: GoogleFonts.plusJakartaSans(
+      bodySmall: GoogleFonts.poppins(
         color: FashionColors.inkSecondary,
         fontSize: 12,
         fontWeight: FontWeight.w400,
       ),
-      labelLarge: GoogleFonts.plusJakartaSans(
+      labelLarge: GoogleFonts.poppins(
         color: FashionColors.inkPrimary,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.3,
       ),
-      labelMedium: GoogleFonts.plusJakartaSans(
+      labelMedium: GoogleFonts.poppins(
         color: FashionColors.inkSecondary,
         fontWeight: FontWeight.w500,
       ),
-      labelSmall: GoogleFonts.plusJakartaSans(
+      labelSmall: GoogleFonts.poppins(
         color: FashionColors.inkSecondary,
         fontWeight: FontWeight.w500,
       ),

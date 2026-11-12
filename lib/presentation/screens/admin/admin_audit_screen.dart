@@ -28,15 +28,15 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
   final Set<int> _expandidos = {};
 
   final List<Map<String, dynamic>> _opcionesFiltro = [
-    {'etiqueta': 'Todo el Sistema', 'valor': '', 'icono': Icons.shield_outlined},
-    {'etiqueta': 'Productos', 'valor': 'Producto', 'icono': Icons.checkroom_outlined},
-    {'etiqueta': 'Usuarios', 'valor': 'User', 'icono': Icons.badge_outlined},
-    {'etiqueta': 'Ventas', 'valor': 'Venta', 'icono': Icons.point_of_sale_outlined},
+    {'etiqueta': 'Todo el historial', 'valor': '', 'icono': Icons.history},
+    {'etiqueta': 'Producto', 'valor': 'Producto', 'icono': Icons.checkroom_outlined},
+    {'etiqueta': 'Venta', 'valor': 'Venta', 'icono': Icons.point_of_sale_outlined},
+    {'etiqueta': 'Pedido', 'valor': 'Pedido', 'icono': Icons.local_shipping_outlined},
     {'etiqueta': 'Inventario', 'valor': 'Inventario', 'icono': Icons.inventory_2_outlined},
-    {'etiqueta': 'Pedidos', 'valor': 'Pedido', 'icono': Icons.local_shipping_outlined},
-    {'etiqueta': 'Facturas', 'valor': 'Factura', 'icono': Icons.receipt_long_outlined},
-    {'etiqueta': 'Producción', 'valor': 'OrdenProduccion', 'icono': Icons.precision_manufacturing_outlined},
-    {'etiqueta': 'Clientes', 'valor': 'Cliente', 'icono': Icons.people_outline},
+    {'etiqueta': 'Producción', 'valor': 'Producc', 'icono': Icons.precision_manufacturing_outlined},
+    {'etiqueta': 'Usuario', 'valor': 'User', 'icono': Icons.badge_outlined},
+    {'etiqueta': 'Factura', 'valor': 'Factura', 'icono': Icons.receipt_long_outlined},
+    {'etiqueta': 'Cliente', 'valor': 'Cliente', 'icono': Icons.people_outline},
   ];
 
   @override
@@ -103,9 +103,9 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
   Color _obtenerColorAccion(String accion) {
     switch (accion.toLowerCase()) {
       case 'created':
-        return FashionColors.statusSuccess;
+        return FashionColors.verdeExito;
       case 'deleted':
-        return FashionColors.statusDanger;
+        return FashionColors.peligro;
       case 'inicio_sesion':
       case 'login':
         return FashionColors.slateAccent;
@@ -136,24 +136,24 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
 
     return AdminShellLayout(
       currentPath: '/admin/seguridad/auditoria',
-      child: RefreshIndicator(
-        onRefresh: () => _cargarAuditorias(pagina: _pagina),
-        color: FashionColors.brandAccent,
+      child: Container(
+        color: FashionColors.backgroundCanvas,
         child: Column(
           children: [
             // BARRA DE CONTROL SUPERIOR
             Container(
-              color: FashionColors.surfaceCard,
+              color: FashionColors.backgroundCanvas,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Column(
                 children: [
                   // Buscador interactivo
                   TextField(
                     onChanged: (v) => setState(() => _busqueda = v),
+                    style: GoogleFonts.poppins(fontSize: 13),
                     decoration: InputDecoration(
                       hintText: 'Buscar por responsable, modelo, IP o dato...',
-                      hintStyle: GoogleFonts.inter(fontSize: 12.5, color: FashionColors.inkMuted),
-                      prefixIcon: const Icon(Icons.search, size: 20, color: FashionColors.inkMuted),
+                      hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: FashionColors.textoMuted),
+                      prefixIcon: const Icon(Icons.search, size: 20, color: FashionColors.textoMuted),
                       suffixIcon: _busqueda.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear, size: 18),
@@ -161,19 +161,19 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
                             )
                           : null,
                       filled: true,
-                      fillColor: FashionColors.surfaceMuted,
+                      fillColor: FashionColors.surfaceSecondary,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: FashionColors.borderSubtle),
+                        borderSide: const BorderSide(color: FashionColors.bordeClaro),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: FashionColors.borderSubtle),
+                        borderSide: const BorderSide(color: FashionColors.bordeClaro),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: FashionColors.inkPrimary, width: 1.5),
+                        borderSide: const BorderSide(color: FashionColors.primaryCorporate, width: 1.5),
                       ),
                     ),
                   ),
@@ -191,19 +191,19 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 6.0),
                           child: FilterChip(
-                            avatar: Icon(icono, size: 15, color: sel ? Colors.white : FashionColors.inkSecondary),
+                            avatar: Icon(icono, size: 15, color: sel ? Colors.white : FashionColors.textoMuted),
                             label: Text(
                               opcion['etiqueta'] as String,
-                              style: GoogleFonts.inter(
+                              style: GoogleFonts.poppins(
                                 fontSize: 11.5,
                                 fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                                color: sel ? Colors.white : FashionColors.inkPrimary,
+                                color: sel ? Colors.white : FashionColors.textoPrincipal,
                               ),
                             ),
                             selected: sel,
-                            selectedColor: FashionColors.inkPrimary,
-                            backgroundColor: FashionColors.surfaceCard,
-                            side: BorderSide(color: sel ? FashionColors.inkPrimary : FashionColors.borderSubtle),
+                            selectedColor: FashionColors.primaryCorporate,
+                            backgroundColor: FashionColors.surfaceSecondary,
+                            side: BorderSide(color: sel ? FashionColors.primaryCorporate : FashionColors.bordeClaro),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             showCheckmark: false,
                             onSelected: (_) {
@@ -226,18 +226,18 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: const BoxDecoration(
-                color: FashionColors.surfaceMuted,
-                border: Border(bottom: BorderSide(color: FashionColors.borderSubtle)),
+                color: FashionColors.arenaSuave,
+                border: Border(bottom: BorderSide(color: FashionColors.bordeClaro)),
               ),
               child: Row(
                 children: [
                   Text(
                     '$_total registros · Página $_pagina de $_ultimaPagina',
-                    style: GoogleFonts.inter(fontSize: 11.5, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary),
+                    style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600, color: FashionColors.textoMuted),
                   ),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.refresh, size: 18, color: FashionColors.inkPrimary),
+                    icon: const Icon(Icons.refresh, size: 18, color: FashionColors.textoPrincipal),
                     tooltip: 'Recargar bitácora',
                     onPressed: () => _cargarAuditorias(pagina: _pagina),
                   ),
@@ -255,204 +255,219 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
 
             // LISTADO DE EVENTOS DE AUDITORÍA
             Expanded(
-              child: _cargando
-                  ? const Center(child: CircularProgressIndicator(color: FashionColors.inkPrimary))
-                  : _error != null
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.error_outline, size: 48, color: FashionColors.statusDanger),
-                                const SizedBox(height: 12),
-                                Text(
-                                  _error!,
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.inter(fontSize: 13, color: FashionColors.inkPrimary),
-                                ),
-                                const SizedBox(height: 14),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: FashionColors.inkPrimary,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  onPressed: () => _cargarAuditorias(pagina: 1),
-                                  icon: const Icon(Icons.refresh, size: 16),
-                                  label: const Text('Reintentar'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : filtradas.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.history, size: 48, color: FashionColors.inkSecondary),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    _busqueda.isNotEmpty
-                                        ? 'No hay registros que coincidan con "$_busqueda"'
-                                        : 'No hay registros para este módulo',
-                                    style: GoogleFonts.inter(fontSize: 13.5, color: FashionColors.inkSecondary),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-                              itemCount: filtradas.length,
-                              itemBuilder: (context, index) {
-                                final a = filtradas[index];
-                                final id = a['id'] ?? index;
-                                final fecha = a['created_at']?.toString() ?? '';
-                                final desc = AuditTextFormatter.describirAuditoria(a);
-                                final dia = AuditTextFormatter.etiquetaDia(fecha);
-                                final relativo = AuditTextFormatter.tiempoRelativo(fecha);
-                                final usuarioFmt = AuditTextFormatter.formatearUsuario(a['usuario'] ?? a['user']);
-                                final colorAccion = _obtenerColorAccion(a['accion']?.toString() ?? '');
-                                final iconoAccion = _obtenerIconoAccion(a['accion']?.toString() ?? '');
-                                final estaExpandido = _expandidos.contains(id);
-                                final tieneDetalles = desc.cambios.isNotEmpty || desc.datos.isNotEmpty;
-
-                                return Card(
-                                  elevation: 0,
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  color: FashionColors.surfaceCard,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    side: const BorderSide(color: FashionColors.borderSubtle),
-                                  ),
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(14),
-                                    onTap: tieneDetalles
-                                        ? () {
-                                            setState(() {
-                                              if (estaExpandido) {
-                                                _expandidos.remove(id);
-                                              } else {
-                                                _expandidos.add(id);
-                                              }
-                                            });
-                                          }
-                                        : null,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              // Badge de acción
-                                              Container(
-                                                width: 36,
-                                                height: 36,
-                                                decoration: BoxDecoration(
-                                                  color: colorAccion.withValues(alpha: 0.12),
-                                                  borderRadius: BorderRadius.circular(10),
-                                                ),
-                                                child: Icon(iconoAccion, color: colorAccion, size: 20),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      desc.titulo,
-                                                      style: GoogleFonts.inter(
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 13,
-                                                        color: FashionColors.inkPrimary,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 3),
-                                                    Text(
-                                                      '$dia · $relativo · $usuarioFmt',
-                                                      style: GoogleFonts.inter(
-                                                        fontSize: 11,
-                                                        color: FashionColors.inkSecondary,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              if (tieneDetalles)
-                                                Icon(
-                                                  estaExpandido ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                                  size: 20,
-                                                  color: FashionColors.inkSecondary,
-                                                ),
-                                            ],
-                                          ),
-
-                                          // DETALLES EXPANDIBLES (CAMBIOS O DATOS REGISTRADOS)
-                                          if (estaExpandido && tieneDetalles) ...[
-                                            const SizedBox(height: 10),
-                                            const Divider(height: 1, color: FashionColors.borderSubtle),
-                                            const SizedBox(height: 8),
-
-                                            if (desc.cambios.isNotEmpty) ...[
-                                              Text(
-                                                'Campos modificados:',
-                                                style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              ...desc.cambios.map((c) => Padding(
-                                                    padding: const EdgeInsets.only(bottom: 4),
-                                                    child: Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text('${c.etiqueta}: ', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary)),
-                                                        Expanded(
-                                                          child: Text(
-                                                            '${c.antes} → ${c.nuevo}',
-                                                            style: GoogleFonts.inter(fontSize: 11, color: FashionColors.inkPrimary),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )),
-                                            ],
-
-                                            if (desc.datos.isNotEmpty) ...[
-                                              Text(
-                                                'Datos del registro:',
-                                                style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              ...desc.datos.map((d) => Padding(
-                                                    padding: const EdgeInsets.only(bottom: 4),
-                                                    child: Row(
-                                                      children: [
-                                                        Text('${d.etiqueta}: ', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkSecondary)),
-                                                        Expanded(
-                                                          child: Text(d.valor, style: GoogleFonts.inter(fontSize: 11, color: FashionColors.inkPrimary)),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  )),
-                                            ],
-
-                                            if (a['ip'] != null && a['ip'].toString().isNotEmpty) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                'IP: ${a['ip']}',
-                                                style: GoogleFonts.jetBrainsMono(fontSize: 10, color: FashionColors.inkSecondary),
-                                              ),
-                                            ],
-                                          ],
-                                        ],
+              child: RefreshIndicator(
+                onRefresh: () => _cargarAuditorias(pagina: _pagina),
+                color: FashionColors.primaryCorporate,
+                child: _cargando
+                    ? const Center(child: CircularProgressIndicator(color: FashionColors.primaryCorporate))
+                    : _error != null
+                        ? ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(height: 40),
+                                    const Icon(Icons.error_outline, size: 48, color: FashionColors.peligro),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      _error!,
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.poppins(fontSize: 13, color: FashionColors.textoPrincipal),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: FashionColors.primaryCorporate,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                       ),
+                                      onPressed: () => _cargarAuditorias(pagina: 1),
+                                      icon: const Icon(Icons.refresh, size: 16),
+                                      label: const Text('Reintentar'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : filtradas.isEmpty
+                            ? ListView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.history, size: 48, color: FashionColors.textoMuted),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          _busqueda.isNotEmpty
+                                              ? 'No hay registros que coincidan con "$_busqueda"'
+                                              : 'No hay registros para este módulo',
+                                          style: GoogleFonts.poppins(fontSize: 13.5, color: FashionColors.textoMuted),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                            ),
+                                ],
+                              )
+                            : ListView.builder(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                                itemCount: filtradas.length,
+                                itemBuilder: (context, index) {
+                                  final a = filtradas[index];
+                                  final id = a['id'] ?? index;
+                                  final fecha = a['created_at']?.toString() ?? '';
+                                  final desc = AuditTextFormatter.describirAuditoria(a);
+                                  final dia = AuditTextFormatter.etiquetaDia(fecha);
+                                  final relativo = AuditTextFormatter.tiempoRelativo(fecha);
+                                  final usuarioFmt = AuditTextFormatter.formatearUsuario(a['usuario'] ?? a['user']);
+                                  final colorAccion = _obtenerColorAccion(a['accion']?.toString() ?? '');
+                                  final iconoAccion = _obtenerIconoAccion(a['accion']?.toString() ?? '');
+                                  final estaExpandido = _expandidos.contains(id);
+                                  final tieneDetalles = desc.cambios.isNotEmpty || desc.datos.isNotEmpty;
+
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    decoration: BoxDecoration(
+                                      color: FashionColors.surfaceSecondary,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(color: FashionColors.bordeClaro),
+                                    ),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
+                                      onTap: tieneDetalles
+                                          ? () {
+                                              setState(() {
+                                                if (estaExpandido) {
+                                                  _expandidos.remove(id);
+                                                } else {
+                                                  _expandidos.add(id);
+                                                }
+                                              });
+                                            }
+                                          : null,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                // Badge de acción
+                                                Container(
+                                                  width: 36,
+                                                  height: 36,
+                                                  decoration: BoxDecoration(
+                                                    color: colorAccion.withValues(alpha: 0.12),
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                  child: Icon(iconoAccion, color: colorAccion, size: 20),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        desc.titulo,
+                                                        style: GoogleFonts.montserrat(
+                                                          fontWeight: FontWeight.w600,
+                                                          fontSize: 13,
+                                                          color: FashionColors.textoPrincipal,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 3),
+                                                      Text(
+                                                        '$dia · $relativo · $usuarioFmt',
+                                                        style: GoogleFonts.poppins(
+                                                          fontSize: 11,
+                                                          color: FashionColors.textoMuted,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                if (tieneDetalles)
+                                                  Icon(
+                                                    estaExpandido ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                                    size: 20,
+                                                    color: FashionColors.textoMuted,
+                                                  ),
+                                              ],
+                                            ),
+
+                                            // DETALLES EXPANDIBLES (CAMBIOS O DATOS REGISTRADOS)
+                                            if (estaExpandido && tieneDetalles) ...[
+                                              const SizedBox(height: 10),
+                                              const Divider(height: 1, color: FashionColors.bordeClaro),
+                                              const SizedBox(height: 8),
+
+                                              if (desc.cambios.isNotEmpty) ...[
+                                                Text(
+                                                  'Campos modificados:',
+                                                  style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.textoPrincipal),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                ...desc.cambios.map((c) => Padding(
+                                                      padding: const EdgeInsets.only(bottom: 4),
+                                                      child: Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text('${c.etiqueta}: ', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.textoMuted)),
+                                                          Expanded(
+                                                            child: Text(
+                                                              '${c.antes} → ${c.nuevo}',
+                                                              style: GoogleFonts.poppins(fontSize: 11, color: FashionColors.textoPrincipal),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )),
+                                              ],
+
+                                              if (desc.datos.isNotEmpty) ...[
+                                                Text(
+                                                  'Datos del registro:',
+                                                  style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.textoPrincipal),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                ...desc.datos.map((d) => Padding(
+                                                      padding: const EdgeInsets.only(bottom: 4),
+                                                      child: Row(
+                                                        children: [
+                                                          Text('${d.etiqueta}: ', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.textoMuted)),
+                                                          Expanded(
+                                                            child: Text(d.valor, style: GoogleFonts.poppins(fontSize: 11, color: FashionColors.textoPrincipal)),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )),
+                                              ],
+
+                                              if (a['ip'] != null && a['ip'].toString().isNotEmpty) ...[
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  'IP: ${a['ip']}',
+                                                  style: GoogleFonts.jetBrainsMono(fontSize: 10, color: FashionColors.textoMuted),
+                                                ),
+                                              ],
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+              ),
             ),
           ],
         ),

@@ -57,7 +57,31 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
     }
   }
 
-  void _abrirModalNuevoUsuario() {
+  Future<void> _cambiarRol(int idUsuario, String nombre, String nuevoRol) async {
+    try {
+      await SecurityService.instance.asignarRolUsuario(idUsuario, nuevoRol);
+      await _cargarTodo();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Rol de "$nombre" cambiado a ${nuevoRol.toUpperCase()} correctamente.'),
+            backgroundColor: FashionColors.verdeExito,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar el rol.')),
+            backgroundColor: FashionColors.peligro,
+          ),
+        );
+      }
+    }
+  }
+
+  void _abrirModalNuevoEmpleado() {
     final nomCtrl = TextEditingController();
     final emailCtrl = TextEditingController();
     final telCtrl = TextEditingController();
@@ -67,14 +91,15 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setMState) => Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(ctx).size.height * 0.88,
+            maxHeight: MediaQuery.of(ctx).size.height * 0.92,
           ),
           decoration: const BoxDecoration(
-            color: FashionColors.surfaceCard,
+            color: FashionColors.backgroundCanvas,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -86,7 +111,7 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: FashionColors.borderSubtle,
+                    color: FashionColors.bordeClaro,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -96,18 +121,18 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                 child: Row(
                   children: [
                     Text(
-                      'Registrar Colaborador Staff',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+                      'Registrar Nuevo Empleado',
+                      style: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.textoPrincipal),
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 20, color: FashionColors.inkSecondary),
+                      icon: const Icon(Icons.close, size: 20, color: FashionColors.textoMuted),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
               ),
-              const Divider(height: 1, color: FashionColors.borderSubtle),
+              const Divider(height: 1, color: FashionColors.bordeClaro),
               Flexible(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -122,47 +147,51 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                     children: [
                       TextField(
                         controller: nomCtrl,
+                        style: GoogleFonts.poppins(fontSize: 14),
                         decoration: InputDecoration(
                           labelText: 'Nombre completo *',
                           filled: true,
-                          fillColor: FashionColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                          fillColor: FashionColors.surfaceSecondary,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
                         ),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: emailCtrl,
                         keyboardType: TextInputType.emailAddress,
+                        style: GoogleFonts.poppins(fontSize: 14),
                         decoration: InputDecoration(
                           labelText: 'Correo corporativo *',
                           filled: true,
-                          fillColor: FashionColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                          fillColor: FashionColors.surfaceSecondary,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
                         ),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: telCtrl,
                         keyboardType: TextInputType.phone,
+                        style: GoogleFonts.poppins(fontSize: 14),
                         decoration: InputDecoration(
                           labelText: 'Teléfono',
                           filled: true,
-                          fillColor: FashionColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                          fillColor: FashionColors.surfaceSecondary,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
                         ),
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
                         initialValue: rol,
+                        style: GoogleFonts.poppins(fontSize: 14, color: FashionColors.textoPrincipal),
                         decoration: InputDecoration(
                           labelText: 'Rol asignado',
                           filled: true,
-                          fillColor: FashionColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                          fillColor: FashionColors.surfaceSecondary,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'empleado', child: Text('Empleado / Ventas POS')),
-                          DropdownMenuItem(value: 'administrador', child: Text('Administrador General')),
+                          DropdownMenuItem(value: 'empleado', child: Text('Empleado / Colaborador')),
+                          DropdownMenuItem(value: 'admin', child: Text('Administrador General')),
                         ],
                         onChanged: (v) => setMState(() => rol = v ?? 'empleado'),
                       ),
@@ -170,17 +199,18 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                       TextField(
                         controller: passCtrl,
                         obscureText: true,
+                        style: GoogleFonts.poppins(fontSize: 14),
                         decoration: InputDecoration(
                           labelText: 'Contraseña temporal *',
                           filled: true,
-                          fillColor: FashionColors.surfaceMuted,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                          fillColor: FashionColors.surfaceSecondary,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.bordeClaro)),
                         ),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: FashionColors.inkPrimary,
+                          backgroundColor: FashionColors.primaryCorporate,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -205,8 +235,8 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Usuario registrado con éxito'),
-                                  backgroundColor: FashionColors.statusSuccess,
+                                  content: Text('Empleado registrado con éxito'),
+                                  backgroundColor: FashionColors.verdeExito,
                                 ),
                               );
                             }
@@ -214,14 +244,14 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible registrar al usuario.')),
-                                  backgroundColor: FashionColors.statusDanger,
+                                  content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible registrar al empleado.')),
+                                  backgroundColor: FashionColors.peligro,
                                 ),
                               );
                             }
                           }
                         },
-                        child: Text('Crear Usuario', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14)),
+                        child: Text('Registrar Empleado', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
                       ),
                     ],
                   ),
@@ -243,22 +273,22 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
       child: Column(
         children: [
           Container(
-            color: Colors.white,
+            color: FashionColors.backgroundCanvas,
             child: TabBar(
               controller: _tabController,
-              labelColor: FashionColors.inkPrimary,
-              unselectedLabelColor: FashionColors.inkSecondary,
-              indicatorColor: FashionColors.brandAccent,
-              labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13),
+              labelColor: FashionColors.textoPrincipal,
+              unselectedLabelColor: FashionColors.textoMuted,
+              indicatorColor: FashionColors.primaryCorporate,
+              labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 13),
               tabs: [
                 const Tab(icon: Icon(Icons.people_alt_outlined, size: 18), text: 'Clientes'),
-                if (esAdmin) const Tab(icon: Icon(Icons.badge_outlined, size: 18), text: 'Staff / Empleados'),
+                if (esAdmin) const Tab(icon: Icon(Icons.badge_outlined, size: 18), text: 'Colaboradores'),
               ],
             ),
           ),
           Expanded(
             child: _cargando
-                ? const Center(child: CircularProgressIndicator(color: FashionColors.brandAccent))
+                ? const Center(child: CircularProgressIndicator(color: FashionColors.primaryCorporate))
                 : TabBarView(
                     controller: _tabController,
                     children: [
@@ -271,16 +301,17 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                           return Card(
                             elevation: 0,
                             margin: const EdgeInsets.only(bottom: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+                            color: FashionColors.surfaceSecondary,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.bordeClaro)),
                             child: ListTile(
-                              leading: const CircleAvatar(backgroundColor: FashionColors.surfaceMuted, child: Icon(Icons.person, color: FashionColors.brandAccent)),
-                              title: Text(c['nombre']?.toString() ?? 'Cliente', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: FashionColors.inkPrimary)),
-                              subtitle: Text('${c['email'] ?? c['correo'] ?? ''} · Ciudad: ${c['ciudad'] ?? "N/A"}', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
+                              leading: const CircleAvatar(backgroundColor: FashionColors.arenaSuave, child: Icon(Icons.person, color: FashionColors.primaryCorporate)),
+                              title: Text(c['nombre']?.toString() ?? 'Cliente', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 13.5, color: FashionColors.textoPrincipal)),
+                              subtitle: Text('${c['email'] ?? c['correo'] ?? ''} · Ciudad: ${c['ciudad'] ?? "N/A"}', style: GoogleFonts.poppins(fontSize: 11, color: FashionColors.textoMuted)),
                             ),
                           );
                         },
                       ),
-                      // Pestaña Usuarios Staff
+                      // Pestaña Usuarios Staff / Colaboradores
                       if (esAdmin)
                         Column(
                           children: [
@@ -293,20 +324,20 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                                       'Colaboradores (${_usuarios.length})',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.inkPrimary),
+                                      style: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 15, color: FashionColors.textoPrincipal),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   ElevatedButton.icon(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: FashionColors.brandAccent,
+                                      backgroundColor: FashionColors.primaryCorporate,
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                     ),
-                                    onPressed: _abrirModalNuevoUsuario,
+                                    onPressed: _abrirModalNuevoEmpleado,
                                     icon: const Icon(Icons.add, size: 16),
-                                    label: Text('Nuevo Usuario', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
+                                    label: Text('+ Nuevo Empleado', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
                                   ),
                                 ],
                               ),
@@ -317,42 +348,80 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                                 itemCount: _usuarios.length,
                                 itemBuilder: (context, index) {
                                   final u = _usuarios[index];
-                                  final id = u['id_usuario'] ?? u['id'];
-                                  final rol = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? 'empleado').toString().toLowerCase();
+                                  final id = u['id_usuario'] ?? u['id'] ?? 0;
+                                  final rawRol = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? u['roles']?[0] ?? 'empleado').toString().toLowerCase();
+                                  final rolCanonico = rawRol.contains('admin') ? 'admin' : (rawRol.contains('cliente') ? 'cliente' : 'empleado');
                                   final activo = u['activo'] == true || u['activo'] == 1;
 
-                                  final colorRol = rol.contains('admin')
-                                      ? FashionColors.brandAccent
-                                      : (rol.contains('empleado') || rol.contains('staff') ? FashionColors.atelierJade : FashionColors.editorialOchre);
+                                  final colorRol = rolCanonico == 'admin'
+                                      ? FashionColors.primaryCorporate
+                                      : (rolCanonico == 'empleado' ? FashionColors.slateAccent : FashionColors.arenaSuave);
 
                                   return Card(
                                     elevation: 0,
                                     margin: const EdgeInsets.only(bottom: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+                                    color: FashionColors.surfaceSecondary,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.bordeClaro)),
                                     child: ListTile(
-                                      title: Text(u['nombre']?.toString() ?? 'Usuario', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: FashionColors.inkPrimary)),
-                                      subtitle: Row(
+                                      title: Text(u['nombre']?.toString() ?? 'Usuario', style: GoogleFonts.montserrat(fontWeight: FontWeight.w600, fontSize: 13.5, color: FashionColors.textoPrincipal)),
+                                      subtitle: Text('${u['email'] ?? ''}', style: GoogleFonts.poppins(fontSize: 11, color: FashionColors.textoMuted)),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text('${u['email'] ?? ''} · ', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary)),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(color: colorRol.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
-                                            child: Text(
-                                              rol.toUpperCase(),
-                                              style: GoogleFonts.jetBrainsMono(fontSize: 9.5, fontWeight: FontWeight.w700, color: colorRol),
+                                          PopupMenuButton<String>(
+                                            tooltip: 'Cambiar Rol',
+                                            initialValue: rolCanonico,
+                                            onSelected: (nuevoRol) {
+                                              if (nuevoRol != rolCanonico) {
+                                                _cambiarRol(id is int ? id : int.tryParse(id.toString()) ?? 0, u['nombre']?.toString() ?? 'Usuario', nuevoRol);
+                                              }
+                                            },
+                                            itemBuilder: (ctx) => [
+                                              PopupMenuItem(
+                                                value: 'admin',
+                                                child: Text('Administrador', style: GoogleFonts.poppins(fontWeight: rolCanonico == 'admin' ? FontWeight.w700 : FontWeight.normal)),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 'empleado',
+                                                child: Text('Empleado', style: GoogleFonts.poppins(fontWeight: rolCanonico == 'empleado' ? FontWeight.w700 : FontWeight.normal)),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 'cliente',
+                                                child: Text('Cliente', style: GoogleFonts.poppins(fontWeight: rolCanonico == 'cliente' ? FontWeight.w700 : FontWeight.normal)),
+                                              ),
+                                            ],
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: colorRol.withValues(alpha: 0.15),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: colorRol.withValues(alpha: 0.4)),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    rolCanonico.toUpperCase(),
+                                                    style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700, color: FashionColors.textoPrincipal),
+                                                  ),
+                                                  const SizedBox(width: 2),
+                                                  const Icon(Icons.arrow_drop_down, size: 14, color: FashionColors.textoPrincipal),
+                                                ],
+                                              ),
                                             ),
                                           ),
+                                          const SizedBox(width: 4),
+                                          Switch(
+                                            value: activo,
+                                            activeColor: FashionColors.verdeExito,
+                                            onChanged: (val) async {
+                                              try {
+                                                await SecurityService.instance.actualizarUsuario(id is int ? id : int.tryParse(id.toString()) ?? 0, {'activo': val});
+                                                _cargarTodo();
+                                              } catch (_) {}
+                                            },
+                                          ),
                                         ],
-                                      ),
-                                      trailing: Switch(
-                                        value: activo,
-                                        activeThumbColor: FashionColors.statusSuccess,
-                                        onChanged: (val) async {
-                                          try {
-                                            await SecurityService.instance.actualizarUsuario(id, {'activo': val});
-                                            _cargarTodo();
-                                          } catch (_) {}
-                                        },
                                       ),
                                     ),
                                   );
@@ -369,7 +438,3 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
     );
   }
 }
-
-// ============================================================================
-// 3. BITÁCORA DE AUDITORÍA (VistaAuditoria.vue)
-// ============================================================================

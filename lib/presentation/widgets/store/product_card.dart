@@ -83,7 +83,7 @@ class _ProductCardWidgetState extends ConsumerState<ProductCardWidget> {
       widget.promocionesVigentes,
     );
 
-    final categoriaNombre = widget.producto.categoria?.nombre.toUpperCase() ?? 'ATELIER';
+    final categoriaNombre = widget.producto.categoria?.nombre.toUpperCase() ?? 'COLECCIÓN';
 
     return GestureDetector(
       onTap: deshabilitado
@@ -377,7 +377,7 @@ class _ProductCardWidgetState extends ConsumerState<ProductCardWidget> {
             const AtelierMonogram(size: 38),
             const SizedBox(height: 6),
             Text(
-              'ATELIER',
+              'COLECCIÓN',
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,

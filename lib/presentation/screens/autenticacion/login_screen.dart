@@ -176,7 +176,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                'ATELIER ARCHIVE · 2026',
+                                'FASHIONSTYLE · 2026',
                                 style: GoogleFonts.jetBrainsMono(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -201,7 +201,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Moda que se ajusta a ti · Sastrería de atelier',
+                          'Moda que se ajusta a ti · Calidad y estilo',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -266,7 +266,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Ingresa con tus credenciales de atelier para continuar.',
+                              'Ingresa con tus credenciales para continuar.',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 13,
                                 color: FashionColors.inkSecondary,

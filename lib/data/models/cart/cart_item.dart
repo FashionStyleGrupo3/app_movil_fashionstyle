@@ -30,6 +30,13 @@ class CartItem {
     this.catalogoId,
   });
 
+  bool get tieneDescuento => precioOriginal > precio;
+
+  int get porcentajeDescuento {
+    if (precioOriginal <= precio || precioOriginal <= 0) return 0;
+    return (((precioOriginal - precio) / precioOriginal) * 100).round();
+  }
+
   factory CartItem.fromJson(Map<String, dynamic> map) {
     return CartItem(
       productoId: JsonParser.toInt(map['productoId'] ?? map['producto_id']),
