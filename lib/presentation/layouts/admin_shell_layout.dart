@@ -63,8 +63,13 @@ class AdminShellLayout extends ConsumerWidget {
       builder: (sheetCtx) {
         return Container(
           decoration: const BoxDecoration(
-            color: FashionColors.surfaceCard,
+            color: Color(0xFFF7F4EF),
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border(
+              top: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+              left: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+              right: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+            ),
           ),
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(sheetCtx).padding.bottom + 16,
@@ -77,7 +82,7 @@ class AdminShellLayout extends ConsumerWidget {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: FashionColors.borderSubtle,
+                  color: const Color(0xFFD8CFC2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -91,31 +96,31 @@ class AdminShellLayout extends ConsumerWidget {
                         Text(
                           titulo,
                           style: GoogleFonts.spaceGrotesk(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: FashionColors.inkPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF111111),
                             letterSpacing: -0.3,
                           ),
                         ),
                         Text(
                           subtitulo,
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: FashionColors.inkSecondary,
+                            color: const Color(0xFF4A4A4A),
                           ),
                         ),
                       ],
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 20, color: FashionColors.inkSecondary),
+                      icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF111111)),
                       onPressed: () => Navigator.pop(sheetCtx),
                     ),
                   ],
                 ),
               ),
-              const Divider(color: FashionColors.borderSubtle, height: 1),
+              const Divider(color: Color(0xFFD8CFC2), height: 1),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 child: _buildBentoSection(
@@ -270,8 +275,13 @@ class AdminShellLayout extends ConsumerWidget {
         return Container(
           height: MediaQuery.of(context).size.height * 0.92,
           decoration: const BoxDecoration(
-            color: FashionColors.surfaceCard,
+            color: Color(0xFFF7F4EF),
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border(
+              top: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+              left: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+              right: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+            ),
           ),
           child: Column(
             children: [
@@ -280,7 +290,7 @@ class AdminShellLayout extends ConsumerWidget {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: FashionColors.borderSubtle,
+                  color: const Color(0xFFD8CFC2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -294,31 +304,31 @@ class AdminShellLayout extends ConsumerWidget {
                         Text(
                           'Módulos Operativos',
                           style: GoogleFonts.spaceGrotesk(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: FashionColors.inkPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF111111),
                             letterSpacing: -0.3,
                           ),
                         ),
                         Text(
                           'Gestión Omnicanal FashionStyle',
                           style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: FashionColors.inkSecondary,
+                            color: const Color(0xFF4A4A4A),
                           ),
                         ),
                       ],
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 20, color: FashionColors.inkSecondary),
+                      icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFF111111)),
                       onPressed: () => Navigator.pop(sheetCtx),
                     ),
                   ],
                 ),
               ),
-              const Divider(color: FashionColors.borderSubtle, height: 1),
+              const Divider(color: Color(0xFFD8CFC2), height: 1),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -460,16 +470,17 @@ class AdminShellLayout extends ConsumerWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              side: const BorderSide(color: FashionColors.borderSubtle),
+                              side: const BorderSide(color: Color(0xFFD8CFC2), width: 1),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            icon: const Icon(Icons.storefront_outlined, size: 18, color: FashionColors.inkPrimary),
+                            icon: const Icon(Icons.storefront_outlined, size: 18, color: Color(0xFF111111)),
                             label: Text(
                               'Tienda Pública',
                               style: GoogleFonts.plusJakartaSans(
-                                color: FashionColors.inkPrimary,
-                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF111111),
+                                fontWeight: FontWeight.w700,
                                 fontSize: 13,
                               ),
                             ),
@@ -483,8 +494,9 @@ class AdminShellLayout extends ConsumerWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              side: const BorderSide(color: FashionColors.statusDanger),
+                              side: const BorderSide(color: FashionColors.statusDanger, width: 1),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             icon: const Icon(Icons.logout_rounded, size: 18, color: FashionColors.statusDanger),
@@ -521,108 +533,128 @@ class AdminShellLayout extends ConsumerWidget {
     required List<_BentoItem> items,
     required ValueChanged<String> onSelect,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: FashionColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: FashionColors.borderSubtle, width: 1),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 4,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: colorAcento,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 14,
+              decoration: BoxDecoration(
+                color: colorAcento,
+                borderRadius: BorderRadius.circular(2),
               ),
-              const SizedBox(width: 8),
-              Text(
-                titulo.toUpperCase(),
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: FashionColors.inkSecondary,
-                  letterSpacing: 0.8,
-                ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              titulo.toUpperCase(),
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF111111),
+                letterSpacing: 0.8,
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          ...items.map((item) {
-            return InkWell(
-              onTap: () => onSelect(item.ruta),
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: item.activo ? FashionColors.surfaceCard : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  border: item.activo
-                      ? Border.all(color: colorAcento.withValues(alpha: 0.4), width: 1.2)
-                      : null,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      item.icono,
-                      size: 20,
-                      color: item.activo ? colorAcento : FashionColors.inkSecondary,
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        const Divider(color: Color(0xFFD8CFC2), height: 1, thickness: 1),
+        const SizedBox(height: 10),
+        ...items.map((item) {
+          final isActivo = item.activo;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSelect(item.ruta),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isActivo ? Colors.white : Colors.white.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isActivo ? const Color(0xFF111111) : const Color(0xFFD8CFC2),
+                      width: isActivo ? 1.5 : 1.0,
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.titulo,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontWeight: item.activo ? FontWeight.w700 : FontWeight.w600,
-                              fontSize: 13,
-                              color: item.activo ? FashionColors.inkPrimary : FashionColors.inkPrimary,
-                            ),
-                          ),
-                          Text(
-                            item.subtitulo,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              color: FashionColors.inkSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (item.activo)
+                  ),
+                  child: Row(
+                    children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        width: 38,
+                        height: 38,
                         decoration: BoxDecoration(
-                          color: colorAcento,
-                          borderRadius: BorderRadius.circular(4),
+                          color: isActivo ? const Color(0xFF111111) : const Color(0xFFF3EEE6),
+                          borderRadius: BorderRadius.circular(10),
+                          border: isActivo
+                              ? null
+                              : Border.all(color: const Color(0xFFD8CFC2), width: 1),
                         ),
-                        child: Text(
-                          'ACTIVO',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
+                        child: Icon(
+                          item.icono,
+                          size: 20,
+                          color: isActivo ? Colors.white : const Color(0xFF111111),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.titulo,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontWeight: isActivo ? FontWeight.w800 : FontWeight.w700,
+                                fontSize: 13,
+                                color: const Color(0xFF111111),
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              item.subtitulo,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF4A4A4A),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isActivo)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF111111),
+                            borderRadius: BorderRadius.circular(6),
                           ),
+                          child: Text(
+                            'ACTIVO',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        )
+                      else
+                        const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 13,
+                          color: Color(0xFF56657A),
                         ),
-                      )
-                    else
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: FashionColors.inkSecondary),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            );
-          }),
-        ],
-      ),
+            ),
+          );
+        }),
+      ],
     );
   }
 
