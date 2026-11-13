@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,9 +47,17 @@ class AppUpdaterService {
       final response = await dio.get(url);
 
       if (response.statusCode == 200 && response.data != null) {
-        final data = response.data is Map<String, dynamic>
-            ? response.data as Map<String, dynamic>
-            : (response.data is String ? Map<String, dynamic>.from(response.data as Map) : null);
+        Map<String, dynamic>? data;
+        if (response.data is Map) {
+          data = Map<String, dynamic>.from(response.data as Map);
+        } else if (response.data is String) {
+          try {
+            final decoded = jsonDecode(response.data as String);
+            if (decoded is Map) {
+              data = Map<String, dynamic>.from(decoded);
+            }
+          } catch (_) {}
+        }
 
         if (data == null) return;
 
