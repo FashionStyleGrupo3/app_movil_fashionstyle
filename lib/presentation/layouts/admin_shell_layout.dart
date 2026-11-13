@@ -28,6 +28,8 @@ class AdminShellLayout extends ConsumerWidget {
     if (path.contains('/seguridad/auditoria')) return 'Bitácora de Auditoría';
     if (path.contains('/seguridad')) return 'Clientes y Usuarios';
     if (path.contains('/cuenta')) return 'Configuración de Cuenta';
+    if (path.contains('/ayuda')) return 'Centro de Ayuda';
+    if (path.contains('/mensajes')) return 'Mensajes y PQRS';
     return 'Panel Administrativo';
   }
 
@@ -38,7 +40,7 @@ class AdminShellLayout extends ConsumerWidget {
     if (path.contains('/prendas') || path.contains('/inventario') || path.contains('/produccion')) {
       return 1; // Taller
     }
-    if (path == '/admin' || path.contains('/seguridad') || path.contains('/cuenta')) {
+    if (path == '/admin' || path.contains('/seguridad') || path.contains('/cuenta') || path.contains('/ayuda') || path.contains('/mensajes')) {
       return 2; // Sistema
     }
     return 3; // Todos / otros
@@ -240,6 +242,20 @@ class AdminShellLayout extends ConsumerWidget {
           icono: Icons.account_circle_outlined,
           activo: currentPath.contains('/cuenta'),
         ),
+        _BentoItem(
+          titulo: 'Mensajes PQRS',
+          subtitulo: 'Bandeja de contacto y PQRS',
+          ruta: '/admin/mensajes',
+          icono: Icons.mail_outline,
+          activo: currentPath.contains('/mensajes'),
+        ),
+        _BentoItem(
+          titulo: 'Centro de Ayuda',
+          subtitulo: 'Manuales de uso y guías',
+          ruta: '/admin/ayuda',
+          icono: Icons.help_outline,
+          activo: currentPath.contains('/ayuda'),
+        ),
       ],
     );
   }
@@ -413,6 +429,20 @@ class AdminShellLayout extends ConsumerWidget {
                           ruta: '/admin/cuenta',
                           icono: Icons.account_circle_outlined,
                           activo: currentPath.contains('/cuenta'),
+                        ),
+                        _BentoItem(
+                          titulo: 'Mensajes PQRS',
+                          subtitulo: 'Bandeja de contacto y PQRS',
+                          ruta: '/admin/mensajes',
+                          icono: Icons.mail_outline,
+                          activo: currentPath.contains('/mensajes'),
+                        ),
+                        _BentoItem(
+                          titulo: 'Centro de Ayuda',
+                          subtitulo: 'Manuales de uso y guías',
+                          ruta: '/admin/ayuda',
+                          icono: Icons.help_outline,
+                          activo: currentPath.contains('/ayuda'),
                         ),
                       ],
                       onSelect: (ruta) {

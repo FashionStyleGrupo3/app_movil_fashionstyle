@@ -101,6 +101,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => FashionRouteScreens.terms(context),
       ),
       GoRoute(
+        path: '/contacto',
+        name: 'contacto',
+        builder: (context, state) => FashionRouteScreens.contact(context),
+      ),
+      GoRoute(
         path: '/perfil',
         name: 'perfil',
         builder: (context, state) => FashionRouteScreens.profile(context, state),
@@ -168,6 +173,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: 'cuenta',
             name: 'admin-cuenta',
             builder: (context, state) => FashionRouteScreens.adminAccount(context),
+          ),
+          GoRoute(
+            path: 'ayuda',
+            name: 'admin-ayuda',
+            builder: (context, state) => FashionRouteScreens.adminHelp(context),
+          ),
+          GoRoute(
+            path: 'mensajes',
+            name: 'admin-mensajes',
+            builder: (context, state) => FashionRouteScreens.adminMessages(context),
           ),
           GoRoute(
             path: 'pagos',

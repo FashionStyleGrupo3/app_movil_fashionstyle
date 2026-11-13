@@ -1,8 +1,8 @@
 {
-  "version": "1.6.0",
-  "buildNumber": 15,
-  "commit": "v1.6.0-production-and-nav-redesign",
-  "updatedAt": "2026-11-13T07:50:00Z",
+  "version": "1.6.1",
+  "buildNumber": 16,
+  "commit": "v1.6.1-web-parity-and-production-modals",
+  "updatedAt": "2026-11-13T08:30:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.6.0: Rediseño completo de la barra de navegación administrativa por secciones emergentes (Comercial, Taller, Sistema, Todos) con resaltado inteligente según la ruta activa. Corrección de órdenes de producción (flujo RF-059 para completar órdenes con reparto de unidades por tallas y descuento de insumos en kárdex, cálculo real de costo_total, validaciones defensivas de stock visible y creación de órdenes). CRUD operativo completo en Materias Primas, Fórmulas de Producción y Proveedores. Refinamiento editorial integrado de UI sobre #F7F4EF con 0 desbordamientos."
+  "notes": "Lanzamiento oficial v1.6.1: Paridad total Web vs Mobile. Modal de cancelación de órdenes en 2 pasos con ajuste de materiales usados ({materiales_usados: [{materia_prima_id, cantidad_usada}]}), barra de búsqueda y filtros de estado por chips en Órdenes de producción, y acciones directas de ciclo de vida (Iniciar, Pausar, Reanudar, Completar, Editar, Cancelar, Eliminar). Vista interactiva y modal de Fórmulas por Prenda con cálculo dinámico de desperdicio, consumo real y costo estimado de materiales por prenda (Screenshot 3). Nuevos módulos: Centro de Ayuda (/admin/ayuda) con 12 guías operativas, Bandeja de Mensajes y PQRS (/admin/mensajes) con respuestas por correo electrónico, y Formulario Oficial de Contacto y PQRS público (/contacto) con radicación y consulta de estado en tiempo real. Rediseño editorial integrado sobre fondo #F7F4EF con 0 desbordamientos."
 }

@@ -16,7 +16,10 @@ import 'package:fashion_style_mobile/presentation/screens/autenticacion/verify_e
 import 'package:fashion_style_mobile/presentation/screens/autenticacion/forgot_password_screen.dart';
 import 'package:fashion_style_mobile/presentation/screens/autenticacion/reset_password_screen.dart';
 import 'package:fashion_style_mobile/presentation/screens/common/placeholder_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_help_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/admin/admin_messages_screen.dart';
 import 'package:fashion_style_mobile/presentation/screens/publico/cart_checkout_screen.dart';
+import 'package:fashion_style_mobile/presentation/screens/publico/contact_screen.dart';
 import 'package:fashion_style_mobile/presentation/screens/publico/terms_screen.dart';
 import 'package:fashion_style_mobile/presentation/screens/publico/catalog_screen.dart';
 import 'package:fashion_style_mobile/presentation/screens/publico/home_screen.dart';
@@ -51,6 +54,7 @@ class FashionRouteScreens {
   };
   static WidgetBuilder catalog = (context) => const CatalogScreen();
   static WidgetBuilder terms = (context) => const TermsScreen();
+  static WidgetBuilder contact = (context) => const ContactScreen();
   static Widget Function(BuildContext, GoRouterState) profile =
       (context, state) => ProfileScreen(
             initialSection: state.uri.queryParameters['seccion'] ?? state.uri.queryParameters['tab'],
@@ -84,4 +88,6 @@ class FashionRouteScreens {
   static WidgetBuilder adminPayments = (context) => const AdminPaymentsConfigScreen();
   static WidgetBuilder adminSecurity = (context) => const AdminSecurityAndUsersScreen();
   static WidgetBuilder adminAudit = (context) => const AdminAuditScreen();
+  static WidgetBuilder adminHelp = (context) => const AdminHelpScreen();
+  static WidgetBuilder adminMessages = (context) => const AdminMessagesScreen();
 }

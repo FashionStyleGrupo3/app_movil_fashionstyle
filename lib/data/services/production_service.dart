@@ -142,10 +142,15 @@ class ProductionService {
     return data is Map<String, dynamic> ? data : {};
   }
 
-  Future<Map<String, dynamic>> cancelarOrdenProduccion(int id, [String? notas]) async {
+  Future<Map<String, dynamic>> cancelarOrdenProduccion(
+    int id, {
+    String? notas,
+    List<Map<String, dynamic>>? materialesUsados,
+  }) async {
     final response = await ApiClient.instance.dio.put('/ordenes-produccion/$id', data: {
       'estado': 'cancelada',
       if (notas != null && notas.isNotEmpty) 'notas': notas,
+      if (materialesUsados != null) 'materiales_usados': materialesUsados,
     });
     final data = ApiResponseParser.extractData(response);
     return data is Map<String, dynamic> ? data : {};

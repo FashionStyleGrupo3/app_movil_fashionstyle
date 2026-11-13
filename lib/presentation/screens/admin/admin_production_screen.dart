@@ -32,6 +32,13 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   List<Map<String, dynamic>> _ordenes = [];
   List<Map<String, dynamic>> _unidadesMedida = [];
 
+  // Fórmulas por prenda state
+  int? _productoFormulaSeleccionadoId;
+
+  // Órdenes filter & search state
+  String _filtroEstadoOrden = '';
+  final TextEditingController _busquedaOrdenCtrl = TextEditingController();
+
   // Simulador state
   ProductionFormulaModel? _formulaSeleccionada;
   int _cantidadProducir = 50;
@@ -54,6 +61,7 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   @override
   void dispose() {
     _busSub?.cancel();
+    _busquedaOrdenCtrl.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -86,6 +94,7 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
         _unidadesMedida = unidades;
         if (calcData != null && calcData!.formulas.isNotEmpty) {
           _formulaSeleccionada ??= calcData!.formulas.first;
+          _productoFormulaSeleccionadoId ??= calcData!.formulas.first.productoId;
         }
         _cargando = false;
       });
@@ -670,132 +679,322 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   }
 
   // ==========================================
-  // 3. FÓRMULAS DE PRODUCCIÓN
+  // 3. FÓRMULAS DE PRODUCCIÓN (PARIDAD WEB SCREENSHOT 3)
   // ==========================================
   Widget _construirFormulas() {
+    // Buscar la fórmula del producto seleccionado
+    Map<String, dynamic>? grupoSeleccionado;
+    if (_productoFormulaSeleccionadoId != null) {
+      for (final g in _formulas) {
+        if (JsonParser.toInt(g['producto_id']) == _productoFormulaSeleccionadoId) {
+          grupoSeleccionado = g;
+          break;
+        }
+      }
+    }
+
+    final List consumos = (grupoSeleccionado?['consumos'] as List?) ?? [];
+
+    // Calcular costo total de materiales por prenda
+    double costoTotalMateriales = 0;
+    final List<Map<String, dynamic>> insumosCalculados = [];
+
+    for (final c in consumos) {
+      final materiaId = JsonParser.toInt(c['materia_prima_id']);
+      Map<String, dynamic>? materia;
+      for (final m in _materias) {
+        if (JsonParser.toInt(m['id_material'] ?? m['id']) == materiaId) {
+          materia = m;
+          break;
+        }
+      }
+
+      final cantidad = JsonParser.toDouble(c['cantidad']);
+      final desperdicio = JsonParser.toDouble(c['desperdicio_porcentaje']);
+      final consumoReal = cantidad * (1 + (desperdicio / 100));
+      final costoUnitario = JsonParser.toDouble(c['costo_unitario_estimado']) > 0
+          ? JsonParser.toDouble(c['costo_unitario_estimado'])
+          : JsonParser.toDouble(materia?['costo_unitario']);
+      final costo = consumoReal * costoUnitario;
+      costoTotalMateriales += costo;
+
+      insumosCalculados.add({
+        'id_formula': c['id_formula'] ?? c['id'],
+        'materia_prima_id': materiaId,
+        'nombre_materia': c['materia_prima']?['nombre'] ?? materia?['nombre'] ?? 'Insumo #$materiaId',
+        'unidad': c['unidad'] ?? materia?['unidad'] ?? 'un',
+        'cantidad': cantidad,
+        'desperdicio': desperdicio,
+        'consumo_real': consumoReal,
+        'proveedor_nombre': c['proveedor']?['nombre'] ?? materia?['proveedor']?['nombre'] ?? '—',
+        'proveedor_id': c['proveedor_id'],
+        'costo_unitario': costoUnitario,
+        'costo': costo,
+        'raw': c,
+      });
+    }
+
     return Column(
       children: [
+        // Selector de Prenda y Botón Agregar Insumo (Matching Web)
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: const BoxDecoration(
-            color: FashionColors.canvasBackground,
+            color: FashionColors.surfaceCard,
             border: Border(bottom: BorderSide(color: FashionColors.borderSubtle)),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${_formulas.length} Fórmulas configuradas', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700, color: FashionColors.inkSecondary)),
-              const Spacer(),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: FashionColors.inkPrimary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                onPressed: () => _abrirModalNuevaFormula(),
-                icon: const Icon(Icons.add, size: 16),
-                label: Text('Nueva Fórmula', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w700)),
+              Text('Prenda', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkSecondary)),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<int>(
+                      value: _productoFormulaSeleccionadoId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(),
+                        hintText: 'Selecciona una prenda...',
+                      ),
+                      items: (_calculadoraData?.formulas ?? []).map((f) {
+                        return DropdownMenuItem<int>(
+                          value: f.productoId,
+                          child: Text(f.nombre, overflow: TextOverflow.ellipsis),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          _productoFormulaSeleccionadoId = val;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FashionColors.brandAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: _productoFormulaSeleccionadoId == null ? null : () => _abrirModalInsumoFormula(),
+                    icon: const Icon(Icons.add, size: 16),
+                    label: Text('Agregar insumo', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                ],
               ),
             ],
           ),
         ),
+
+        // Contenido: Lista de insumos o placeholder
         Expanded(
-          child: _formulas.isEmpty
-              ? RefreshIndicator(
-                  onRefresh: _cargarTodo,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+          child: _productoFormulaSeleccionadoId == null
+              ? Center(
+                  child: Padding(
                     padding: const EdgeInsets.all(32),
-                    children: [
-                      const SizedBox(height: 48),
-                      Icon(Icons.format_list_bulleted_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.5)),
-                      const SizedBox(height: 12),
-                      Center(child: Text('No hay fórmulas configuradas', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 14))),
-                    ],
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.touch_app_outlined, size: 48, color: FashionColors.inkSecondary),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Elige una prenda para ver o armar su receta.',
+                          style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 )
-              : RefreshIndicator(
-                  onRefresh: _cargarTodo,
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
-                    itemCount: _formulas.length,
-                    itemBuilder: (context, index) {
-                      final f = _formulas[index];
-                      final consumos = (f['consumos'] as List?) ?? [];
-                      final nombre = f['nombre']?.toString() ?? 'Prenda';
-                      final precio = JsonParser.toDouble(f['precio_venta']);
-
-                      return Card(
-                        elevation: 0,
-                        margin: const EdgeInsets.only(bottom: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
-                        child: ExpansionTile(
-                          leading: CircleAvatar(
-                            backgroundColor: const Color(0xFF7C3AED).withValues(alpha: 0.15),
-                            child: const Icon(Icons.format_list_bulleted, color: Color(0xFF7C3AED), size: 20),
-                          ),
-                          title: Text(nombre, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
-                          subtitle: Text(
-                            '${consumos.length} insumos · PVP: ${CurrencyFormatter.formatearCOP(precio)}',
-                            style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
-                          ),
+              : insumosCalculados.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              color: FashionColors.surfaceMuted,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Insumos de Confección:', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
-                                  const SizedBox(height: 6),
-                                  if (consumos.isEmpty)
-                                    const Text('Sin insumos registrados', style: TextStyle(fontSize: 11, color: FashionColors.inkSecondary))
-                                  else
-                                    ...consumos.map((c) {
-                                      final mId = c['materia_prima_id'];
-                                      final materia = _calculadoraData?.buscarMateriaPorId(JsonParser.toInt(mId));
-                                      final cant = JsonParser.toDouble(c['cantidad']);
-                                      final unid = c['unidad'] ?? materia?.unidad ?? 'un';
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 2),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text('• ${materia?.nombre ?? "Insumo #$mId"}', style: const TextStyle(fontSize: 12)),
-                                            Text('$cant $unid', style: GoogleFonts.jetBrainsMono(fontSize: 12, fontWeight: FontWeight.w600)),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                ],
-                              ),
+                            const Icon(Icons.format_list_bulleted_outlined, size: 48, color: FashionColors.inkSecondary),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Esta prenda no tiene insumos en su fórmula.',
+                              style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 14),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(backgroundColor: FashionColors.inkPrimary, foregroundColor: Colors.white),
+                              onPressed: () => _abrirModalInsumoFormula(),
+                              icon: const Icon(Icons.add, size: 16),
+                              label: const Text('Agregar Primer Insumo'),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: _cargarTodo,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 96),
+                        children: [
+                          ...insumosCalculados.map((ins) {
+                            return Card(
+                              elevation: 0,
+                              margin: const EdgeInsets.only(bottom: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                side: const BorderSide(color: FashionColors.borderSubtle),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            ins['nombre_materia'].toString(),
+                                            style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                                          ),
+                                        ),
+                                        Text(
+                                          CurrencyFormatter.formatearCOP(ins['costo']),
+                                          style: GoogleFonts.jetBrainsMono(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.brandAccent),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Cant: ${(ins['cantidad'] as double).toStringAsFixed(2)} ${ins['unidad']}',
+                                          style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+                                        ),
+                                        const Text(' · ', style: TextStyle(color: FashionColors.inkSecondary)),
+                                        Text(
+                                          'Desperdicio: ${(ins['desperdicio'] as double).toStringAsFixed(1)}%',
+                                          style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+                                        ),
+                                        const Text(' · ', style: TextStyle(color: FashionColors.inkSecondary)),
+                                        Text(
+                                          'Real: ${(ins['consumo_real'] as double).toStringAsFixed(4)}',
+                                          style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'Proveedor: ${ins['proveedor_nombre']}',
+                                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
+                                        ),
+                                        const Spacer(),
+                                        IconButton(
+                                          icon: const Icon(Icons.edit_outlined, size: 18, color: FashionColors.inkSecondary),
+                                          tooltip: 'Editar insumo',
+                                          onPressed: () => _abrirModalInsumoFormula(insumoEditar: ins),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete_outline, size: 18, color: FashionColors.peligro),
+                                          tooltip: 'Quitar insumo',
+                                          onPressed: () => _quitarInsumoFormula(ins),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+
+                          const SizedBox(height: 8),
+
+                          // Footer con costo total de materiales por prenda
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: FashionColors.borderSubtle),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Costo de materiales por prenda',
+                                  style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                                ),
+                                Text(
+                                  CurrencyFormatter.formatearCOP(costoTotalMateriales),
+                                  style: GoogleFonts.jetBrainsMono(fontSize: 15, fontWeight: FontWeight.w700, color: FashionColors.brandAccent),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
         ),
       ],
     );
   }
 
-  void _abrirModalNuevaFormula() {
-    int? selectedProductoId;
-    int? selectedMateriaId;
-    final cantidadCtrl = TextEditingController(text: '1.5');
-    final notasCtrl = TextEditingController();
+  // MODAL AGREGAR / EDITAR INSUMO DE LA FÓRMULA (PARIDAD WEB SCREENSHOT 3)
+  void _abrirModalInsumoFormula({Map<String, dynamic>? insumoEditar}) {
+    if (_productoFormulaSeleccionadoId == null) return;
+
+    final esEdicion = insumoEditar != null;
+    int? materiaPrimaId = esEdicion ? JsonParser.toInt(insumoEditar['materia_prima_id']) : null;
+    int? proveedorId = esEdicion ? (insumoEditar['proveedor_id'] != null ? JsonParser.toInt(insumoEditar['proveedor_id']) : null) : null;
+    final cantidadCtrl = TextEditingController(text: esEdicion ? '${insumoEditar['cantidad']}' : '1');
+    double desperdicioPorcentaje = esEdicion ? JsonParser.toDouble(insumoEditar['desperdicio']) : 5.0;
+
+    // Buscar grupo de consumos actuales de esta prenda para evitar insumos duplicados en creación
+    final grupoActual = _formulas.firstWhere(
+      (g) => JsonParser.toInt(g['producto_id']) == _productoFormulaSeleccionadoId,
+      orElse: () => <String, dynamic>{},
+    );
+    final List consumosActuales = (grupoActual['consumos'] as List?) ?? [];
+    final setIdsEnReceta = consumosActuales.map((c) => JsonParser.toInt(c['materia_prima_id'])).toSet();
+
+    final materiasDisponibles = _materias.where((m) {
+      final id = JsonParser.toInt(m['id_material'] ?? m['id']);
+      if (esEdicion && id == materiaPrimaId) return true;
+      return !setIdsEnReceta.contains(id);
+    }).toList();
+
+    if (!esEdicion && materiasDisponibles.isNotEmpty) {
+      materiaPrimaId = JsonParser.toInt(materiasDisponibles.first['id_material'] ?? materiasDisponibles.first['id']);
+    }
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) {
+      builder: (sheetCtx) {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
+            Map<String, dynamic>? matElegida;
+            for (final m in _materias) {
+              if (JsonParser.toInt(m['id_material'] ?? m['id']) == materiaPrimaId) {
+                matElegida = m;
+                break;
+              }
+            }
+
+            final cant = double.tryParse(cantidadCtrl.text.trim()) ?? 0;
+            final consumoConDesperdicio = cant * (1 + (desperdicioPorcentaje / 100));
+            final costoUnitario = JsonParser.toDouble(matElegida?['costo_unitario']);
+            final costoEstimado = consumoConDesperdicio * costoUnitario;
+            final unidad = matElegida?['unidad']?.toString() ?? 'un';
+
             return Container(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
@@ -812,80 +1011,213 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Container(width: 40, height: 4, decoration: BoxDecoration(color: FashionColors.borderSubtle, borderRadius: BorderRadius.circular(2))),
+                    Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: FashionColors.borderSubtle, borderRadius: BorderRadius.circular(2)))),
+                    const SizedBox(height: 14),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          esEdicion ? 'Editar insumo de la fórmula' : 'Agregar insumo a la fórmula',
+                          style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded, size: 20, color: FashionColors.inkSecondary),
+                          onPressed: () => Navigator.pop(sheetCtx),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    Text('Nueva Fórmula de Producción', style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
+
+                    // Selector de Insumo
+                    Text('Insumo *', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 6),
                     DropdownButtonFormField<int>(
-                      value: selectedProductoId,
+                      value: materiaPrimaId,
                       isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'Prenda / Producto *', border: OutlineInputBorder()),
-                      items: (_calculadoraData?.formulas ?? []).map((f) {
+                      decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
+                      items: materiasDisponibles.map((m) {
+                        final id = JsonParser.toInt(m['id_material'] ?? m['id']);
                         return DropdownMenuItem<int>(
-                          value: f.productoId,
-                          child: Text(f.nombre, overflow: TextOverflow.ellipsis),
-                        );
-                      }).toList(),
-                      onChanged: (v) => setModalState(() => selectedProductoId = v),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      value: selectedMateriaId,
-                      isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'Materia Prima / Insumo *', border: OutlineInputBorder()),
-                      items: _materias.map((m) {
-                        final id = m['id_material'] ?? m['id'];
-                        return DropdownMenuItem<int>(
-                          value: id is int ? id : int.tryParse(id.toString()),
+                          value: id,
                           child: Text('${m['nombre']} (${m['unidad'] ?? "un"})', overflow: TextOverflow.ellipsis),
                         );
                       }).toList(),
-                      onChanged: (v) => setModalState(() => selectedMateriaId = v),
+                      onChanged: (val) {
+                        setModalState(() {
+                          materiaPrimaId = val;
+                        });
+                      },
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: cantidadCtrl,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(labelText: 'Consumo por unidad confeccionada *', border: OutlineInputBorder()),
+                    const SizedBox(height: 14),
+
+                    // Fila Cantidad y Desperdicio
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Cantidad por prenda ($unidad) *', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 6),
+                              TextFormField(
+                                controller: cantidadCtrl,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
+                                onChanged: (_) => setModalState(() {}),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Desperdicio (%)', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 6),
+                              Container(
+                                height: 48,
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                alignment: Alignment.centerLeft,
+                                decoration: BoxDecoration(
+                                  color: FashionColors.canvasBackground,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: FashionColors.borderSubtle),
+                                ),
+                                child: Text(
+                                  esEdicion ? '${desperdicioPorcentaje.toStringAsFixed(1)}% · automático' : 'Se asigna automáticamente',
+                                  style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: notasCtrl,
-                      decoration: const InputDecoration(labelText: 'Notas / Observaciones', border: OutlineInputBorder()),
+                    const SizedBox(height: 14),
+
+                    // Selector de Proveedor (opcional)
+                    Text('Proveedor (opcional)', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<int?>(
+                      value: proveedorId,
+                      isExpanded: true,
+                      decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
+                      items: [
+                        const DropdownMenuItem<int?>(value: null, child: Text('Sin proveedor asignado')),
+                        ..._proveedores.map((p) {
+                          final id = JsonParser.toInt(p['id']);
+                          return DropdownMenuItem<int?>(value: id, child: Text(p['nombre']?.toString() ?? 'Proveedor #$id'));
+                        }),
+                      ],
+                      onChanged: (val) => setModalState(() => proveedorId = val),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Live Preview Box (Matching Screenshot 3)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: FashionColors.canvasBackground,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: FashionColors.borderSubtle),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.calculate_outlined, size: 16, color: FashionColors.slateAccent),
+                              const SizedBox(width: 6),
+                              Text('Cálculo Dinámico:', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.slateAccent)),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          RichText(
+                            text: TextSpan(
+                              style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkPrimary),
+                              children: [
+                                const TextSpan(text: 'Consumo real por prenda: '),
+                                TextSpan(
+                                  text: '${consumoConDesperdicio.toStringAsFixed(4)} $unidad',
+                                  style: const TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                                const TextSpan(text: ' · Costo estimado: '),
+                                TextSpan(
+                                  text: CurrencyFormatter.formatearCOP(costoEstimado),
+                                  style: const TextStyle(fontWeight: FontWeight.w700, color: FashionColors.brandAccent),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: FashionColors.inkPrimary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+
+                    // Botones Cancelar / Guardar
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: () => Navigator.pop(sheetCtx),
+                            child: const Text('Cancelar'),
+                          ),
                         ),
-                        onPressed: () async {
-                          if (selectedProductoId == null || selectedMateriaId == null) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Selecciona producto y materia prima')));
-                            return;
-                          }
-                          try {
-                            await ProductionService.instance.crearFormula({
-                              'producto_id': selectedProductoId,
-                              'materia_prima_id': selectedMateriaId,
-                              'cantidad': double.tryParse(cantidadCtrl.text.trim()) ?? 1,
-                              'notas': notasCtrl.text.trim(),
-                            });
-                            Navigator.pop(ctx);
-                            ChangeBus.instance.notifyAll(['produccion']);
-                            _cargarTodo();
-                          } catch (e) {
-                            _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'Error al registrar insumo en la fórmula.'));
-                          }
-                        },
-                        child: const Text('Agregar Insumo a la Fórmula'),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: FashionColors.brandAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: () async {
+                              if (materiaPrimaId == null || cant <= 0) {
+                                ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Ingresa un insumo y una cantidad válida')));
+                                return;
+                              }
+
+                              final payload = {
+                                'producto_id': _productoFormulaSeleccionadoId,
+                                'materia_prima_id': materiaPrimaId,
+                                'cantidad': cant,
+                                'unidad_medida_id': matElegida?['unidad_medida_id'] ?? matElegida?['unidad_medida']?['id'],
+                                'costo_unitario_estimado': costoUnitario,
+                                'proveedor_id': proveedorId,
+                              };
+
+                              try {
+                                if (esEdicion) {
+                                  final idFormula = JsonParser.toInt(insumoEditar['id_formula']);
+                                  await ProductionService.instance.actualizarFormula(idFormula, payload);
+                                } else {
+                                  await ProductionService.instance.crearFormula(payload);
+                                }
+                                Navigator.pop(sheetCtx);
+                                ChangeBus.instance.notifyAll(['produccion']);
+                                _cargarTodo();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(esEdicion ? 'Insumo actualizado con éxito.' : 'Insumo agregado a la receta.')),
+                                );
+                              } catch (e) {
+                                _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'No se pudo guardar el insumo.'));
+                              }
+                            },
+                            child: Text(
+                              esEdicion ? 'Guardar cambios' : 'Agregar',
+                              style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -895,6 +1227,35 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
         );
       },
     );
+  }
+
+  Future<void> _quitarInsumoFormula(Map<String, dynamic> ins) async {
+    final conf = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Quitar Insumo'),
+        content: Text('¿Deseas quitar "${ins['nombre_materia']}" de la receta de esta prenda?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sí, quitar'),
+          ),
+        ],
+      ),
+    );
+
+    if (conf == true) {
+      try {
+        final idFormula = JsonParser.toInt(ins['id_formula']);
+        await ProductionService.instance.eliminarFormula(idFormula);
+        ChangeBus.instance.notifyAll(['produccion']);
+        _cargarTodo();
+      } catch (e) {
+        _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'No se pudo quitar el insumo.'));
+      }
+    }
   }
 
   // ==========================================
@@ -1138,37 +1499,104 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
   }
 
   // ==========================================
-  // 5. ÓRDENES DE PRODUCCIÓN (COMPLETAR & CRUD)
+  // 5. ÓRDENES DE PRODUCCIÓN (PARIDAD WEB SCREENSHOTS 1 & 2)
   // ==========================================
   Widget _construirOrdenes() {
+    final busq = _busquedaOrdenCtrl.text.trim().toLowerCase();
+    final ordenesFiltradas = _ordenes.where((o) {
+      final estado = (o['estado']?.toString() ?? 'planificada').toLowerCase();
+      if (_filtroEstadoOrden.isNotEmpty && estado != _filtroEstadoOrden) return false;
+      if (busq.isNotEmpty) {
+        final numStr = (o['numero']?.toString() ?? '').toLowerCase();
+        final prendaStr = _nombrePrendaOrden(o).toLowerCase();
+        final notasStr = (o['notas']?.toString() ?? '').toLowerCase();
+        return numStr.contains(busq) || prendaStr.contains(busq) || notasStr.contains(busq);
+      }
+      return true;
+    }).toList();
+
     return Column(
       children: [
+        // Barra Superior: Búsqueda y Botón Nueva Orden
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
           decoration: const BoxDecoration(
-            color: FashionColors.canvasBackground,
+            color: FashionColors.surfaceCard,
             border: Border(bottom: BorderSide(color: FashionColors.borderSubtle)),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${_ordenes.length} Órdenes de Producción', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700, color: FashionColors.inkSecondary)),
-              const Spacer(),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: FashionColors.inkPrimary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _busquedaOrdenCtrl,
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
+                        hintText: 'Buscar por número, prenda o notas...',
+                        hintStyle: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary.withValues(alpha: 0.6)),
+                        prefixIcon: const Icon(Icons.search, size: 18, color: FashionColors.inkSecondary),
+                        suffixIcon: _busquedaOrdenCtrl.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 16),
+                                onPressed: () {
+                                  _busquedaOrdenCtrl.clear();
+                                  setState(() {});
+                                },
+                              )
+                            : null,
+                        filled: true,
+                        fillColor: FashionColors.canvasBackground,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.borderSubtle)),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: FashionColors.inkPrimary)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FashionColors.inkPrimary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () => _abrirModalNuevaOrden(),
+                    icon: const Icon(Icons.add, size: 16),
+                    label: Text('Nueva Orden', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Filter Chips: Todos, Planificada, En proceso, Pausada, Completada, Cancelada
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildChipEstadoOrden('Todos', ''),
+                    const SizedBox(width: 6),
+                    _buildChipEstadoOrden('Planificada', 'planificada'),
+                    const SizedBox(width: 6),
+                    _buildChipEstadoOrden('En proceso', 'en_proceso'),
+                    const SizedBox(width: 6),
+                    _buildChipEstadoOrden('Pausada', 'pausada'),
+                    const SizedBox(width: 6),
+                    _buildChipEstadoOrden('Completada', 'completada'),
+                    const SizedBox(width: 6),
+                    _buildChipEstadoOrden('Cancelada', 'cancelada'),
+                  ],
                 ),
-                onPressed: () => _abrirModalNuevaOrden(),
-                icon: const Icon(Icons.add, size: 16),
-                label: Text('Nueva Orden', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w700)),
               ),
             ],
           ),
         ),
+
+        // Lista de Órdenes
         Expanded(
-          child: _ordenes.isEmpty
+          child: ordenesFiltradas.isEmpty
               ? RefreshIndicator(
                   onRefresh: _cargarTodo,
                   child: ListView(
@@ -1176,9 +1604,16 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                     padding: const EdgeInsets.all(32),
                     children: [
                       const SizedBox(height: 48),
-                      Icon(Icons.assignment_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.5)),
+                      Icon(Icons.assignment_outlined, size: 48, color: FashionColors.inkSecondary.withValues(alpha: 0.4)),
                       const SizedBox(height: 12),
-                      Center(child: Text('No hay órdenes de producción registradas', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 14))),
+                      Center(
+                        child: Text(
+                          _ordenes.isEmpty
+                              ? 'No hay órdenes de producción registradas'
+                              : 'No hay órdenes que coincidan con los filtros',
+                          style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
+                        ),
+                      ),
                     ],
                   ),
                 )
@@ -1186,11 +1621,11 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                   onRefresh: _cargarTodo,
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(left: 12, right: 12, top: 12, bottom: 96),
-                    itemCount: _ordenes.length,
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 96),
+                    itemCount: ordenesFiltradas.length,
                     itemBuilder: (context, index) {
-                      final o = _ordenes[index];
-                      final id = o['id_orden'] ?? o['id'];
+                      final o = ordenesFiltradas[index];
+                      final id = JsonParser.toInt(o['id_orden'] ?? o['id']);
                       final numero = o['numero']?.toString() ?? 'ORD-#$id';
                       final estado = (o['estado']?.toString() ?? 'planificada').toLowerCase();
                       final esCompletada = estado == 'completada';
@@ -1199,16 +1634,29 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                       final costoReal = _extraerCostoOrden(o);
                       final cantidad = JsonParser.toInt(o['cantidad']);
 
-                      Color badgeColor = FashionColors.slateAccent;
-                      if (esCompletada) badgeColor = FashionColors.verdeExito;
-                      if (esCancelada) badgeColor = FashionColors.peligro;
-                      if (estado == 'en_proceso') badgeColor = const Color(0xFF2563EB);
-                      if (estado == 'pausada') badgeColor = FashionColors.aviso;
+                      Color badgeBg = const Color(0xFFF3F4F6);
+                      Color badgeText = const Color(0xFF6B7280);
+                      if (estado == 'planificada') {
+                        badgeBg = const Color(0xFFFEF3C7);
+                        badgeText = const Color(0xFFB45309);
+                      } else if (estado == 'en_proceso') {
+                        badgeBg = const Color(0xFFEFF6FF);
+                        badgeText = const Color(0xFF1D4ED8);
+                      } else if (estado == 'pausada') {
+                        badgeBg = const Color(0xFFFFF7ED);
+                        badgeText = const Color(0xFFC2410C);
+                      } else if (esCompletada) {
+                        badgeBg = const Color(0xFFECFDF5);
+                        badgeText = const Color(0xFF047857);
+                      }
 
                       return Card(
                         elevation: 0,
                         margin: const EdgeInsets.only(bottom: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: const BorderSide(color: FashionColors.borderSubtle)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: const BorderSide(color: FashionColors.borderSubtle),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(12),
                           child: Column(
@@ -1216,77 +1664,137 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                             children: [
                               Row(
                                 children: [
-                                  Text(numero, style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
+                                  Text(
+                                    numero,
+                                    style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                                  ),
                                   const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: badgeColor.withValues(alpha: 0.12),
+                                      color: badgeBg,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       estado.toUpperCase(),
-                                      style: GoogleFonts.spaceGrotesk(fontSize: 9, fontWeight: FontWeight.w700, color: badgeColor),
+                                      style: GoogleFonts.spaceGrotesk(fontSize: 9, fontWeight: FontWeight.w700, color: badgeText),
                                     ),
                                   ),
                                   const Spacer(),
-                                  if (!esCompletada && !esCancelada)
-                                    PopupMenuButton<String>(
-                                      icon: const Icon(Icons.more_horiz, size: 18),
-                                      onSelected: (val) {
-                                        if (val == 'cancelar') {
-                                          _cancelarOrden(id);
-                                        } else if (val == 'en_proceso' || val == 'pausada') {
-                                          _cambiarEstadoOrden(id, val);
-                                        }
-                                      },
-                                      itemBuilder: (ctx) => [
-                                        if (estado != 'en_proceso')
-                                          const PopupMenuItem(value: 'en_proceso', child: Text('Pasar a En Proceso')),
-                                        if (estado != 'pausada')
-                                          const PopupMenuItem(value: 'pausada', child: Text('Pausar Orden')),
-                                        const PopupMenuItem(value: 'cancelar', child: Text('Cancelar Orden', style: TextStyle(color: FashionColors.peligro))),
-                                      ],
-                                    ),
+                                  Text(
+                                    o['created_at'] != null ? o['created_at'].toString().split('T').first : '',
+                                    style: GoogleFonts.jetBrainsMono(fontSize: 10, color: FashionColors.inkSecondary),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 6),
-                              Text(nombrePrenda, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary)),
+                              Text(
+                                nombrePrenda,
+                                style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13, color: FashionColors.inkPrimary),
+                              ),
                               const SizedBox(height: 4),
                               Row(
                                 children: [
                                   Text('Lote: $cantidad prendas', style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary)),
                                   const Text(' · ', style: TextStyle(color: FashionColors.inkSecondary)),
-                                  Text('Costo: ${CurrencyFormatter.formatearCOP(costoReal)}', style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary)),
+                                  Text(
+                                    'Costo: ${CurrencyFormatter.formatearCOP(costoReal)}',
+                                    style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary),
+                                  ),
                                 ],
                               ),
                               if (o['notas'] != null && o['notas'].toString().isNotEmpty) ...[
                                 const SizedBox(height: 4),
-                                Text('Notas: ${o['notas']}', style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: FashionColors.inkSecondary)),
+                                Text(
+                                  'Notas: ${o['notas']}',
+                                  style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: FashionColors.inkSecondary),
+                                ),
                               ],
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
+
+                              // Botones de acción del ciclo de vida
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  if (!esCompletada && !esCancelada) ...[
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: FashionColors.verdeExito,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                      ),
-                                      onPressed: () => _abrirModalCompletar(o),
-                                      icon: const Icon(Icons.check_circle_outline, size: 16),
-                                      label: Text('Completar Orden', style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700)),
+                                  // Acciones para Planificada: Iniciar, Editar, Cancelar, Eliminar
+                                  if (estado == 'planificada') ...[
+                                    IconButton(
+                                      icon: const Icon(Icons.play_arrow_rounded, color: Color(0xFF2563EB), size: 20),
+                                      tooltip: 'Iniciar producción',
+                                      onPressed: () => _cambiarEstadoOrden(id, 'en_proceso'),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit_outlined, color: FashionColors.inkSecondary, size: 18),
+                                      tooltip: 'Editar orden',
+                                      onPressed: () => _abrirModalEdicionOrden(o),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.cancel_outlined, color: FashionColors.peligro, size: 18),
+                                      tooltip: 'Cancelar orden',
+                                      onPressed: () => _abrirModalCancelacion2Pasos(o),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: FashionColors.peligro, size: 18),
+                                      tooltip: 'Eliminar orden',
+                                      onPressed: () => _eliminarOrden(id),
                                     ),
                                   ],
+
+                                  // Acciones para En Proceso: Pausar, Completar, Editar, Cancelar, Eliminar
+                                  if (estado == 'en_proceso') ...[
+                                    IconButton(
+                                      icon: const Icon(Icons.pause_rounded, color: Color(0xFFD97706), size: 20),
+                                      tooltip: 'Pausar producción',
+                                      onPressed: () => _cambiarEstadoOrden(id, 'pausada'),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.check_circle_outline_rounded, color: FashionColors.verdeExito, size: 20),
+                                      tooltip: 'Completar orden',
+                                      onPressed: () => _abrirModalCompletar(o),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit_outlined, color: FashionColors.inkSecondary, size: 18),
+                                      tooltip: 'Editar orden',
+                                      onPressed: () => _abrirModalEdicionOrden(o),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.cancel_outlined, color: FashionColors.peligro, size: 18),
+                                      tooltip: 'Cancelar orden',
+                                      onPressed: () => _abrirModalCancelacion2Pasos(o),
+                                    ),
+                                  ],
+
+                                  // Acciones para Pausada: Reanudar, Completar, Editar, Cancelar
+                                  if (estado == 'pausada') ...[
+                                    IconButton(
+                                      icon: const Icon(Icons.play_arrow_rounded, color: Color(0xFF2563EB), size: 20),
+                                      tooltip: 'Reanudar producción',
+                                      onPressed: () => _cambiarEstadoOrden(id, 'en_proceso'),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.check_circle_outline_rounded, color: FashionColors.verdeExito, size: 20),
+                                      tooltip: 'Completar orden',
+                                      onPressed: () => _abrirModalCompletar(o),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit_outlined, color: FashionColors.inkSecondary, size: 18),
+                                      tooltip: 'Editar orden',
+                                      onPressed: () => _abrirModalEdicionOrden(o),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.cancel_outlined, color: FashionColors.peligro, size: 18),
+                                      tooltip: 'Cancelar orden',
+                                      onPressed: () => _abrirModalCancelacion2Pasos(o),
+                                    ),
+                                  ],
+
+                                  // Acciones para Cancelada: Eliminar
                                   if (esCancelada) ...[
                                     TextButton.icon(
                                       style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
                                       onPressed: () => _eliminarOrden(id),
                                       icon: const Icon(Icons.delete_outline, size: 16),
-                                      label: const Text('Eliminar Orden', style: TextStyle(fontSize: 11)),
+                                      label: const Text('Eliminar', style: TextStyle(fontSize: 11)),
                                     ),
                                   ],
                                 ],
@@ -1300,6 +1808,30 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
                 ),
         ),
       ],
+    );
+  }
+
+  Widget _buildChipEstadoOrden(String etiqueta, String valor) {
+    final sel = _filtroEstadoOrden == valor;
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => setState(() => _filtroEstadoOrden = valor),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: sel ? FashionColors.brandAccent : FashionColors.canvasBackground,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: sel ? FashionColors.brandAccent : FashionColors.borderSubtle),
+        ),
+        child: Text(
+          etiqueta,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: sel ? Colors.white : FashionColors.inkSecondary,
+          ),
+        ),
+      ),
     );
   }
 
@@ -1503,32 +2035,483 @@ class _AdminProductionScreenState extends ConsumerState<AdminProductionScreen> w
     }
   }
 
-  Future<void> _cancelarOrden(int id) async {
-    final conf = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cancelar Orden'),
-        content: const Text('¿Estás seguro de cancelar esta orden de producción?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('No')),
-          TextButton(
-            style: TextButton.styleFrom(foregroundColor: FashionColors.peligro),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Cancelar Orden'),
-          ),
-        ],
-      ),
-    );
+  // ==========================================
+  // MODAL DE CANCELACIÓN EN 2 PASOS (PARIDAD WEB SCREENSHOTS 1 & 2)
+  // ==========================================
+  Future<void> _abrirModalCancelacion2Pasos(Map<String, dynamic> orden) async {
+    final id = JsonParser.toInt(orden['id_orden'] ?? orden['id']);
+    final numero = orden['numero']?.toString() ?? 'ORD-#$id';
+    final cantidadOrden = JsonParser.toInt(orden['cantidad'], 1);
 
-    if (conf == true) {
-      try {
-        await ProductionService.instance.cancelarOrdenProduccion(id);
-        ChangeBus.instance.notifyAll(['produccion']);
-        _cargarTodo();
-      } catch (e) {
-        _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'No se pudo cancelar la orden.'));
+    // Obtener los insumos de la fórmula de esta orden
+    List consumosOrden = [];
+    final formula = orden['formula'];
+    if (formula is Map<String, dynamic>) {
+      final cList = formula['consumos'] ?? formula['materia_prima'];
+      if (cList is List) consumosOrden = cList;
+    }
+
+    // Si la orden no traía consumos anidados, buscamos en _formulas por producto_id
+    if (consumosOrden.isEmpty) {
+      final productoId = formula is Map<String, dynamic>
+          ? JsonParser.toInt(formula['producto_id'] ?? formula['producto']?['id_producto'])
+          : null;
+      if (productoId != null) {
+        for (final g in _formulas) {
+          if (JsonParser.toInt(g['producto_id']) == productoId) {
+            consumosOrden = (g['consumos'] as List?) ?? [];
+            break;
+          }
+        }
       }
     }
+
+    final Map<int, TextEditingController> controladoresMateriales = {};
+    for (final c in consumosOrden) {
+      final mId = JsonParser.toInt(c['materia_prima_id']);
+      if (mId > 0) {
+        controladoresMateriales[mId] = TextEditingController(text: '0');
+      }
+    }
+
+    int pasoCancelacion = 1;
+    bool enviandoCancelacion = false;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 440),
+                padding: const EdgeInsets.all(22),
+                child: pasoCancelacion == 1
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 60,
+                            height: 60,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFEE2E2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.warning_amber_rounded, size: 34, color: Color(0xFFDC2626)),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            '¿Se usaron materiales?',
+                            style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Para cancelar la orden $numero, dinos si se llegó a cortar tela o usar insumos del inventario.',
+                            style: GoogleFonts.plusJakartaSans(fontSize: 13, color: FashionColors.inkSecondary, height: 1.4),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Opción 1: No usé nada (Devolver todo)
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 13),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                side: const BorderSide(color: FashionColors.borderSubtle),
+                              ),
+                              onPressed: enviandoCancelacion
+                                  ? null
+                                  : () async {
+                                      setDialogState(() => enviandoCancelacion = true);
+                                      try {
+                                        await ProductionService.instance.cancelarOrdenProduccion(id, materialesUsados: []);
+                                        Navigator.pop(dialogCtx);
+                                        ChangeBus.instance.notifyAll(['produccion', 'inventarios']);
+                                        await _cargarTodo();
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              backgroundColor: FashionColors.inkPrimary,
+                                              content: Text('$numero cancelada y stock ajustado.'),
+                                            ),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        setDialogState(() => enviandoCancelacion = false);
+                                        _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'No se pudo cancelar la orden.'));
+                                      }
+                                    },
+                              child: Text(
+                                'No, no usé nada (Devolver todo)',
+                                style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Opción 2: Sí usé materiales (Ajustar stock)
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFDC2626),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 13),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: () {
+                                setDialogState(() => pasoCancelacion = 2);
+                              },
+                              child: Text(
+                                'Sí, usé materiales (Ajustar stock)',
+                                style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogCtx),
+                            child: Text(
+                              'Cancelar',
+                              style: GoogleFonts.spaceGrotesk(fontSize: 12, color: FashionColors.inkSecondary),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFFEE2E2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.warning_amber_rounded, size: 20, color: Color(0xFFDC2626)),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Ajuste de materiales',
+                                      style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                                    ),
+                                    Text(
+                                      'Ingresa las cantidades realmente usadas.',
+                                      style: GoogleFonts.plusJakartaSans(fontSize: 11, color: FashionColors.inkSecondary),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 250),
+                            child: consumosOrden.isEmpty
+                                ? Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Text(
+                                        'No se encontraron materiales en la fórmula de esta orden.',
+                                        style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: consumosOrden.length,
+                                    itemBuilder: (ctx, idx) {
+                                      final c = consumosOrden[idx];
+                                      final mId = JsonParser.toInt(c['materia_prima_id']);
+                                      Map<String, dynamic>? mat;
+                                      for (final m in _materias) {
+                                        if (JsonParser.toInt(m['id_material'] ?? m['id']) == mId) {
+                                          mat = m;
+                                          break;
+                                        }
+                                      }
+
+                                      final nomMat = c['materia_prima']?['nombre'] ?? c['nombre'] ?? mat?['nombre'] ?? 'Insumo #$mId';
+                                      final unidad = c['unidad'] ?? mat?['unidad'] ?? 'un';
+                                      final cantPorPrenda = JsonParser.toDouble(c['cantidad']);
+                                      final requeridoTotal = cantPorPrenda * cantidadOrden;
+
+                                      return Container(
+                                        margin: const EdgeInsets.only(bottom: 8),
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: FashionColors.canvasBackground,
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: FashionColors.borderSubtle),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    nomMat,
+                                                    style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    'Requerido: ${requeridoTotal.toStringAsFixed(2)} $unidad',
+                                                    style: GoogleFonts.jetBrainsMono(fontSize: 11, color: FashionColors.inkSecondary),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            SizedBox(
+                                              width: 80,
+                                              child: TextFormField(
+                                                controller: controladoresMateriales[mId],
+                                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                                textAlign: TextAlign.center,
+                                                decoration: const InputDecoration(
+                                                  isDense: true,
+                                                  contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => setDialogState(() => pasoCancelacion = 1),
+                                child: Text('Atrás', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w600)),
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFDC2626),
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                onPressed: enviandoCancelacion
+                                    ? null
+                                    : () async {
+                                        setDialogState(() => enviandoCancelacion = true);
+                                        try {
+                                          final payloadMateriales = controladoresMateriales.entries.map((e) {
+                                            return {
+                                              'materia_prima_id': e.key,
+                                              'cantidad_usada': double.tryParse(e.value.text.trim()) ?? 0,
+                                            };
+                                          }).toList();
+
+                                          await ProductionService.instance.cancelarOrdenProduccion(
+                                            id,
+                                            materialesUsados: payloadMateriales,
+                                          );
+                                          Navigator.pop(dialogCtx);
+                                          ChangeBus.instance.notifyAll(['produccion', 'inventarios']);
+                                          await _cargarTodo();
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                backgroundColor: FashionColors.inkPrimary,
+                                                content: Text('$numero cancelada y stock ajustado.'),
+                                              ),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          setDialogState(() => enviandoCancelacion = false);
+                                          _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'No se pudo cancelar la orden.'));
+                                        }
+                                      },
+                                child: Text(
+                                  enviandoCancelacion ? 'Cancelando...' : 'Confirmar Cancelación',
+                                  style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ==========================================
+  // MODAL DE EDICIÓN DE ORDEN (PARIDAD WEB)
+  // ==========================================
+  void _abrirModalEdicionOrden(Map<String, dynamic> orden) {
+    final id = JsonParser.toInt(orden['id_orden'] ?? orden['id']);
+    final numero = orden['numero']?.toString() ?? 'ORD-#$id';
+    final nombrePrenda = _nombrePrendaOrden(orden);
+    final cantidadAnterior = JsonParser.toInt(orden['cantidad'], 1);
+    final costoTotalAnterior = _extraerCostoOrden(orden);
+    final costoPorUnidad = costoTotalAnterior / cantidadAnterior;
+
+    final cantidadCtrl = TextEditingController(text: '$cantidadAnterior');
+    final notasCtrl = TextEditingController(text: orden['notas']?.toString() ?? '');
+    bool guardando = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            final nuevaCant = int.tryParse(cantidadCtrl.text.trim()) ?? cantidadAnterior;
+            final nuevoCosto = costoPorUnidad * nuevaCant;
+
+            return Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+                left: 20,
+                right: 20,
+                top: 16,
+              ),
+              decoration: const BoxDecoration(
+                color: FashionColors.surfaceCard,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: FashionColors.borderSubtle, borderRadius: BorderRadius.circular(2)))),
+                    const SizedBox(height: 14),
+
+                    Text('Editar $numero', style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary)),
+                    Text(nombrePrenda, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: FashionColors.inkSecondary)),
+                    const SizedBox(height: 16),
+
+                    Text('Unidades a producir', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 6),
+                    TextFormField(
+                      controller: cantidadCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12)),
+                      onChanged: (_) => setModalState(() {}),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'El costo total se reajusta automáticamente según las unidades.',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 10, color: FashionColors.inkSecondary),
+                    ),
+                    const SizedBox(height: 14),
+
+                    Text('Notas', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 6),
+                    TextFormField(
+                      controller: notasCtrl,
+                      maxLines: 3,
+                      decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.all(12)),
+                    ),
+                    const SizedBox(height: 14),
+
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: FashionColors.canvasBackground, borderRadius: BorderRadius.circular(10), border: Border.all(color: FashionColors.borderSubtle)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Nuevo Costo Estimado:', style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600)),
+                          Text(CurrencyFormatter.formatearCOP(nuevoCosto), style: GoogleFonts.jetBrainsMono(fontSize: 13, fontWeight: FontWeight.w700, color: FashionColors.brandAccent)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: () => Navigator.pop(sheetCtx),
+                            child: const Text('Cancelar'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: FashionColors.brandAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: guardando
+                                ? null
+                                : () async {
+                                    if (nuevaCant < 1 || nuevaCant > 100000) {
+                                      ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('La cantidad debe estar entre 1 y 100.000.')));
+                                      return;
+                                    }
+
+                                    setModalState(() => guardando = true);
+                                    try {
+                                      final payload = <String, dynamic>{
+                                        'notas': notasCtrl.text.trim().isNotEmpty ? notasCtrl.text.trim() : null,
+                                      };
+                                      if (nuevaCant != cantidadAnterior) {
+                                        payload['cantidad'] = nuevaCant;
+                                        payload['costo_total'] = double.parse(nuevoCosto.toStringAsFixed(2));
+                                      }
+
+                                      await ProductionService.instance.actualizarOrdenProduccion(id, payload);
+                                      Navigator.pop(sheetCtx);
+                                      ChangeBus.instance.notifyAll(['produccion']);
+                                      await _cargarTodo();
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$numero actualizada.')));
+                                      }
+                                    } catch (e) {
+                                      setModalState(() => guardando = false);
+                                      _mostrarErrorDialog(ApiClient.obtenerMensajeError(e, 'No se pudo actualizar la orden.'));
+                                    }
+                                  },
+                            child: Text(guardando ? 'Guardando...' : 'Guardar cambios', style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w700)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _cambiarEstadoOrden(int id, String nuevoEstado) async {
