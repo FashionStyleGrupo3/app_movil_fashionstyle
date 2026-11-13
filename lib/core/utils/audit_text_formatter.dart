@@ -1,10 +1,24 @@
 // @source-mirror: src/services/usuarioServicio.js, src/services/seguridadServicio.js, src/utils/auditoriaTexto.js
+import 'dart:convert';
 import 'package:fashion_style_mobile/core/network/api_response_parser.dart';
 import 'package:fashion_style_mobile/core/utils/currency_formatter.dart';
 import 'package:fashion_style_mobile/data/models/audit/audit_models.dart';
 import 'package:intl/intl.dart';
 
 class AuditTextFormatter {
+  static const List<String> _mesesCortos = [
+    'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
+  ];
+
+  static const List<String> _mesesLargos = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ];
+
+  static const List<String> _diasSemana = [
+    'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
+  ];
+
   static String formatearUsuario(dynamic userRaw) {
     if (userRaw == null) return 'Sistema';
     if (userRaw is String) {
@@ -14,11 +28,11 @@ class AuditTextFormatter {
     if (userRaw is Map) {
       final nombre = userRaw['nombre'] ?? userRaw['name'] ?? userRaw['usuario'];
       final correo = userRaw['correo'] ?? userRaw['email'];
-      if (nombre != null && correo != null && nombre.toString().isNotEmpty && correo.toString().isNotEmpty) {
+      if (nombre != null && correo != null && nombre.toString().trim().isNotEmpty && correo.toString().trim().isNotEmpty) {
         return '${nombre.toString().trim()} (${correo.toString().trim()})';
       }
-      if (nombre != null && nombre.toString().isNotEmpty) return nombre.toString().trim();
-      if (correo != null && correo.toString().isNotEmpty) return correo.toString().trim();
+      if (nombre != null && nombre.toString().trim().isNotEmpty) return nombre.toString().trim();
+      if (correo != null && correo.toString().trim().isNotEmpty) return correo.toString().trim();
       final id = userRaw['id_usuario'] ?? userRaw['id'];
       if (id != null) return 'Usuario #$id';
       return 'Sistema';
@@ -52,13 +66,17 @@ class AuditTextFormatter {
   };
 
   static const Map<String, Map<String, String>> acciones = {
-    'created': {'etiqueta': 'Creado', 'verbo': 'creó'},
-    'updated': {'etiqueta': 'Modificado', 'verbo': 'modificó'},
-    'deleted': {'etiqueta': 'Eliminado', 'verbo': 'eliminó'},
-    'INICIO_SESION': {'etiqueta': 'Inicio de Sesión', 'verbo': 'inició sesión'},
+    'created': {'etiqueta': 'Creación', 'verbo': 'creó'},
+    'creacion': {'etiqueta': 'Creación', 'verbo': 'creó'},
+    'updated': {'etiqueta': 'Actualización', 'verbo': 'modificó'},
+    'actualizacion': {'etiqueta': 'Actualización', 'verbo': 'modificó'},
+    'deleted': {'etiqueta': 'Eliminación', 'verbo': 'eliminó'},
+    'eliminacion': {'etiqueta': 'Eliminación', 'verbo': 'eliminó'},
+    'inicio_sesion': {'etiqueta': 'Inicio de Sesión', 'verbo': 'inició sesión'},
     'login': {'etiqueta': 'Inicio de Sesión', 'verbo': 'inició sesión'},
-    'anulado': {'etiqueta': 'Anulado', 'verbo': 'anuló'},
-    'cancelado': {'etiqueta': 'Cancelado', 'verbo': 'canceló'},
+    'anulado': {'etiqueta': 'Anulación', 'verbo': 'anuló'},
+    'cancelado': {'etiqueta': 'Cancelación', 'verbo': 'canceló'},
+    'estado': {'etiqueta': 'Cambio de Estado', 'verbo': 'cambió estado de'},
   };
 
   static const Map<String, String> etiquetas = {
@@ -66,12 +84,16 @@ class AuditTextFormatter {
     'nombre': 'Nombre',
     'descripcion': 'Descripción',
     'color': 'Color',
+    'talla': 'Talla',
     'categoria_id': 'Categoría',
     'catalogo_id': 'Colección',
     'precio_venta': 'Precio de venta',
+    'precio': 'Precio',
+    'costo': 'Costo',
+    'valor': 'Valor',
     'activo': 'Activo',
-    'publicado': 'Publicado en la tienda',
-    'numero_comprobante': 'N.º de comprobante',
+    'publicado': 'Publicado en tienda',
+    'numero_comprobante': 'N.º comprobante',
     'pedido_id': 'Pedido',
     'usuario_id': 'Responsable',
     'cliente_nombre': 'Cliente',
@@ -99,6 +121,10 @@ class AuditTextFormatter {
     'terminos_version': 'Versión de términos',
     'terminos_aceptados_at': 'Términos aceptados el',
     'foto_perfil': 'Foto de perfil',
+    'via': 'Método de acceso',
+    'ultimo_acceso': 'Último acceso',
+    'stock_minimo': 'Stock mínimo',
+    'descuento': 'Descuento',
   };
 
   static const Set<String> ocultos = {
@@ -130,8 +156,9 @@ class AuditTextFormatter {
 
   static String etiquetaCampo(String campo) {
     if (etiquetas.containsKey(campo)) return etiquetas[campo]!;
-    final limpio = campo.replaceAll(RegExp(r'_id$'), '').replaceAll('_', ' ');
-    return limpio.isEmpty ? campo : limpio[0].toUpperCase() + limpio.substring(1);
+    final limpio = campo.replaceAll(RegExp(r'_id$'), '').replaceAll('_', ' ').trim();
+    if (limpio.isEmpty) return campo;
+    return limpio[0].toUpperCase() + (limpio.length > 1 ? limpio.substring(1) : '');
   }
 
   static bool esCampoVisible(String campo) {
@@ -143,15 +170,18 @@ class AuditTextFormatter {
     final fecha = DateTime.tryParse(valor.toString());
     if (fecha == null) return valor.toString();
 
-    final formato = conHora
-        ? DateFormat("d 'de' MMMM 'de' y, h:mm a", 'es_CO')
-        : DateFormat("d 'de' MMMM 'de' y", 'es_CO');
     try {
+      final formato = conHora
+          ? DateFormat("d 'de' MMMM 'de' y, h:mm a", 'es_CO')
+          : DateFormat("d 'de' MMMM 'de' y", 'es_CO');
       return formato.format(fecha);
     } catch (_) {
-      return conHora
-          ? '${fecha.day}/${fecha.month}/${fecha.year} ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')}'
-          : '${fecha.day}/${fecha.month}/${fecha.year}';
+      final mes = _mesesCortos[fecha.month - 1];
+      if (!conHora) return '${fecha.day} de $mes de ${fecha.year}';
+      final hora = fecha.hour > 12 ? fecha.hour - 12 : (fecha.hour == 0 ? 12 : fecha.hour);
+      final ampm = fecha.hour >= 12 ? 'p.m.' : 'a.m.';
+      final minStr = fecha.minute.toString().padLeft(2, '0');
+      return '${fecha.day} de $mes de ${fecha.year}, $hora:$minStr $ampm';
     }
   }
 
@@ -170,18 +200,57 @@ class AuditTextFormatter {
 
     if (campo == 'foto_perfil') return 'Imagen cargada';
     if (campo.endsWith('_id')) return '#$valor';
-    if (campo.endsWith('_at') || campo.startsWith('fecha_')) return formatearFecha(valor);
+    if (campo.endsWith('_at') || campo.startsWith('fecha_') || campo == 'ultimo_acceso') {
+      return formatearFecha(valor);
+    }
 
     if (valor is Map) {
-      return valor.values.map((e) => e?.toString() ?? '').join(', ');
+      if (valor.isEmpty) return '—';
+      return valor.entries
+          .map((e) => '${etiquetaCampo(e.key.toString())}: ${formatearValor(e.key.toString(), e.value)}')
+          .join(', ');
+    }
+
+    if (valor is List) {
+      if (valor.isEmpty) return '—';
+      return valor.map((e) => formatearValor(campo, e)).join(', ');
+    }
+
+    if (valor is String) {
+      final s = valor.trim();
+      if ((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))) {
+        try {
+          final decoded = jsonDecode(s);
+          return formatearValor(campo, decoded);
+        } catch (_) {}
+      }
     }
 
     final texto = valor.toString();
     final corto = texto.length > 90 ? '${texto.substring(0, 90)}…' : texto;
     if (corto.isNotEmpty && RegExp(r'^[a-záéíóúüñÁÉÍÓÚÜÑ]', unicode: true).hasMatch(corto)) {
-      return corto[0].toUpperCase() + corto.substring(1);
+      return corto[0].toUpperCase() + (corto.length > 1 ? corto.substring(1) : '');
     }
     return corto;
+  }
+
+  static Map<String, dynamic> extraerMapaSeguro(dynamic raw) {
+    if (raw == null) return {};
+    if (raw is Map) {
+      return raw.map((k, v) => MapEntry(k.toString(), v));
+    }
+    if (raw is String) {
+      final s = raw.trim();
+      if (s.startsWith('{') && s.endsWith('}')) {
+        try {
+          final dec = jsonDecode(s);
+          if (dec is Map) {
+            return dec.map((k, v) => MapEntry(k.toString(), v));
+          }
+        } catch (_) {}
+      }
+    }
+    return {};
   }
 
   static String? _nombreDelRegistro(Map<String, dynamic> datos) {
@@ -194,7 +263,8 @@ class AuditTextFormatter {
   }
 
   static String? _verboEspecial(Map<String, dynamic> item, List<AuditFieldChange> cambios) {
-    if (item['accion']?.toString() != 'updated' || cambios.isEmpty) return null;
+    final accion = item['accion']?.toString().toLowerCase() ?? '';
+    if (accion != 'updated' || cambios.isEmpty) return null;
 
     final Map<String, AuditFieldChange> porCampo = {
       for (final c in cambios) c.campo: c,
@@ -218,18 +288,15 @@ class AuditTextFormatter {
   static AuditDescription describirAuditoria(Map<String, dynamic> item) {
     final modelo = infoModelo(item['modelo']);
     final accionRaw = item['accion']?.toString() ?? 'updated';
-    final accionDef = acciones[accionRaw] ?? {'etiqueta': accionRaw, 'verbo': 'registró'};
+    final accionNorm = accionRaw.toLowerCase().replaceAll(' ', '_');
+    final accionDef = acciones[accionNorm] ?? acciones[accionRaw] ?? {'etiqueta': accionRaw, 'verbo': 'registró'};
     final accion = AuditActionInfo(
-      etiqueta: accionDef['etiqueta']!,
-      verbo: accionDef['verbo']!,
+      etiqueta: accionDef['etiqueta'] ?? accionRaw,
+      verbo: accionDef['verbo'] ?? 'registró',
     );
 
-    final Map<String, dynamic> antes = item['datos_anteriores'] is Map
-        ? (item['datos_anteriores'] as Map).map((k, v) => MapEntry(k.toString(), v))
-        : {};
-    final Map<String, dynamic> nuevos = item['datos_nuevos'] is Map
-        ? (item['datos_nuevos'] as Map).map((k, v) => MapEntry(k.toString(), v))
-        : {};
+    final Map<String, dynamic> antes = extraerMapaSeguro(item['datos_anteriores']);
+    final Map<String, dynamic> nuevos = extraerMapaSeguro(item['datos_nuevos']);
 
     final Map<String, dynamic> referencia = {...antes, ...nuevos};
     final nombre = _nombreDelRegistro(referencia);
@@ -237,7 +304,7 @@ class AuditTextFormatter {
     List<AuditFieldChange> cambios = [];
     List<AuditFieldData> datos = [];
 
-    if (accionRaw == 'updated') {
+    if (accionNorm == 'updated' || accionNorm == 'actualizacion') {
       final Set<String> todosCampos = {...antes.keys, ...nuevos.keys};
       final camposVisibles = todosCampos.where(esCampoVisible).toList();
 
@@ -257,7 +324,7 @@ class AuditTextFormatter {
         }
       }
     } else {
-      final origen = accionRaw == 'deleted' ? antes : nuevos;
+      final origen = (accionNorm == 'deleted' || accionNorm == 'eliminacion') ? antes : nuevos;
       for (final campo in origen.keys.where(esCampoVisible)) {
         final val = origen[campo];
         if (val != null && val != '') {
@@ -272,12 +339,14 @@ class AuditTextFormatter {
       }
     }
 
-    final bool soloInterno = accionRaw == 'updated' && cambios.isEmpty;
+    final bool soloInterno = (accionNorm == 'updated' || accionNorm == 'actualizacion') && cambios.isEmpty;
     final userMap = item['usuario'] is Map ? item['usuario'] as Map : null;
     final actor = JsonParser.toStr(userMap?['nombre'], 'El sistema');
     final verbo = _verboEspecial(item, cambios) ?? accion.verbo;
     final modeloId = item['modelo_id'];
-    final sujeto = nombre ?? (modeloId != null ? '#$modeloId' : '');
+    final sujeto = nombre != null && nombre.isNotEmpty
+        ? (nombre.startsWith('#') ? nombre : '«$nombre»')
+        : (modeloId != null ? '#$modeloId' : '');
 
     return AuditDescription(
       modelo: modelo,
@@ -319,9 +388,11 @@ class AuditTextFormatter {
 
     try {
       final texto = DateFormat("EEEE, d 'de' MMMM 'de' y", 'es_CO').format(fecha);
-      return texto.isNotEmpty ? texto[0].toUpperCase() + texto.substring(1) : texto;
+      return texto.isNotEmpty ? (texto[0].toUpperCase() + (texto.length > 1 ? texto.substring(1) : '')) : texto;
     } catch (_) {
-      return '${fecha.day}/${fecha.month}/${fecha.year}';
+      final diaSemana = _diasSemana[fecha.weekday - 1];
+      final mes = _mesesLargos[fecha.month - 1];
+      return '$diaSemana, ${fecha.day} de $mes de ${fecha.year}';
     }
   }
 }

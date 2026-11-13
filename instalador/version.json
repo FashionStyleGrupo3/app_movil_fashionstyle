@@ -1,8 +1,8 @@
 {
-  "version": "1.5.3",
-  "buildNumber": 12,
-  "commit": "v1.5.3-qa-runtime-fixes-orders-home",
-  "updatedAt": "2026-11-12T17:30:00Z",
+  "version": "1.5.4",
+  "buildNumber": 13,
+  "commit": "v1.5.4-audit-screen-carousel-fixes",
+  "updatedAt": "2026-11-12T19:30:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.5.3: Corrección de errores de tiempo de ejecución en adb logcat (blindaje de WebSocket Reverb contra excepciones no controladas y mitigación de AGTM en decodificación de imágenes en Android 17), eliminación total de avisos pegados de bolsa/carrito en transiciones de rutas y modales, sincronización en tiempo real de estados de pedidos en modo prueba y avance de despacho en Pedidos y Facturas con recálculo dinámico de KPIs, barra de búsqueda superior y carrusel hero full-width en portada, botones de Cerrar Sesión y Eliminar Cuenta con confirmación en Mi Perfil, y corrección del pipeline CI en develop."
+  "notes": "Lanzamiento oficial v1.5.4: Corrección crítica de ErrorWidget gris en la Bitácora de Auditoría (formateo seguro de fechas sin dependencia rígida de tablas de localización intl, soporte para datos JSON en cadena y desglose detallado de qué cambios se hicieron antes -> después), corrección de diapositivas negras y encuadre cortado en el carrusel de inicio (resolución en cascada de imágenes de portada, encuadre superior/medio Alignment(0, -0.35), opacidad 1.0 y scrim de gradiente inferior para máxima luminosidad y legibilidad), y sincronización robusta en CI con git pull --rebase."
 }

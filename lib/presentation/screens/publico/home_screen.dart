@@ -146,6 +146,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   List<_DiapositivaHero> _obtenerDiapositivas() {
+    const String defaultHeroFallback = 'img/hero.jpg';
+    final String fallbackUrl = ImageUrlResolver.resolve(defaultHeroFallback);
+
     if (_colecciones.isNotEmpty) {
       return _colecciones.map((col) {
         final prendasCol = _productos.where((p) => p.catalogo?.idCatalogo == col.idCatalogo).toList();
@@ -155,9 +158,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             .take(3)
             .toList();
 
-        final foto = col.original['imagen'] != null
-            ? ImageUrlResolver.resolve(col.original['imagen'])
-            : (imagenes.isNotEmpty ? imagenes.first : '');
+        // 1. Revisar si la colección tiene imagen propia válida
+        String foto = '';
+        final rawColImg = col.original['imagen'] ?? col.original['imagen_url'];
+        if (rawColImg != null && rawColImg.toString().trim().isNotEmpty) {
+          foto = ImageUrlResolver.resolve(rawColImg.toString());
+        }
+
+        // 2. Si no tiene imagen propia, elegir la primera imagen de las prendas de esta colección
+        if (foto.isEmpty && imagenes.isNotEmpty) {
+          foto = imagenes.first;
+        }
+
+        // 3. Si tampoco tiene prendas con foto, elegir la primera imagen de cualquier producto del catálogo
+        if (foto.isEmpty) {
+          final cualquierFoto = _productos
+              .map((p) => p.primeraImagenUrl)
+              .firstWhere((img) => img.isNotEmpty, orElse: () => '');
+          if (cualquierFoto.isNotEmpty) {
+            foto = cualquierFoto;
+          }
+        }
+
+        // 4. Si aún no hay foto, respaldo en storage hero.jpg
+        if (foto.isEmpty) {
+          foto = fallbackUrl;
+        }
 
         return _DiapositivaHero(
           id: col.idCatalogo,
@@ -176,12 +202,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .take(3)
         .toList();
 
+    final primeraFoto = imagenesPortadas.isNotEmpty ? imagenesPortadas.first : fallbackUrl;
+
     return [
       _DiapositivaHero(
         id: null,
         titulo: 'Nueva Colección ${DateTime.now().year}',
         texto: 'Moda minimalista y sastrería de alta gama.',
-        fotoUrl: imagenesPortadas.isNotEmpty ? imagenesPortadas.first : '',
+        fotoUrl: primeraFoto,
         imagenesPrendas: imagenesPortadas,
         totalPrendas: _productos.length,
       )
@@ -360,34 +388,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     return Stack(
                       fit: StackFit.expand,
                       children: [
-                        // Imagen de portada de fondo inmersiva y nítida
+                        // Imagen de portada de fondo inmersiva y nítida (opacidad 1.0, encuadre superior/medio, placeholder arenaSuave)
                         if (d.fotoUrl.isNotEmpty)
                           Positioned.fill(
-                            child: Opacity(
-                              opacity: 0.82,
-                              child: CachedNetworkImage(
-                                imageUrl: d.fotoUrl,
+                            child: CachedNetworkImage(
+                              imageUrl: d.fotoUrl,
+                              fit: BoxFit.cover,
+                              alignment: const Alignment(0, -0.35),
+                              memCacheWidth: 1080,
+                              placeholder: (_, __) => Container(color: FashionColors.arenaSuave),
+                              errorWidget: (_, __, ___) => Image.asset(
+                                'assets/images/prenda-respaldo.png',
                                 fit: BoxFit.cover,
-                                memCacheWidth: 1080,
-                                placeholder: (_, __) => Container(color: FashionColors.inkPrimary),
-                                errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                                alignment: const Alignment(0, -0.35),
                               ),
+                            ),
+                          )
+                        else
+                          Positioned.fill(
+                            child: Image.asset(
+                              'assets/images/prenda-respaldo.png',
+                              fit: BoxFit.cover,
+                              alignment: const Alignment(0, -0.35),
                             ),
                           ),
 
-                        // Gradiente de contraste para legibilidad total del texto
+                        // Gradiente de contraste inferior (scrim solo en la base para máxima nitidez y legibilidad)
                         Positioned.fill(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
                                 colors: [
-                                  FashionColors.inkPrimary.withValues(alpha: 0.95),
-                                  FashionColors.inkPrimary.withValues(alpha: 0.78),
                                   Colors.transparent,
+                                  Colors.transparent,
+                                  const Color(0xD9111111),
                                 ],
-                                stops: const [0.35, 0.70, 1.0],
+                                stops: const [0.0, 0.45, 1.0],
                               ),
                             ),
                           ),
