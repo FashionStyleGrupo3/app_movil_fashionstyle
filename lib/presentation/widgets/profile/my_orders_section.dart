@@ -235,7 +235,7 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                   label: Text(e['label']!),
                   selected: sel,
                   selectedColor: FashionColors.inkPrimary,
-                  backgroundColor: FashionColors.surfaceCard,
+                  backgroundColor: FashionColors.surfaceMuted,
                   side: BorderSide(color: sel ? FashionColors.inkPrimary : FashionColors.borderSubtle),
                   labelStyle: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
@@ -319,8 +319,8 @@ class _SeccionMisPedidosState extends ConsumerState<SeccionMisPedidos> {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               decoration: BoxDecoration(
-                                color: FashionColors.surfaceCard,
-                                borderRadius: BorderRadius.circular(16),
+                                color: FashionColors.surfaceMuted,
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: FashionColors.borderSubtle),
                               ),
                               child: Column(

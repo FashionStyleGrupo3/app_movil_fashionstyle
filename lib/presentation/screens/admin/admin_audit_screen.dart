@@ -196,16 +196,9 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
-        borderRadius: BorderRadius.circular(16),
+        color: FashionColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: FashionColors.bordeClaro),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -599,7 +592,7 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
+        color: FashionColors.surfaceMuted,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.4)),
       ),

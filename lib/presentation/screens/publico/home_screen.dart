@@ -789,7 +789,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: activo ? FashionColors.inkPrimary : FashionColors.surfaceCard,
+          color: activo ? FashionColors.inkPrimary : FashionColors.surfaceMuted,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: activo ? FashionColors.inkPrimary : FashionColors.borderSubtle,
@@ -856,8 +856,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 250,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: FashionColors.surfaceCard,
-                  borderRadius: BorderRadius.circular(16),
+                  color: FashionColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: FashionColors.borderSubtle),
                 ),
                 child: Row(

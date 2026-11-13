@@ -1,8 +1,8 @@
 {
-  "version": "1.5.5",
-  "buildNumber": 14,
-  "commit": "v1.5.5-admin-security-and-backend-sync",
-  "updatedAt": "2026-11-13T06:30:00Z",
+  "version": "1.6.0",
+  "buildNumber": 15,
+  "commit": "v1.6.0-seamless-ui-refinement",
+  "updatedAt": "2026-11-13T07:20:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.5.5: Sincronización con backend (PR #49) y frontend (PRs #71-#72) con validaciones de seguridad para eliminación de colaboradores (prohibición de autoeliminación de administradores y protección del último administrador en el sistema), soporte de auditorías para nuevos módulos observados en backend, optimización de áreas táctiles en formulario de prendas y checkout."
+  "notes": "Lanzamiento oficial v1.6.0: Refinamiento de UI editorial integrado: eliminación de contenedores y tarjetas pesadas para una integración limpia sobre el fondo crema oficial (#F7F4EF) con separadores sutiles (#E4DDD2); unificación del encabezado de perfil eliminando elementos duplicados y asegurando contraste accesible en avatar, iniciales y botones; pestañas editoriales con subrayado continuo; campos de formulario sin bordes pesados; optimización de espacio y consistencia estética en vistas públicas y administrativas con 0 desbordamientos."
 }

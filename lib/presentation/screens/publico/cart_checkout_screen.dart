@@ -539,8 +539,8 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
-        borderRadius: BorderRadius.circular(16),
+        color: FashionColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: FashionColors.borderSubtle),
       ),
       child: Stack(
@@ -705,10 +705,10 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
 
   Widget _construirResumenFinanciero(CartState cart) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
-        borderRadius: BorderRadius.circular(16),
+        color: FashionColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: FashionColors.borderSubtle),
       ),
       child: Column(
@@ -760,8 +760,8 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
   Widget _construirFormularioEntrega() {
     return Container(
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
-        borderRadius: BorderRadius.circular(16),
+        color: FashionColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: FashionColors.borderSubtle),
       ),
       child: ExpansionTile(

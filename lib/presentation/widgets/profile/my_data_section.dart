@@ -1,18 +1,14 @@
 // @source-mirror: src/views/publico/VistaMiPerfil.vue, src/components/perfil/SeccionMisPedidos.vue, src/components/perfil/SeccionFavoritos.vue
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
 import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/core/validators/garment_and_field_validators.dart';
 import 'package:fashion_style_mobile/core/validators/password_validator.dart';
 import 'package:fashion_style_mobile/data/services/user_service.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
-import 'package:go_router/go_router.dart';
-import 'package:fashion_style_mobile/core/utils/image_url_resolver.dart';
-import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SeccionMisDatos extends ConsumerStatefulWidget {
   const SeccionMisDatos({super.key});
@@ -63,152 +59,6 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     _passNuevaCtrl.dispose();
     _passConfirmCtrl.dispose();
     super.dispose();
-  }
-
-  bool _subiendoFoto = false;
-
-  Future<ImageSource?> _seleccionarOrigenImagen() async {
-    return showModalBottomSheet<ImageSource>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: FashionColors.surfaceCard,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: FashionColors.borderSubtle,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              Text(
-                'Seleccionar Foto de Perfil',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: FashionColors.inkPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: FashionColors.surfaceMuted,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.camera_alt_outlined, color: FashionColors.inkPrimary),
-                ),
-                title: Text('Tomar foto con la cámara', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14)),
-                subtitle: Text('Abre la cámara para una nueva captura', style: GoogleFonts.inter(fontSize: 11.5, color: FashionColors.inkSecondary)),
-                onTap: () => Navigator.pop(ctx, ImageSource.camera),
-              ),
-              const SizedBox(height: 6),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: FashionColors.surfaceMuted,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.photo_library_outlined, color: FashionColors.inkPrimary),
-                ),
-                title: Text('Elegir de la galería', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14)),
-                subtitle: Text('Selecciona una imagen guardada en tu dispositivo', style: GoogleFonts.inter(fontSize: 11.5, color: FashionColors.inkSecondary)),
-                onTap: () => Navigator.pop(ctx, ImageSource.gallery),
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _subirNuevaFoto() async {
-    final origen = await _seleccionarOrigenImagen();
-    if (origen == null) return;
-    final picker = ImagePicker();
-    final foto = await picker.pickImage(source: origen, maxWidth: 800, imageQuality: 85);
-    if (foto == null) return;
-
-    setState(() => _subiendoFoto = true);
-    try {
-      final res = await UserService.instance.subirFotoPerfil(foto.path, foto.name);
-      final fotoUrl = res['foto_perfil'] ?? res['foto'] ?? res['url'] ?? res['foto_url'];
-      if (fotoUrl != null) {
-        await ref.read(authProvider.notifier).actualizarUsuario({
-          'foto_perfil': fotoUrl,
-          'foto': fotoUrl,
-          ...res,
-        });
-      }
-      await ref.read(authProvider.notifier).refrescarSesion();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Foto de perfil actualizada correctamente'),
-            backgroundColor: FashionColors.verdeExito,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(ApiClient.obtenerMensajeError(e, 'No se pudo subir la imagen de perfil.')),
-            backgroundColor: FashionColors.peligro,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _subiendoFoto = false);
-    }
-  }
-
-  Future<void> _quitarFoto() async {
-    setState(() => _subiendoFoto = true);
-    try {
-      await UserService.instance.quitarFotoPerfil();
-      await ref.read(authProvider.notifier).actualizarUsuario({
-        'foto_perfil': null,
-        'foto': null,
-      });
-      await ref.read(authProvider.notifier).refrescarSesion();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Foto de perfil eliminada'),
-            backgroundColor: FashionColors.verdeExito,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible quitar la foto de perfil.')),
-            backgroundColor: FashionColors.peligro,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _subiendoFoto = false);
-    }
   }
 
   Future<void> _guardarPerfil() async {
@@ -359,436 +209,242 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
     }
   }
 
-  Widget _avatarFallback(AuthState authState) {
-    final inicial = (authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0] : 'U').toUpperCase();
-    return Center(
-      child: Text(
-        inicial,
-        style: GoogleFonts.inter(
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          color: FashionColors.inkPrimary,
-        ),
+  InputDecoration _decoracionInput(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13),
+      filled: true,
+      fillColor: FashionColors.surfaceMuted,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: FashionColors.borderSubtle),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: FashionColors.borderSubtle),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: FashionColors.inkPrimary, width: 1.2),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 96), // Clearance para Floating Pill Dock
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 96), // Clearance para dock inferior
       children: [
-        // GESTIÓN Y VISOR DE FOTO DE PERFIL
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: FashionColors.surfaceCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: FashionColors.borderSubtle),
-          ),
-          child: Column(
-            children: [
-              Center(
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: 92,
-                      height: 92,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: FashionColors.surfaceMuted,
-                        border: Border.all(color: FashionColors.borderSubtle, width: 2),
-                      ),
-                      child: ClipOval(
-                        child: _subiendoFoto
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(strokeWidth: 2.5, color: FashionColors.inkPrimary),
-                                ),
-                              )
-                            : (authState.fotoUsuario != null && authState.fotoUsuario!.trim().isNotEmpty)
-                                ? Image.network(
-                                    ImageUrlResolver.resolve(authState.fotoUsuario!),
-                                    key: ValueKey(authState.fotoUsuario),
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => _avatarFallback(authState),
-                                  )
-                                : _avatarFallback(authState),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Material(
-                        color: FashionColors.inkPrimary,
-                        shape: const CircleBorder(),
-                        elevation: 2,
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: _subiendoFoto ? null : _subirNuevaFoto,
-                          child: const Padding(
-                            padding: EdgeInsets.all(7),
-                            child: Icon(Icons.camera_alt, color: Colors.white, size: 16),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Usuario FashionStyle',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                authState.correoUsuario,
-                style: GoogleFonts.inter(fontSize: 12.5, color: FashionColors.inkSecondary),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: FashionColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: FashionColors.borderSubtle),
-                ),
-                child: Text(
-                  authState.esAdmin
-                      ? 'Administrador General'
-                      : (authState.esEmpleado ? 'Personal Operativo Staff' : 'Cliente Registrado'),
-                  style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: FashionColors.inkPrimary),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: FashionColors.inkPrimary,
-                      side: const BorderSide(color: FashionColors.borderSubtle),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    ),
-                    onPressed: _subiendoFoto ? null : _subirNuevaFoto,
-                    icon: const Icon(Icons.photo_camera_outlined, size: 16),
-                    label: Text(
-                      authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty ? 'Cambiar foto' : 'Subir foto',
-                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 12.5),
-                    ),
-                  ),
-                  if (authState.fotoUsuario != null && authState.fotoUsuario!.isNotEmpty) ...[
-                    const SizedBox(width: 10),
-                    TextButton.icon(
-                      style: TextButton.styleFrom(
-                        foregroundColor: FashionColors.statusDanger,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                      onPressed: _subiendoFoto ? null : _quitarFoto,
-                      icon: const Icon(Icons.delete_outline, size: 16),
-                      label: Text('Quitar foto', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 12.5)),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
+        // 1. INFORMACIÓN PERSONAL (INTEGRADA DIRECTAMENTE EN EL LIENZO)
+        Text(
+          'Información Personal',
+          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
         ),
-
-        const SizedBox(height: 16),
-
-        // DATOS PERSONALES
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: FashionColors.surfaceCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: FashionColors.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Información Personal',
-                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _nombreCtrl,
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Nombre completo',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _telefonoCtrl,
-                keyboardType: TextInputType.phone,
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Teléfono',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _ciudadCtrl,
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Ciudad',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _direccionCtrl,
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Dirección habitual',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FashionColors.brandAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: _cargandoPerfil ? null : _guardarPerfil,
-                  child: _cargandoPerfil
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : Text('Guardar cambios de perfil', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
-                ),
-              ),
-            ],
-          ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _nombreCtrl,
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Nombre completo'),
         ),
-
-        const SizedBox(height: 16),
-
-        // CAMBIO DE CORREO (2 PASOS)
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: FashionColors.surfaceCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: FashionColors.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Cambio de Correo Electrónico',
-                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
-              ),
-              const SizedBox(height: 14),
-              if (!_esperandoCodigoCorreo) ...[
-                TextField(
-                  controller: _nuevoCorreoCtrl,
-                  keyboardType: TextInputType.emailAddress,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                  decoration: InputDecoration(
-                    labelText: 'Nuevo correo electrónico',
-                    labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                    filled: true,
-                    fillColor: FashionColors.surfaceMuted,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FashionColors.inkPrimary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: _cargandoCorreo ? null : _solicitarCambioCorreo,
-                  child: _cargandoCorreo
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : Text('Solicitar código de cambio', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                ),
-              ] else ...[
-                TextField(
-                  controller: _codigoCorreoCtrl,
-                  keyboardType: TextInputType.number,
-                  maxLength: 6,
-                  style: GoogleFonts.jetBrainsMono(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 4),
-                  decoration: InputDecoration(
-                    labelText: 'Código de 6 dígitos recibido',
-                    counterText: '',
-                    filled: true,
-                    fillColor: FashionColors.surfaceMuted,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.statusSuccess,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: _cargandoCorreo ? null : _confirmarCambioCorreo,
-                      child: const Text('Confirmar nuevo correo'),
-                    ),
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: () => setState(() => _esperandoCodigoCorreo = false),
-                      child: Text('Cancelar', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary)),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _telefonoCtrl,
+          keyboardType: TextInputType.phone,
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Teléfono'),
         ),
-
-        const SizedBox(height: 16),
-
-        // CAMBIO DE CONTRASEÑA
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: FashionColors.surfaceCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: FashionColors.borderSubtle),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Seguridad y Contraseña',
-                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _passActualCtrl,
-                obscureText: true,
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Contraseña actual',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _passNuevaCtrl,
-                obscureText: true,
-                onChanged: (_) => setState(() {}),
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Nueva contraseña',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _passConfirmCtrl,
-                obscureText: true,
-                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
-                decoration: InputDecoration(
-                  labelText: 'Confirmar nueva contraseña',
-                  labelStyle: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary, fontSize: 13.5),
-                  filled: true,
-                  fillColor: FashionColors.surfaceMuted,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FashionColors.brandAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: _cargandoPass ? null : _actualizarPassword,
-                  child: _cargandoPass
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : Text('Actualizar contraseña', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14)),
-                ),
-              ),
-            ],
-          ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _ciudadCtrl,
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Ciudad'),
         ),
-        const SizedBox(height: 20),
-
-        // CERRAR SESIÓN
-        Container(
+        const SizedBox(height: 10),
+        TextField(
+          controller: _direccionCtrl,
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Dirección habitual'),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
           width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 12),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.inkPrimary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: _cargandoPerfil ? null : _guardarPerfil,
+            child: _cargandoPerfil
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text('Guardar cambios de perfil', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 13.5)),
+          ),
+        ),
+
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Divider(color: FashionColors.borderSubtle, height: 1),
+        ),
+
+        // 2. CAMBIO DE CORREO ELECTRÓNICO (INTEGRADO EN EL LIENZO)
+        Text(
+          'Cambio de Correo Electrónico',
+          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+        ),
+        const SizedBox(height: 12),
+        if (!_esperandoCodigoCorreo) ...[
+          TextField(
+            controller: _nuevoCorreoCtrl,
+            keyboardType: TextInputType.emailAddress,
+            style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+            decoration: _decoracionInput('Nuevo correo electrónico'),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: FashionColors.inkPrimary,
+                side: const BorderSide(color: FashionColors.borderSubtle),
+                backgroundColor: FashionColors.surfaceMuted,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: _cargandoCorreo ? null : _solicitarCambioCorreo,
+              child: _cargandoCorreo
+                  ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: FashionColors.inkPrimary))
+                  : Text('Solicitar código de confirmación', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13)),
+            ),
+          ),
+        ] else ...[
+          TextField(
+            controller: _codigoCorreoCtrl,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            style: GoogleFonts.jetBrainsMono(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 4),
+            decoration: _decoracionInput('Código de 6 dígitos recibido').copyWith(counterText: ''),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FashionColors.statusSuccess,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: _cargandoCorreo ? null : _confirmarCambioCorreo,
+                  child: const Text('Confirmar nuevo correo'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () => setState(() => _esperandoCodigoCorreo = false),
+                child: Text('Cancelar', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary)),
+              ),
+            ],
+          ),
+        ],
+
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Divider(color: FashionColors.borderSubtle, height: 1),
+        ),
+
+        // 3. SEGURIDAD Y CONTRASEÑA (INTEGRADO EN EL LIENZO)
+        Text(
+          'Seguridad y Contraseña',
+          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 16, color: FashionColors.inkPrimary),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _passActualCtrl,
+          obscureText: true,
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Contraseña actual'),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _passNuevaCtrl,
+          obscureText: true,
+          onChanged: (_) => setState(() {}),
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Nueva contraseña'),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _passConfirmCtrl,
+          obscureText: true,
+          style: GoogleFonts.plusJakartaSans(fontSize: 14, color: FashionColors.inkPrimary),
+          decoration: _decoracionInput('Confirmar nueva contraseña'),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.inkPrimary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: _cargandoPass ? null : _actualizarPassword,
+            child: _cargandoPass
+                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text('Actualizar contraseña', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 13.5)),
+          ),
+        ),
+
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Divider(color: FashionColors.borderSubtle, height: 1),
+        ),
+
+        // 4. CERRAR SESIÓN
+        SizedBox(
+          width: double.infinity,
           child: OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: FashionColors.textoPrincipal,
-              side: const BorderSide(color: FashionColors.bordeClaro, width: 1.5),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              backgroundColor: FashionColors.surfaceSecondary,
+              foregroundColor: FashionColors.inkPrimary,
+              side: const BorderSide(color: FashionColors.borderSubtle, width: 1.5),
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              backgroundColor: FashionColors.surfaceMuted,
             ),
             icon: const Icon(Icons.logout_rounded, size: 18),
             label: Text(
               'Cerrar Sesión',
-              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
+              style: GoogleFonts.plusJakartaSans(fontSize: 13.5, fontWeight: FontWeight.w600),
             ),
             onPressed: () async {
               final confirmar = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  backgroundColor: FashionColors.backgroundCanvas,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  backgroundColor: FashionColors.canvasBackground,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   title: Text(
                     'Cerrar Sesión',
-                    style: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+                    style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700),
                   ),
                   content: Text(
                     '¿Deseas cerrar tu sesión actual de FashionStyle?',
-                    style: GoogleFonts.poppins(fontSize: 13),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 13),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: Text('Cancelar', style: GoogleFonts.poppins(color: FashionColors.textoMuted)),
+                      child: Text('Cancelar', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary)),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: FashionColors.primaryCorporate,
+                        backgroundColor: FashionColors.inkPrimary,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       onPressed: () => Navigator.pop(ctx, true),
                       child: const Text('Cerrar Sesión'),
@@ -806,54 +462,56 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
           ),
         ),
 
-        // ZONA DE PELIGRO: ELIMINAR MI CUENTA
+        const SizedBox(height: 14),
+
+        // 5. ZONA DE PELIGRO: ELIMINAR MI CUENTA
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: FashionColors.peligro.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: FashionColors.peligro.withValues(alpha: 0.25)),
+            color: FashionColors.statusDanger.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: FashionColors.statusDanger.withValues(alpha: 0.2)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: FashionColors.peligro, size: 20),
+                  const Icon(Icons.warning_amber_rounded, color: FashionColors.statusDanger, size: 18),
                   const SizedBox(width: 8),
                   Text(
                     'Zona de Peligro',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 13,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 12.5,
                       fontWeight: FontWeight.w700,
-                      color: FashionColors.peligro,
+                      color: FashionColors.statusDanger,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 'Al solicitar la eliminación de tu cuenta, se cerrará tu sesión y se procesará la baja según los Términos y Condiciones.',
-                style: GoogleFonts.poppins(fontSize: 12, color: FashionColors.textoMuted),
+                style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: FashionColors.inkSecondary),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: TextButton.icon(
                   style: TextButton.styleFrom(
-                    foregroundColor: FashionColors.peligro,
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    foregroundColor: FashionColors.statusDanger,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(color: FashionColors.peligro.withValues(alpha: 0.3)),
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: FashionColors.statusDanger.withValues(alpha: 0.25)),
                     ),
                   ),
-                  icon: const Icon(Icons.delete_forever_rounded, size: 18),
+                  icon: const Icon(Icons.delete_forever_rounded, size: 16),
                   label: Text(
                     'Eliminar mi cuenta',
-                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 12.5, fontWeight: FontWeight.w600),
                   ),
                   onPressed: () async {
                     final esAdmin = ref.read(authProvider).esAdmin;
@@ -861,7 +519,7 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('No puedes eliminar tu propia cuenta de administrador'),
-                          backgroundColor: FashionColors.peligro,
+                          backgroundColor: FashionColors.statusDanger,
                         ),
                       );
                       return;
@@ -870,34 +528,34 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
                     final confirmar = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        backgroundColor: FashionColors.backgroundCanvas,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        backgroundColor: FashionColors.canvasBackground,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: Row(
                           children: [
-                            const Icon(Icons.warning_rounded, color: FashionColors.peligro),
+                            const Icon(Icons.warning_rounded, color: FashionColors.statusDanger),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 '¿Eliminar tu cuenta?',
-                                style: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+                                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700),
                               ),
                             ),
                           ],
                         ),
                         content: Text(
                           'Esta acción desactivará tu cuenta de FashionStyle y cerrará inmediatamente tu sesión en este dispositivo.',
-                          style: GoogleFonts.poppins(fontSize: 13),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 13),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
-                            child: Text('Cancelar', style: GoogleFonts.poppins(color: FashionColors.textoMuted)),
+                            child: Text('Cancelar', style: GoogleFonts.plusJakartaSans(color: FashionColors.inkSecondary)),
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: FashionColors.peligro,
+                              backgroundColor: FashionColors.statusDanger,
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                             onPressed: () => Navigator.pop(ctx, true),
                             child: const Text('Sí, eliminar cuenta'),

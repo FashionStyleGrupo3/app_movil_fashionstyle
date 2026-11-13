@@ -384,7 +384,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                                 label: const Text('Todo'),
                                 selected: filtros.categoriaId == null,
                                 selectedColor: FashionColors.inkPrimary,
-                                backgroundColor: FashionColors.surfaceCard,
+                                backgroundColor: FashionColors.surfaceMuted,
                                 side: BorderSide(
                                   color: filtros.categoriaId == null ? FashionColors.inkPrimary : FashionColors.borderSubtle,
                                 ),
@@ -407,7 +407,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                                   label: Text(cat.nombre),
                                   selected: sel,
                                   selectedColor: FashionColors.inkPrimary,
-                                  backgroundColor: FashionColors.surfaceCard,
+                                  backgroundColor: FashionColors.surfaceMuted,
                                   side: BorderSide(
                                     color: sel ? FashionColors.inkPrimary : FashionColors.borderSubtle,
                                   ),
@@ -455,7 +455,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                           ),
                           selected: _soloDisponibles,
                           selectedColor: FashionColors.slateAccent.withValues(alpha: 0.12),
-                          backgroundColor: FashionColors.surfaceCard,
+                          backgroundColor: FashionColors.surfaceMuted,
                           side: BorderSide(
                             color: _soloDisponibles ? FashionColors.slateAccent : FashionColors.borderSubtle,
                           ),
@@ -472,7 +472,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            backgroundColor: FashionColors.surfaceCard,
+                            backgroundColor: FashionColors.surfaceMuted,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             side: const BorderSide(color: FashionColors.borderSubtle),
                           ),

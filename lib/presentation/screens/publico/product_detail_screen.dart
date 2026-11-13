@@ -465,20 +465,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     ),
                   ),
 
-                // ESPECIFICACIÓN ATELIER CON TOP-RADIUS 28PX
+                // ESPECIFICACIÓN EDITORIAL INTEGRADA DIRECTAMENTE EN EL LIENZO #F7F4EF
                 Container(
                   decoration: const BoxDecoration(
-                    color: FashionColors.surfaceCard,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        offset: Offset(0, -2),
-                      ),
-                    ],
+                    border: Border(top: BorderSide(color: FashionColors.borderSubtle, width: 1)),
                   ),
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -772,21 +764,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           ),
         ),
 
-        // BARRA FIJA INFERIOR ERGONÓMICA EN SAFEAREA CON BOTÓN TERRACOTTA (#B83A24)
+        // BARRA FIJA INFERIOR ERGONÓMICA EN SAFEAREA
         SafeArea(
           top: false,
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
-            decoration: BoxDecoration(
-              color: FashionColors.surfaceCard,
-              border: const Border(top: BorderSide(color: FashionColors.borderSubtle, width: 0.8)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
-                ),
-              ],
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 14),
+            decoration: const BoxDecoration(
+              color: FashionColors.canvasBackground,
+              border: Border(top: BorderSide(color: FashionColors.borderSubtle, width: 1)),
             ),
             child: Row(
               children: [

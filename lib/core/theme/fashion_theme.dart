@@ -219,22 +219,22 @@ class FashionTheme {
         iconTheme: const IconThemeData(color: FashionColors.inkPrimary),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: FashionColors.surfaceCard,
-        modalBackgroundColor: FashionColors.surfaceCard,
+        backgroundColor: FashionColors.canvasBackground,
+        modalBackgroundColor: FashionColors.canvasBackground,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         dragHandleColor: FashionColors.borderSubtle,
         dragHandleSize: Size(44, 4),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
       cardTheme: CardThemeData(
-        color: FashionColors.surfaceCard,
+        color: FashionColors.surfaceMuted,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           side: const BorderSide(color: FashionColors.borderSubtle, width: 1),
         ),
       ),

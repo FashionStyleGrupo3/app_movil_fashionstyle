@@ -89,19 +89,12 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
-        borderRadius: BorderRadius.circular(18),
+        color: FashionColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: esAlerta ? FashionColors.statusDanger.withValues(alpha: 0.5) : FashionColors.borderSubtle,
           width: esAlerta ? 1.5 : 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,16 +181,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: FashionColors.surfaceCard,
-        borderRadius: BorderRadius.circular(18),
+        color: FashionColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: FashionColors.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -655,16 +641,9 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: FashionColors.surfaceCard,
-                      borderRadius: BorderRadius.circular(16),
+                      color: FashionColors.surfaceMuted,
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: FashionColors.borderSubtle),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.02),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -43,7 +43,7 @@ class CartDrawerWidget extends ConsumerWidget {
           // Header del Carrito de Compras
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            color: FashionColors.surfaceCard,
+            color: FashionColors.canvasBackground,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -203,8 +203,8 @@ class CartDrawerWidget extends ConsumerWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: FashionColors.surfaceCard,
-                                  borderRadius: BorderRadius.circular(16),
+                                  color: FashionColors.surfaceMuted,
+                                  borderRadius: BorderRadius.circular(12),
                                   border: Border.all(color: FashionColors.borderSubtle),
                                 ),
                                 child: Row(
@@ -387,7 +387,7 @@ class CartDrawerWidget extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               decoration: const BoxDecoration(
-                color: FashionColors.surfaceCard,
+                color: FashionColors.canvasBackground,
                 border: Border(top: BorderSide(color: FashionColors.borderSubtle)),
               ),
               child: Column(

@@ -93,8 +93,8 @@ class _ProductCardWidgetState extends ConsumerState<ProductCardWidget> {
             },
       child: Container(
         decoration: BoxDecoration(
-          color: FashionColors.surfaceCard,
-          borderRadius: BorderRadius.circular(18),
+          color: FashionColors.surfaceMuted,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: FashionColors.borderSubtle, width: 1),
         ),
         clipBehavior: Clip.antiAlias,

@@ -79,44 +79,36 @@ class _TermsScreenState extends State<TermsScreen> {
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 96), // Clearance para Floating Pill Dock
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: FashionColors.surfaceCard,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: FashionColors.borderSubtle),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _termino?['titulo']?.toString() ?? 'Términos y Condiciones de Uso',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: FashionColors.inkPrimary,
-                          ),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 96), // Clearance para Floating Pill Dock
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _termino?['titulo']?.toString() ?? 'Términos y Condiciones de Uso',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: FashionColors.inkPrimary,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Versión ${_termino?['version'] ?? '1.0'}',
-                          style: GoogleFonts.jetBrainsMono(fontSize: 12, color: FashionColors.inkSecondary),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Versión ${_termino?['version'] ?? '1.0'}',
+                        style: GoogleFonts.jetBrainsMono(fontSize: 12, color: FashionColors.inkSecondary),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(color: FashionColors.borderSubtle, height: 1),
+                      const SizedBox(height: 18),
+                      Text(
+                        _termino?['contenido']?.toString() ??
+                            'Al acceder a nuestra plataforma y adquirir productos, aceptas nuestros términos de despacho, garantías y tratamiento seguro de datos.',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          height: 1.6,
+                          color: FashionColors.inkPrimary,
                         ),
-                        const SizedBox(height: 16),
-                        const Divider(color: FashionColors.borderSubtle),
-                        const SizedBox(height: 16),
-                        Text(
-                          _termino?['contenido']?.toString() ??
-                              'Al acceder a nuestra plataforma y adquirir productos, aceptas nuestros términos de despacho, garantías y tratamiento seguro de datos.',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            height: 1.6,
-                            color: FashionColors.inkPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
     );
