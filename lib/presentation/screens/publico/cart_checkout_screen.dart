@@ -538,137 +538,164 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
   Widget _construirTarjetaItem(CartItem item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: FashionColors.surfaceCard,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: FashionColors.borderSubtle),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: 72,
-              height: 96,
-              child: item.imagen.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: item.imagen,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(color: FashionColors.surfaceMuted),
-                      errorWidget: (_, __, ___) => const Icon(Icons.checkroom_rounded, color: FashionColors.inkSecondary),
-                    )
-                  : const Icon(Icons.checkroom_rounded, color: FashionColors.inkSecondary),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.nombre,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: FashionColors.surfaceMuted,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'Talla: ${item.talla}',
-                    style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 72,
+                    height: 96,
+                    child: item.imagen.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: item.imagen,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => Container(color: FashionColors.surfaceMuted),
+                            errorWidget: (_, __, ___) => const Icon(Icons.checkroom_rounded, color: FashionColors.inkSecondary),
+                          )
+                        : const Icon(Icons.checkroom_rounded, color: FashionColors.inkSecondary),
                   ),
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Text(
-                      CurrencyFormatter.formatearCOP(item.precio),
-                      style: FashionTheme.priceTextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14.5,
-                        color: FashionColors.inkPrimary,
-                      ),
-                    ),
-                    if (item.precioOriginal > item.precio) ...[
-                      const SizedBox(width: 6),
-                      Text(
-                        CurrencyFormatter.formatearCOP(item.precioOriginal),
-                        style: FashionTheme.priceTextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.lineThrough,
-                          color: FashionColors.inkSecondary,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 36.0),
+                        child: Text(
+                          item.nombre,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 14, color: FashionColors.inkPrimary),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: FashionColors.statusDanger.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(4),
+                          color: FashionColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '-${item.porcentajeDescuento}%',
-                          style: GoogleFonts.jetBrainsMono(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w700,
-                            color: FashionColors.statusDanger,
-                          ),
+                          'Talla: ${item.talla}',
+                          style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: FashionColors.inkPrimary),
                         ),
                       ),
-                    ],
-                    const Spacer(),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: FashionColors.borderSubtle),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          InkWell(
-                            onTap: item.cantidad > 1
-                                ? () => ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad - 1)
-                                : null,
-                            child: const Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Icon(Icons.remove, size: 16, color: FashionColors.inkPrimary),
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                CurrencyFormatter.formatearCOP(item.precio),
+                                style: FashionTheme.priceTextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14.5,
+                                  color: FashionColors.inkPrimary,
+                                ),
+                              ),
+                              if (item.precioOriginal > item.precio) ...[
+                                Row(
+                                  children: [
+                                    Text(
+                                      CurrencyFormatter.formatearCOP(item.precioOriginal),
+                                      style: FashionTheme.priceTextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.lineThrough,
+                                        color: FashionColors.inkSecondary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: FashionColors.statusDanger.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        '-${item.porcentajeDescuento}%',
+                                        style: GoogleFonts.jetBrainsMono(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w700,
+                                          color: FashionColors.statusDanger,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              '${item.cantidad}',
-                              style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: FashionColors.borderSubtle),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                          InkWell(
-                            onTap: item.cantidad < item.stockMaximo
-                                ? () => ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad + 1)
-                                : null,
-                            child: const Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Icon(Icons.add, size: 16, color: FashionColors.inkPrimary),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                InkWell(
+                                  onTap: item.cantidad > 1
+                                      ? () => ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad - 1)
+                                      : null,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(5.0),
+                                    child: Icon(Icons.remove, size: 16, color: FashionColors.inkPrimary),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Text(
+                                    '${item.cantidad}',
+                                    style: GoogleFonts.jetBrainsMono(fontWeight: FontWeight.w700, fontSize: 13, color: FashionColors.inkPrimary),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: item.cantidad < item.stockMaximo
+                                      ? () => ref.read(cartProvider.notifier).actualizarCantidad(item.varianteId, item.cantidad + 1)
+                                      : null,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(5.0),
+                                    child: Icon(Icons.add, size: 16, color: FashionColors.inkPrimary),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded, size: 18, color: FashionColors.statusDanger),
-                      tooltip: 'Eliminar',
-                      onPressed: () => ref.read(cartProvider.notifier).eliminarPrenda(item.varianteId),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: SizedBox(
+              width: 44,
+              height: 44,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                icon: const Icon(Icons.close_rounded, size: 20, color: FashionColors.statusDanger),
+                tooltip: 'Eliminar',
+                onPressed: () => ref.read(cartProvider.notifier).eliminarPrenda(item.varianteId),
+              ),
             ),
           ),
         ],

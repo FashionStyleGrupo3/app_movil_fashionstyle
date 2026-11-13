@@ -856,6 +856,17 @@ class _SeccionMisDatosState extends ConsumerState<SeccionMisDatos> {
                     style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
                   ),
                   onPressed: () async {
+                    final esAdmin = ref.read(authProvider).esAdmin;
+                    if (esAdmin) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No puedes eliminar tu propia cuenta de administrador'),
+                          backgroundColor: FashionColors.peligro,
+                        ),
+                      );
+                      return;
+                    }
+
                     final confirmar = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(

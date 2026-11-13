@@ -56,6 +56,39 @@ class SecurityService {
     return data is Map<String, dynamic> ? data : {};
   }
 
+  Future<void> eliminarUsuario(
+    int id, {
+    int? idUsuarioAutenticado,
+    List<Map<String, dynamic>>? usuariosActuales,
+  }) async {
+    // 1. Validar que no se intente eliminar la cuenta de la sesión actual
+    if (idUsuarioAutenticado != null && id == idUsuarioAutenticado) {
+      throw Exception('No puedes eliminar tu propia cuenta de administrador');
+    }
+
+    // 2. Proteger al último administrador si se cuenta con la lista en memoria o consultándola
+    if (usuariosActuales != null && usuariosActuales.isNotEmpty) {
+      final objetivo = usuariosActuales.firstWhere(
+        (u) => (u['id_usuario'] ?? u['id'] ?? 0) == id,
+        orElse: () => <String, dynamic>{},
+      );
+      final rawRol = (objetivo['rol'] ?? objetivo['roles']?[0]?['nombre'] ?? objetivo['roles']?[0] ?? '').toString().toLowerCase();
+      final esAdmin = rawRol.contains('admin');
+      if (esAdmin) {
+        final totalAdmins = usuariosActuales.where((u) {
+          final r = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? u['roles']?[0] ?? '').toString().toLowerCase();
+          return r.contains('admin');
+        }).length;
+        if (totalAdmins <= 1) {
+          throw Exception('No se puede eliminar al último administrador');
+        }
+      }
+    }
+
+    // 3. Ejecución contra el backend (API)
+    await ApiClient.instance.dio.delete('/usuarios/$id');
+  }
+
   Future<PaginatedResponse<Map<String, dynamic>>> obtenerAuditorias([
     Map<String, dynamic>? filtros,
   ]) async {

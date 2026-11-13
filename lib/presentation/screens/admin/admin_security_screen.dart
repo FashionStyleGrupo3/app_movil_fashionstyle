@@ -58,6 +58,30 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
   }
 
   Future<void> _cambiarRol(int idUsuario, String nombre, String nuevoRol) async {
+    // Si se retira el rol de administrador, verificar que no sea el último
+    if (nuevoRol != 'admin') {
+      final totalAdmins = _usuarios.where((u) {
+        final r = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? u['roles']?[0] ?? '').toString().toLowerCase();
+        return r.contains('admin');
+      }).length;
+      final objetivo = _usuarios.firstWhere(
+        (u) => (u['id_usuario'] ?? u['id'] ?? 0) == idUsuario,
+        orElse: () => <String, dynamic>{},
+      );
+      final rawRol = (objetivo['rol'] ?? objetivo['roles']?[0]?['nombre'] ?? objetivo['roles']?[0] ?? '').toString().toLowerCase();
+      if (rawRol.contains('admin') && totalAdmins <= 1) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No se puede eliminar al último administrador'),
+              backgroundColor: FashionColors.peligro,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
     try {
       await SecurityService.instance.asignarRolUsuario(idUsuario, nuevoRol);
       await _cargarTodo();
@@ -74,6 +98,116 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible cambiar el rol.')),
+            backgroundColor: FashionColors.peligro,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _eliminarUsuario(Map<String, dynamic> usuario) async {
+    final authState = ref.read(authProvider);
+    final miId = authState.usuarioId;
+    final idTarget = usuario['id_usuario'] ?? usuario['id'] ?? 0;
+    final int userId = idTarget is int ? idTarget : int.tryParse(idTarget.toString()) ?? 0;
+    final nombre = usuario['nombre'] ?? usuario['name'] ?? 'Usuario';
+
+    // 1. Validar que no sea el mismo usuario de la sesión actual (por id)
+    if (miId != null && userId == miId) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No puedes eliminar tu propia cuenta de administrador'),
+            backgroundColor: FashionColors.peligro,
+          ),
+        );
+      }
+      return;
+    }
+
+    // 2. Proteger al último administrador
+    final rawRol = (usuario['rol'] ?? usuario['roles']?[0]?['nombre'] ?? usuario['roles']?[0] ?? '').toString().toLowerCase();
+    final esAdmin = rawRol.contains('admin');
+    if (esAdmin) {
+      final totalAdmins = _usuarios.where((u) {
+        final r = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? u['roles']?[0] ?? '').toString().toLowerCase();
+        return r.contains('admin');
+      }).length;
+      if (totalAdmins <= 1) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No se puede eliminar al último administrador'),
+              backgroundColor: FashionColors.peligro,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // 3. Confirmación previa mediante diálogo
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: FashionColors.backgroundCanvas,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_rounded, color: FashionColors.peligro),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Eliminar Colaborador',
+                style: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          '¿Estás seguro de que deseas eliminar a "$nombre"? Se revocarán sus accesos al sistema.',
+          style: GoogleFonts.poppins(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Cancelar', style: GoogleFonts.poppins(color: FashionColors.textoMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FashionColors.peligro,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    try {
+      await SecurityService.instance.eliminarUsuario(
+        userId,
+        idUsuarioAutenticado: miId,
+        usuariosActuales: _usuarios,
+      );
+      await _cargarTodo();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Usuario "$nombre" eliminado correctamente.'),
+            backgroundColor: FashionColors.verdeExito,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible eliminar al usuario.')),
             backgroundColor: FashionColors.peligro,
           ),
         );
@@ -349,9 +483,14 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                                 itemBuilder: (context, index) {
                                   final u = _usuarios[index];
                                   final id = u['id_usuario'] ?? u['id'] ?? 0;
+                                  final int userId = id is int ? id : int.tryParse(id.toString()) ?? 0;
                                   final rawRol = (u['rol'] ?? u['roles']?[0]?['nombre'] ?? u['roles']?[0] ?? 'empleado').toString().toLowerCase();
                                   final rolCanonico = rawRol.contains('admin') ? 'admin' : (rawRol.contains('cliente') ? 'cliente' : 'empleado');
                                   final activo = u['activo'] == true || u['activo'] == 1;
+
+                                  final authState = ref.watch(authProvider);
+                                  final miId = authState.usuarioId;
+                                  final bool esMismoUsuario = miId != null && miId == userId;
 
                                   final colorRol = rolCanonico == 'admin'
                                       ? FashionColors.primaryCorporate
@@ -373,7 +512,7 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                                             initialValue: rolCanonico,
                                             onSelected: (nuevoRol) {
                                               if (nuevoRol != rolCanonico) {
-                                                _cambiarRol(id is int ? id : int.tryParse(id.toString()) ?? 0, u['nombre']?.toString() ?? 'Usuario', nuevoRol);
+                                                _cambiarRol(userId, u['nombre']?.toString() ?? 'Usuario', nuevoRol);
                                               }
                                             },
                                             itemBuilder: (ctx) => [
@@ -415,10 +554,51 @@ class _AdminSecurityAndUsersScreenState extends ConsumerState<AdminSecurityAndUs
                                             value: activo,
                                             activeColor: FashionColors.verdeExito,
                                             onChanged: (val) async {
+                                              if (esMismoUsuario && !val) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('No puedes eliminar tu propia cuenta de administrador'),
+                                                    backgroundColor: FashionColors.peligro,
+                                                  ),
+                                                );
+                                                return;
+                                              }
                                               try {
-                                                await SecurityService.instance.actualizarUsuario(id is int ? id : int.tryParse(id.toString()) ?? 0, {'activo': val});
+                                                await SecurityService.instance.actualizarUsuario(userId, {'activo': val});
                                                 _cargarTodo();
-                                              } catch (_) {}
+                                              } catch (e) {
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(ApiClient.obtenerMensajeError(e, 'No fue posible actualizar el estado.')),
+                                                      backgroundColor: FashionColors.peligro,
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            },
+                                          ),
+                                          const SizedBox(width: 2),
+                                          IconButton(
+                                            icon: Icon(
+                                              esMismoUsuario ? Icons.lock_outline : Icons.delete_outline,
+                                              size: 20,
+                                              color: esMismoUsuario ? FashionColors.textoMuted.withValues(alpha: 0.35) : FashionColors.peligro,
+                                            ),
+                                            tooltip: esMismoUsuario
+                                                ? 'No puedes eliminar tu propia cuenta de administrador'
+                                                : 'Eliminar colaborador',
+                                            onPressed: () {
+                                              if (esMismoUsuario) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text('No puedes eliminar tu propia cuenta de administrador'),
+                                                    backgroundColor: FashionColors.peligro,
+                                                  ),
+                                                );
+                                              } else {
+                                                _eliminarUsuario(u);
+                                              }
                                             },
                                           ),
                                         ],

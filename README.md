@@ -1,15 +1,15 @@
-# Fashion Style Móvil (Android) &bull; v1.3.0
+# Fashion Style Móvil (Android) &bull; v1.5.4
 
 Aplicación móvil oficial para la gestión integral y comercio electrónico de la boutique **Fashion Style**, conectada al backend REST en Laravel y Wompi Bancolombia.
 
-[![Versión](https://img.shields.io/badge/version-1.3.0%2B7-B83A24.svg)](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/tag/v1.3.0)
-[![Descargar APK](https://img.shields.io/badge/Descargar-fashionstyle--release.apk-115E59.svg)](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/download/v1.3.0/fashionstyle-release.apk)
+[![Versión](https://img.shields.io/badge/version-1.5.4%2B13-B83A24.svg)](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/tag/v1.5.4)
+[![Descargar APK](https://img.shields.io/badge/Descargar-fashionstyle--release.apk-115E59.svg)](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/download/v1.5.4/fashionstyle-release.apk)
 
 ## 📲 Descarga Directa del Instalador
 
-Puedes descargar e instalar el archivo APK de la versión más reciente (`v1.3.0`) directamente desde el siguiente enlace oficial:
+Puedes descargar e instalar el archivo APK de la versión más reciente (`v1.5.4`) directamente desde el siguiente enlace oficial:
 
-👉 **[Descargar Fashion Style Móvil v1.3.0](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/download/v1.3.0/fashionstyle-release.apk)**
+👉 **[Descargar Fashion Style Móvil v1.5.4](https://github.com/FashionStyleGrupo3/app_movil_fashionstyle/releases/download/v1.5.4/fashionstyle-release.apk)**
 
 Enlace alternativo directo en repositorio:
 👉 [fashionstyle-release.apk (instalador local)](https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk)

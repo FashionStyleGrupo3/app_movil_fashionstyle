@@ -554,9 +554,10 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
                                   errorWidget: (_, __, ___) => const Icon(Icons.image_not_supported, size: 24),
                                 ),
                                 Positioned(
-                                  top: 2,
-                                  right: 2,
+                                  top: 0,
+                                  right: 0,
                                   child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
                                     onTap: () {
                                       setState(() {
                                         _imagenesEliminadas.add(img.idImagen);
@@ -564,12 +565,18 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(3),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black54,
-                                        shape: BoxShape.circle,
+                                      width: 44,
+                                      height: 44,
+                                      alignment: Alignment.topRight,
+                                      padding: const EdgeInsets.all(4),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black54,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.close, size: 14, color: Colors.white),
                                       ),
-                                      child: const Icon(Icons.close, size: 14, color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -597,21 +604,28 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
                                   fit: BoxFit.cover,
                                 ),
                                 Positioned(
-                                  top: 2,
-                                  right: 2,
+                                  top: 0,
+                                  right: 0,
                                   child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
                                     onTap: () {
                                       setState(() {
                                         _imagenesNuevas.removeAt(idx);
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(3),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black54,
-                                        shape: BoxShape.circle,
+                                      width: 44,
+                                      height: 44,
+                                      alignment: Alignment.topRight,
+                                      padding: const EdgeInsets.all(4),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black54,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.close, size: 14, color: Colors.white),
                                       ),
-                                      child: const Icon(Icons.close, size: 14, color: Colors.white),
                                     ),
                                   ),
                                 ),
