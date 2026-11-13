@@ -809,8 +809,8 @@ class _AdminAuditScreenState extends ConsumerState<AdminAuditScreen> {
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               )
                             : ListView.builder(
                                 physics: const AlwaysScrollableScrollPhysics(),
