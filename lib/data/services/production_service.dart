@@ -102,6 +102,12 @@ class ProductionService {
     return data is Map<String, dynamic> ? data : {};
   }
 
+  Future<Map<String, dynamic>> crearFormulaLote(Map<String, dynamic> payload) async {
+    final response = await ApiClient.instance.dio.post('/formulas-produccion/lote', data: payload);
+    final data = ApiResponseParser.extractData(response);
+    return data is Map<String, dynamic> ? data : {};
+  }
+
   Future<Map<String, dynamic>> actualizarFormula(int id, Map<String, dynamic> payload) async {
     final response = await ApiClient.instance.dio.put('/formulas-produccion/$id', data: payload);
     final data = ApiResponseParser.extractData(response);
@@ -134,6 +140,33 @@ class ProductionService {
     final response = await ApiClient.instance.dio.post('/ordenes-produccion/$id/completar', data: payload);
     final data = ApiResponseParser.extractData(response);
     return data is Map<String, dynamic> ? data : {};
+  }
+
+  Future<Map<String, dynamic>> cancelarOrdenProduccion(int id, [String? notas]) async {
+    final response = await ApiClient.instance.dio.put('/ordenes-produccion/$id', data: {
+      'estado': 'cancelada',
+      if (notas != null && notas.isNotEmpty) 'notas': notas,
+    });
+    final data = ApiResponseParser.extractData(response);
+    return data is Map<String, dynamic> ? data : {};
+  }
+
+  Future<void> eliminarOrdenProduccion(int id) async {
+    await ApiClient.instance.dio.delete('/ordenes-produccion/$id');
+  }
+
+  Future<List<Map<String, dynamic>>> obtenerVariantesProducto(int productoId) async {
+    try {
+      final response = await ApiClient.instance.dio.get('/productos/$productoId');
+      final data = ApiResponseParser.extractData(response);
+      if (data is Map<String, dynamic>) {
+        final vars = data['variantes'];
+        if (vars is List) {
+          return vars.whereType<Map<String, dynamic>>().toList();
+        }
+      }
+    } catch (_) {}
+    return [];
   }
 
   // Dataset para la Calculadora de Costos

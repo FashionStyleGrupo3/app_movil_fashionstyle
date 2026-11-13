@@ -31,11 +31,217 @@ class AdminShellLayout extends ConsumerWidget {
     return 'Panel Administrativo';
   }
 
-  int _determinarSlotActivo(String path) {
-    if (path == '/admin') return 0;
-    if (path.contains('/ventas')) return 1;
-    if (path.contains('/pedidos') || path.contains('/produccion')) return 2;
-    return 3; // Módulos
+  int _determinarSeccionActiva(String path) {
+    if (path.contains('/ventas') || path.contains('/pedidos') || path.contains('/pagos')) {
+      return 0; // Comercial
+    }
+    if (path.contains('/prendas') || path.contains('/inventario') || path.contains('/produccion')) {
+      return 1; // Taller
+    }
+    if (path == '/admin' || path.contains('/seguridad') || path.contains('/cuenta')) {
+      return 2; // Sistema
+    }
+    return 3; // Todos / otros
+  }
+
+  void _abrirModalSeccion(
+    BuildContext context,
+    WidgetRef ref,
+    AuthState authState, {
+    required String titulo,
+    required String subtitulo,
+    required Color colorAcento,
+    required List<_BentoItem> items,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: FashionColors.surfaceCard,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(sheetCtx).padding.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: FashionColors.borderSubtle,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          titulo,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: FashionColors.inkPrimary,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        Text(
+                          subtitulo,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: FashionColors.inkSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20, color: FashionColors.inkSecondary),
+                      onPressed: () => Navigator.pop(sheetCtx),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(color: FashionColors.borderSubtle, height: 1),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: _buildBentoSection(
+                  titulo: titulo,
+                  colorAcento: colorAcento,
+                  items: items,
+                  onSelect: (ruta) {
+                    Navigator.pop(sheetCtx);
+                    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+                    if (currentPath != ruta) context.go(ruta);
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _abrirSeccionComercial(BuildContext context, WidgetRef ref, AuthState authState) {
+    _abrirModalSeccion(
+      context,
+      ref,
+      authState,
+      titulo: 'Módulos Comerciales',
+      subtitulo: 'Ventas, facturación y dispersión',
+      colorAcento: FashionColors.brandAccent,
+      items: [
+        _BentoItem(
+          titulo: 'Ventas POS',
+          subtitulo: 'Caja mostrador & PDF 80mm',
+          ruta: '/admin/ventas',
+          icono: Icons.receipt_long_outlined,
+          activo: currentPath.contains('/ventas'),
+        ),
+        _BentoItem(
+          titulo: 'Pedidos y Facturas',
+          subtitulo: 'Despachos web y seguimiento',
+          ruta: '/admin/pedidos',
+          icono: Icons.local_shipping_outlined,
+          activo: currentPath.contains('/pedidos'),
+        ),
+        _BentoItem(
+          titulo: 'Pagos & Dispersión',
+          subtitulo: 'Credenciales Wompi y bancos',
+          ruta: '/admin/pagos',
+          icono: Icons.account_balance_outlined,
+          activo: currentPath.contains('/pagos'),
+        ),
+      ],
+    );
+  }
+
+  void _abrirSeccionTaller(BuildContext context, WidgetRef ref, AuthState authState) {
+    _abrirModalSeccion(
+      context,
+      ref,
+      authState,
+      titulo: 'Taller & Operaciones',
+      subtitulo: 'Prendas, inventario y producción',
+      colorAcento: FashionColors.slateAccent,
+      items: [
+        _BentoItem(
+          titulo: 'Gestión de Prendas',
+          subtitulo: 'Catálogo, variantes y fotos',
+          ruta: '/admin/prendas',
+          icono: Icons.checkroom_outlined,
+          activo: currentPath.contains('/prendas'),
+        ),
+        _BentoItem(
+          titulo: 'Inventario / Kárdex',
+          subtitulo: 'Stock, alertas y bodega',
+          ruta: '/admin/inventario',
+          icono: Icons.inventory_2_outlined,
+          activo: currentPath.contains('/inventario'),
+        ),
+        _BentoItem(
+          titulo: 'Producción / Costos BOM',
+          subtitulo: 'Fórmulas y órdenes activas',
+          ruta: '/admin/produccion',
+          icono: Icons.content_cut_outlined,
+          activo: currentPath.contains('/produccion'),
+        ),
+      ],
+    );
+  }
+
+  void _abrirSeccionSistema(BuildContext context, WidgetRef ref, AuthState authState) {
+    _abrirModalSeccion(
+      context,
+      ref,
+      authState,
+      titulo: 'Control & Sistema',
+      subtitulo: 'Dashboard, auditoría, staff y cuenta',
+      colorAcento: FashionColors.editorialOchre,
+      items: [
+        _BentoItem(
+          titulo: 'Panel de Control',
+          subtitulo: 'KPIs en vivo y analítica',
+          ruta: '/admin',
+          icono: Icons.dashboard_outlined,
+          activo: currentPath == '/admin',
+        ),
+        _BentoItem(
+          titulo: 'Clientes & Usuarios',
+          subtitulo: 'Roles en vivo y accesos',
+          ruta: '/admin/seguridad',
+          icono: Icons.people_outline,
+          activo: currentPath == '/admin/seguridad',
+        ),
+        if (authState.esAdmin)
+          _BentoItem(
+            titulo: 'Bitácora de Auditoría',
+            subtitulo: 'Trazabilidad de cambios',
+            ruta: '/admin/seguridad/auditoria',
+            icono: Icons.history_edu_outlined,
+            activo: currentPath.contains('/auditoria'),
+          ),
+        _BentoItem(
+          titulo: 'Mi Cuenta',
+          subtitulo: 'Perfil del operador',
+          ruta: '/admin/cuenta',
+          icono: Icons.account_circle_outlined,
+          activo: currentPath.contains('/cuenta'),
+        ),
+      ],
+    );
   }
 
   void _abrirBentoModulos(BuildContext context, WidgetRef ref, AuthState authState) {
@@ -449,7 +655,7 @@ class AdminShellLayout extends ConsumerWidget {
     });
 
     final titulo = _obtenerTitulo(currentPath);
-    final slotActivo = _determinarSlotActivo(currentPath);
+    final seccionActiva = _determinarSeccionActiva(currentPath);
 
     return Scaffold(
       backgroundColor: FashionColors.canvasBackground,
@@ -570,40 +776,31 @@ class AdminShellLayout extends ConsumerWidget {
           child: Row(
             children: [
               _buildBottomSlot(
-                icono: Icons.dashboard_outlined,
-                iconoActivo: Icons.dashboard_rounded,
-                label: 'Dashboard',
-                activo: slotActivo == 0,
-                onTap: () {
-                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
-                  if (currentPath != '/admin') context.go('/admin');
-                },
+                icono: Icons.point_of_sale_outlined,
+                iconoActivo: Icons.point_of_sale_rounded,
+                label: 'Comercial',
+                activo: seccionActiva == 0,
+                onTap: () => _abrirSeccionComercial(context, ref, authState),
               ),
               _buildBottomSlot(
-                icono: Icons.receipt_long_outlined,
-                iconoActivo: Icons.receipt_long_rounded,
-                label: 'Ventas POS',
-                activo: slotActivo == 1,
-                onTap: () {
-                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
-                  if (currentPath != '/admin/ventas') context.go('/admin/ventas');
-                },
+                icono: Icons.precision_manufacturing_outlined,
+                iconoActivo: Icons.precision_manufacturing_rounded,
+                label: 'Taller',
+                activo: seccionActiva == 1,
+                onTap: () => _abrirSeccionTaller(context, ref, authState),
               ),
               _buildBottomSlot(
-                icono: Icons.local_shipping_outlined,
-                iconoActivo: Icons.local_shipping_rounded,
-                label: 'Pedidos',
-                activo: slotActivo == 2,
-                onTap: () {
-                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
-                  if (currentPath != '/admin/pedidos') context.go('/admin/pedidos');
-                },
+                icono: Icons.tune_outlined,
+                iconoActivo: Icons.tune_rounded,
+                label: 'Sistema',
+                activo: seccionActiva == 2,
+                onTap: () => _abrirSeccionSistema(context, ref, authState),
               ),
               _buildBottomSlot(
                 icono: Icons.grid_view_outlined,
                 iconoActivo: Icons.grid_view_rounded,
-                label: 'Módulos',
-                activo: slotActivo == 3,
+                label: 'Todos',
+                activo: false,
                 onTap: () => _abrirBentoModulos(context, ref, authState),
               ),
             ],

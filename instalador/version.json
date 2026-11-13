@@ -1,8 +1,8 @@
 {
   "version": "1.6.0",
   "buildNumber": 15,
-  "commit": "v1.6.0-seamless-ui-refinement",
-  "updatedAt": "2026-11-13T07:20:00Z",
+  "commit": "v1.6.0-production-and-nav-redesign",
+  "updatedAt": "2026-11-13T07:50:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.6.0: Refinamiento de UI editorial integrado: eliminación de contenedores y tarjetas pesadas para una integración limpia sobre el fondo crema oficial (#F7F4EF) con separadores sutiles (#E4DDD2); unificación del encabezado de perfil eliminando elementos duplicados y asegurando contraste accesible en avatar, iniciales y botones; pestañas editoriales con subrayado continuo; campos de formulario sin bordes pesados; optimización de espacio y consistencia estética en vistas públicas y administrativas con 0 desbordamientos."
+  "notes": "Lanzamiento oficial v1.6.0: Rediseño completo de la barra de navegación administrativa por secciones emergentes (Comercial, Taller, Sistema, Todos) con resaltado inteligente según la ruta activa. Corrección de órdenes de producción (flujo RF-059 para completar órdenes con reparto de unidades por tallas y descuento de insumos en kárdex, cálculo real de costo_total, validaciones defensivas de stock visible y creación de órdenes). CRUD operativo completo en Materias Primas, Fórmulas de Producción y Proveedores. Refinamiento editorial integrado de UI sobre #F7F4EF con 0 desbordamientos."
 }
