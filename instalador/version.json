@@ -1,8 +1,8 @@
 {
-  "version": "1.5.4",
-  "buildNumber": 13,
-  "commit": "v1.5.4-audit-screen-carousel-fixes",
-  "updatedAt": "2026-11-12T19:30:00Z",
+  "version": "1.5.5",
+  "buildNumber": 14,
+  "commit": "v1.5.5-admin-security-and-backend-sync",
+  "updatedAt": "2026-11-13T06:30:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.5.4: Corrección crítica de ErrorWidget gris en la Bitácora de Auditoría (formateo seguro de fechas sin dependencia rígida de tablas de localización intl, soporte para datos JSON en cadena y desglose detallado de qué cambios se hicieron antes -> después), corrección de diapositivas negras y encuadre cortado en el carrusel de inicio (resolución en cascada de imágenes de portada, encuadre superior/medio Alignment(0, -0.35), opacidad 1.0 y scrim de gradiente inferior para máxima luminosidad y legibilidad), y sincronización robusta en CI con git pull --rebase."
+  "notes": "Lanzamiento oficial v1.5.5: Sincronización con backend (PR #49) y frontend (PRs #71-#72) con validaciones de seguridad para eliminación de colaboradores (prohibición de autoeliminación de administradores y protección del último administrador en el sistema), soporte de auditorías para nuevos módulos observados en backend, optimización de áreas táctiles en formulario de prendas y checkout."
 }
