@@ -7,7 +7,6 @@ import 'package:fashion_style_mobile/core/theme/fashion_theme.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/cart_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/favorites_provider.dart';
-import 'package:fashion_style_mobile/presentation/widgets/common/fashion_brand_emblem.dart';
 import 'package:fashion_style_mobile/presentation/widgets/store/cart_drawer.dart';
 
 class PublicShellLayout extends ConsumerStatefulWidget {
@@ -46,8 +45,16 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
       final soloFavs = ref.read(favoritesProvider).soloFavoritos;
       return soloFavs ? 2 : 1;
     }
-    if (location.startsWith('/perfil') || location.startsWith('/login') || location.startsWith('/registro')) {
+    if (location.startsWith('/carrito')) {
       return 3;
+    }
+    if (location.startsWith('/perfil') ||
+        location.startsWith('/login') ||
+        location.startsWith('/registro') ||
+        location.startsWith('/verificar-correo') ||
+        location.startsWith('/recuperar-contrasena') ||
+        location.startsWith('/restablecer-contrasena')) {
+      return 4;
     }
     return 0;
   }
@@ -68,6 +75,9 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
         context.go('/catalogo');
         break;
       case 3:
+        context.go('/carrito');
+        break;
+      case 4:
         final auth = ref.read(authProvider);
         if (auth.estaAutenticado) {
           context.go('/perfil');
@@ -122,56 +132,66 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
     });
   }
 
-  Widget _buildDockItem({
+  Widget _buildNavItem({
     required int idx,
-    required IconData icono,
-    required IconData iconoActivo,
+    required IconData icon,
+    required IconData activeIcon,
     required String label,
-    required bool activo,
+    required bool active,
     int badgeCount = 0,
   }) {
-    return GestureDetector(
-      onTap: () => _navegarAIndice(idx),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
-        padding: activo
-            ? const EdgeInsets.symmetric(horizontal: 14, vertical: 8)
-            : const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: activo ? Colors.white.withValues(alpha: 0.18) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Badge(
-              isLabelVisible: badgeCount > 0,
-              backgroundColor: FashionColors.brandAccent,
-              label: Text(
-                '$badgeCount',
-                style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              child: Icon(
-                activo ? iconoActivo : icono,
-                color: activo ? Colors.white : Colors.white70,
-                size: 20,
-              ),
+    const activeBg = Color(0xFFF7F4EF);
+    const activeFg = Color(0xFF111111);
+    final inactiveFg = Colors.white.withValues(alpha: 0.70);
+
+    return Expanded(
+      child: Material(
+        color: active ? activeBg : Colors.transparent,
+        child: InkWell(
+          onTap: () => _navegarAIndice(idx),
+          child: Container(
+            decoration: BoxDecoration(
+              border: active
+                  ? const Border(
+                      top: BorderSide(color: Color(0xFF111111), width: 2),
+                    )
+                  : null,
             ),
-            if (activo) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: GoogleFonts.plusJakartaSans(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                  letterSpacing: -0.2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Badge(
+                  isLabelVisible: badgeCount > 0,
+                  backgroundColor: FashionColors.brandAccent,
+                  label: Text(
+                    '$badgeCount',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  child: Icon(
+                    active ? activeIcon : icon,
+                    color: active ? activeFg : inactiveFg,
+                    size: 20,
+                  ),
                 ),
-              ),
-            ],
-          ],
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: active ? activeFg : inactiveFg,
+                    fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                    fontSize: 10,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -201,63 +221,20 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
         shadowColor: FashionColors.inkPrimary.withValues(alpha: 0.05),
         centerTitle: false,
         titleSpacing: 16,
-        title: FashionBrandHeader(
-          emblemSize: 32,
-          compacto: false,
+        title: GestureDetector(
           onTap: () => context.go('/'),
-        ),
-        actions: [
-          if (authState.esPersonal)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-              child: InkWell(
-                onTap: () {
-                  ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
-                  context.go('/admin');
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: FashionColors.inkPrimary,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.admin_panel_settings_rounded, size: 16, color: FashionColors.crema),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Admin',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: FashionColors.crema,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          behavior: HitTestBehavior.opaque,
+          child: Text(
+            'FASHIONSTYLE',
+            style: GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              letterSpacing: -0.4,
+              color: FashionColors.inkPrimary,
+              height: 1.1,
             ),
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            tooltip: 'Carrito de compras',
-            icon: Badge(
-              isLabelVisible: cartState.totalPrendas > 0,
-              backgroundColor: FashionColors.brandAccent,
-              label: Text(
-                '${cartState.totalPrendas}',
-                style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              child: const Icon(Icons.shopping_bag_outlined, size: 24, color: FashionColors.inkPrimary),
-            ),
-            onPressed: () => _abrirCarritoComprasModal(context),
           ),
-          const SizedBox(width: 8),
-        ],
+        ),
       ),
       // Soporte gestual táctil: deslizamiento horizontal rápido para alternar secciones principales
       body: GestureDetector(
@@ -265,7 +242,7 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
         onHorizontalDragEnd: (details) {
           final deltaX = details.velocity.pixelsPerSecond.dx;
           if (deltaX.abs() > 400) {
-            if (deltaX < 0 && indiceNav < 3) {
+            if (deltaX < 0 && indiceNav < 4) {
               _navegarAIndice(indiceNav + 1);
             } else if (deltaX > 0 && indiceNav > 0) {
               _navegarAIndice(indiceNav - 1);
@@ -274,56 +251,52 @@ class _PublicShellLayoutState extends ConsumerState<PublicShellLayout> {
         },
         child: widget.child,
       ),
-      // FLOATING PILL DOCK INFERIOR SARTORIAL
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      // BARRA INFERIOR EDGE-TO-EDGE DE 5 PESTAÑAS (#111111)
+      bottomNavigationBar: Container(
+        color: const Color(0xFF111111),
+        child: SafeArea(
+          top: false,
           child: Container(
-            height: 62,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            decoration: BoxDecoration(
-              color: FashionColors.inkPrimary,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: FashionColors.inkPrimary.withValues(alpha: 0.22),
-                  blurRadius: 18,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
+            height: 56,
+            color: const Color(0xFF111111),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildDockItem(
+                _buildNavItem(
                   idx: 0,
-                  icono: Icons.home_outlined,
-                  iconoActivo: Icons.home_rounded,
+                  icon: Icons.home_outlined,
+                  activeIcon: Icons.home_rounded,
                   label: 'Inicio',
-                  activo: indiceNav == 0,
+                  active: indiceNav == 0,
                 ),
-                _buildDockItem(
+                _buildNavItem(
                   idx: 1,
-                  icono: Icons.grid_view_outlined,
-                  iconoActivo: Icons.grid_view_rounded,
+                  icon: Icons.grid_view_outlined,
+                  activeIcon: Icons.grid_view_rounded,
                   label: 'Catálogo',
-                  activo: indiceNav == 1,
+                  active: indiceNav == 1,
                 ),
-                _buildDockItem(
+                _buildNavItem(
                   idx: 2,
-                  icono: Icons.favorite_border_rounded,
-                  iconoActivo: Icons.favorite_rounded,
+                  icon: Icons.favorite_border_rounded,
+                  activeIcon: Icons.favorite_rounded,
                   label: 'Favoritos',
                   badgeCount: favsState.total,
-                  activo: indiceNav == 2,
+                  active: indiceNav == 2,
                 ),
-                _buildDockItem(
+                _buildNavItem(
                   idx: 3,
-                  icono: Icons.person_outline_rounded,
-                  iconoActivo: Icons.person_rounded,
+                  icon: Icons.shopping_bag_outlined,
+                  activeIcon: Icons.shopping_bag_rounded,
+                  label: 'Carrito',
+                  badgeCount: cartState.totalPrendas,
+                  active: indiceNav == 3,
+                ),
+                _buildNavItem(
+                  idx: 4,
+                  icon: Icons.person_outline_rounded,
+                  activeIcon: Icons.person_rounded,
                   label: authState.estaAutenticado ? 'Perfil' : 'Ingresar',
-                  activo: indiceNav == 3,
+                  active: indiceNav == 4,
                 ),
               ],
             ),

@@ -1,0 +1,30 @@
+name: Publish Official GitHub Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publicar Release de APK Oficial
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Publicar GitHub Release con APK
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Fashion Style Móvil ${{ github.ref_name }}
+          make_latest: true
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            instalador/fashionstyle-release.apk
+            instalador/version.json

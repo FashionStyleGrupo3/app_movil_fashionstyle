@@ -319,6 +319,7 @@ Destino: ${_ciudadCtrl.text.isNotEmpty ? _ciudadCtrl.text : 'A convenir'}
     final authState = ref.watch(authProvider);
 
     return PublicShellLayout(
+      currentIndex: 3,
       child: RefreshIndicator(
         color: FashionColors.brandAccent,
         backgroundColor: FashionColors.surfaceCard,

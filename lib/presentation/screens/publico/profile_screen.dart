@@ -1,7 +1,7 @@
 // @source-mirror: src/views/publico/VistaMiPerfil.vue, src/components/perfil/SeccionMisPedidos.vue, src/components/perfil/SeccionFavoritos.vue
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fashion_style_mobile/core/network/api_client.dart';
@@ -11,6 +11,7 @@ import 'package:fashion_style_mobile/data/services/user_service.dart';
 import 'package:fashion_style_mobile/presentation/layouts/public_shell_layout.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_provider.dart';
 import 'package:fashion_style_mobile/presentation/providers/auth_state.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/image_crop_editor_dialog.dart';
 import 'package:fashion_style_mobile/presentation/widgets/profile/favorites_section.dart';
 import 'package:fashion_style_mobile/presentation/widgets/profile/my_data_section.dart';
 import 'package:fashion_style_mobile/presentation/widgets/profile/my_orders_section.dart';
@@ -148,12 +149,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
 
   Future<void> _subirFoto(ImageSource origen) async {
     final picker = ImagePicker();
-    final pick = await picker.pickImage(source: origen, imageQuality: 85, maxWidth: 1024, maxHeight: 1024);
+    final pick = await picker.pickImage(source: origen, imageQuality: 90, maxWidth: 1600, maxHeight: 1600);
     if (pick == null) return;
+
+    final bytes = await pick.readAsBytes();
+    if (!mounted) return;
+
+    final File? cropped = await ImageCropEditorDialog.show(
+      context,
+      imageBytes: bytes,
+      aspectRatio: 1.0,
+      title: 'Ajustar foto de perfil',
+    );
+    if (cropped == null) return;
 
     setState(() => _subiendoFoto = true);
     try {
-      final res = await UserService.instance.subirFotoPerfil(pick.path, pick.name);
+      final res = await UserService.instance.subirFotoPerfil(
+        cropped.path,
+        'avatar_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
       ref.read(authProvider.notifier).actualizarUsuario(res);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -203,13 +218,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
     final authState = ref.watch(authProvider);
 
     return PublicShellLayout(
-      currentIndex: 3,
+      currentIndex: 4,
       child: Column(
         children: [
-          // 1. CABECERA INTEGRADA EDITORIAL SOBRE #F7F4EF (SIN DUAL CARD NI FONDOS OSCUROS PESADOS)
+          // 1. FRANJA DE IDENTIDAD COMPACTA (56x56 avatar cuadrado #111111 + badge terracota #B85338)
           _construirCabeceraIntegrada(authState),
 
-          // 2. PESTAÑAS SUBRAYADAS EDITORIALES (2px #111111 sobre 1px #E4DDD2)
+          // 2. BARRA DE PESTAÑAS EDGE-TO-EDGE DE 3 COLUMNAS (#111111 ACTIVA / #EFECE6 INACTIVA)
           _construirBarraPestanas(),
 
           // 3. CONTENIDO DE LAS PESTAÑAS DIRECTAMENTE EN EL LIENZO
@@ -232,154 +247,88 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
     final inicial = (authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario[0] : 'U').toUpperCase();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          // Avatar cuadrado 56x56 #111111 con badge terracota #B85338
+          Stack(
+            clipBehavior: Clip.none,
             children: [
-              // Avatar interactivo con anillo sutil y botón de cámara
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: FashionColors.surfaceMuted,
-                      border: Border.all(color: FashionColors.borderSubtle, width: 1.5),
-                    ),
-                    child: ClipOval(
-                      child: _subiendoFoto
-                          ? const Center(
-                              child: SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: FashionColors.inkPrimary),
-                              ),
-                            )
-                          : (authState.fotoUsuario != null && authState.fotoUsuario!.trim().isNotEmpty)
-                              ? Image.network(
-                                  ImageUrlResolver.resolve(authState.fotoUsuario!),
-                                  key: ValueKey(authState.fotoUsuario),
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => _avatarFallback(inicial),
-                                )
-                              : _avatarFallback(inicial),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -2,
-                    right: -2,
-                    child: Material(
-                      color: FashionColors.inkPrimary,
-                      shape: const CircleBorder(),
-                      elevation: 1,
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: _subiendoFoto ? null : () => _abrirOpcionesFoto(context, authState),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Icon(Icons.camera_alt, color: Colors.white, size: 12),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF111111),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: _subiendoFoto
+                    ? const Center(
+                        child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
+                      )
+                    : (authState.fotoUsuario != null && authState.fotoUsuario!.trim().isNotEmpty)
+                        ? Image.network(
+                            ImageUrlResolver.resolve(authState.fotoUsuario!),
+                            key: ValueKey(authState.fotoUsuario),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => _avatarFallback(inicial),
+                          )
+                        : _avatarFallback(inicial),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Usuario Fashion Style',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: FashionColors.inkPrimary,
-                        letterSpacing: -0.3,
-                      ),
+              Positioned(
+                bottom: -3,
+                right: -3,
+                child: Material(
+                  color: const Color(0xFFB85338),
+                  shape: const CircleBorder(),
+                  elevation: 1,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: _subiendoFoto ? null : () => _abrirOpcionesFoto(context, authState),
+                    child: const Padding(
+                      padding: EdgeInsets.all(4.5),
+                      child: Icon(Icons.camera_alt, color: Colors.white, size: 11),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      authState.correoUsuario,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12.5,
-                        color: FashionColors.inkSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        color: authState.tieneAccesoAdmin
-                            ? FashionColors.editorialGoldDark.withValues(alpha: 0.14)
-                            : FashionColors.surfaceMuted,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: authState.tieneAccesoAdmin
-                              ? FashionColors.editorialGoldDark.withValues(alpha: 0.45)
-                              : FashionColors.borderSubtle,
-                        ),
-                      ),
-                      child: Text(
-                        authState.tieneAccesoAdmin ? 'STAFF / ADMIN' : 'CLIENTE',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.0,
-                          color: authState.tieneAccesoAdmin
-                              ? FashionColors.editorialGoldDark
-                              : FashionColors.inkSecondary,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
-
-          // Botón Panel de Administración con alto contraste y fondo suave
-          if (authState.tieneAccesoAdmin) ...[
-            const SizedBox(height: 12),
-            InkWell(
-              borderRadius: BorderRadius.circular(10),
-              onTap: () => context.go('/admin'),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                decoration: BoxDecoration(
-                  color: FashionColors.surfaceMuted,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: FashionColors.borderSubtle),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  authState.nombreUsuario.isNotEmpty ? authState.nombreUsuario : 'Usuario Fashion Style',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF111111),
+                    letterSpacing: -0.3,
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.admin_panel_settings_rounded, size: 18, color: FashionColors.inkPrimary),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Panel de Administración',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: FashionColors.inkPrimary,
-                      ),
-                    ),
-                    const Spacer(),
-                    const Icon(Icons.arrow_forward_rounded, size: 16, color: FashionColors.inkPrimary),
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  authState.correoUsuario,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    color: const Color(0xFF6F6F6F),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -387,14 +336,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
 
   Widget _avatarFallback(String inicial) {
     return Container(
-      color: FashionColors.surfaceMuted,
+      color: const Color(0xFF111111),
       alignment: Alignment.center,
       child: Text(
         inicial,
         style: GoogleFonts.spaceGrotesk(
           fontSize: 22,
           fontWeight: FontWeight.w700,
-          color: FashionColors.inkPrimary,
+          color: Colors.white,
         ),
       ),
     );
@@ -403,24 +352,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> with SingleTicker
   Widget _construirBarraPestanas() {
     return Container(
       width: double.infinity,
+      height: 40,
       decoration: const BoxDecoration(
+        color: Color(0xFFEFECE6),
         border: Border(
-          bottom: BorderSide(color: FashionColors.borderSubtle, width: 1),
+          top: BorderSide(color: Color(0xFFD8CFC2), width: 1),
+          bottom: BorderSide(color: Color(0xFFD8CFC2), width: 1),
         ),
       ),
       child: TabBar(
         controller: _tabController,
         dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
-        indicatorWeight: 2.0,
-        indicatorColor: FashionColors.inkPrimary,
-        labelColor: FashionColors.inkPrimary,
-        unselectedLabelColor: FashionColors.inkSecondary,
-        labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 13, letterSpacing: -0.2),
-        unselectedLabelStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w500, fontSize: 13),
+        indicator: const BoxDecoration(
+          color: Color(0xFF111111),
+        ),
+        labelColor: Colors.white,
+        unselectedLabelColor: const Color(0xFF6F6F6F),
+        labelStyle: GoogleFonts.spaceGrotesk(
+          fontWeight: FontWeight.w700,
+          fontSize: 12.5,
+          letterSpacing: -0.2,
+        ),
+        unselectedLabelStyle: GoogleFonts.plusJakartaSans(
+          fontWeight: FontWeight.w600,
+          fontSize: 12.5,
+        ),
         tabs: const [
-          Tab(text: 'Mis Datos'),
-          Tab(text: 'Mis Pedidos'),
+          Tab(text: 'Mis datos'),
+          Tab(text: 'Mis pedidos'),
           Tab(text: 'Favoritos'),
         ],
       ),

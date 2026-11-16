@@ -13,6 +13,7 @@ import 'package:fashion_style_mobile/data/models/product/catalog.dart';
 import 'package:fashion_style_mobile/data/models/product/category.dart';
 import 'package:fashion_style_mobile/data/models/product/product.dart';
 import 'package:fashion_style_mobile/data/models/product/product_image.dart';
+import 'package:fashion_style_mobile/presentation/widgets/common/image_crop_editor_dialog.dart';
 
 // Modal de Creación / Edición de Prenda
 class ModalFormularioPrenda extends StatefulWidget {
@@ -88,11 +89,26 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
   Future<void> _seleccionarImagenesGaleria() async {
     try {
       final picker = ImagePicker();
-      final seleccionadas = await picker.pickMultiImage(maxWidth: 1200, imageQuality: 85);
-      if (seleccionadas.isNotEmpty) {
-        setState(() {
-          _imagenesNuevas.addAll(seleccionadas);
-        });
+      final seleccionadas = await picker.pickMultiImage(maxWidth: 1600, imageQuality: 90);
+      if (seleccionadas.isNotEmpty && mounted) {
+        for (final img in seleccionadas) {
+          final bytes = await img.readAsBytes();
+          if (!mounted) break;
+          final cropped = await ImageCropEditorDialog.show(
+            context,
+            imageBytes: bytes,
+            title: 'Ajustar foto de prenda',
+          );
+          if (cropped != null) {
+            setState(() {
+              _imagenesNuevas.add(XFile(cropped.path));
+            });
+          } else {
+            setState(() {
+              _imagenesNuevas.add(img);
+            });
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -106,11 +122,19 @@ class _ModalFormularioPrendaState extends State<ModalFormularioPrenda> {
   Future<void> _tomarFotoCamara() async {
     try {
       final picker = ImagePicker();
-      final foto = await picker.pickImage(source: ImageSource.camera, maxWidth: 1200, imageQuality: 85);
-      if (foto != null) {
-        setState(() {
-          _imagenesNuevas.add(foto);
-        });
+      final foto = await picker.pickImage(source: ImageSource.camera, maxWidth: 1600, imageQuality: 90);
+      if (foto != null && mounted) {
+        final bytes = await foto.readAsBytes();
+        final cropped = await ImageCropEditorDialog.show(
+          context,
+          imageBytes: bytes,
+          title: 'Ajustar foto de prenda',
+        );
+        if (cropped != null) {
+          setState(() {
+            _imagenesNuevas.add(XFile(cropped.path));
+          });
+        }
       }
     } catch (e) {
       if (mounted) {

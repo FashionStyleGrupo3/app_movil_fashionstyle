@@ -112,7 +112,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     final correo = widget.correo ?? ref.read(authProvider).correoUsuario;
 
     return PublicShellLayout(
-      currentIndex: 3,
+      currentIndex: 4,
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 96), // Clearance para Floating Pill Dock

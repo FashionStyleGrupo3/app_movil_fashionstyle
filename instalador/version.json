@@ -1,8 +1,8 @@
 {
-  "version": "1.6.1",
-  "buildNumber": 16,
-  "commit": "v1.6.1-web-parity-and-production-modals",
-  "updatedAt": "2026-11-13T08:30:00Z",
+  "version": "1.6.2",
+  "buildNumber": 17,
+  "commit": "v1.6.2-compact-profile-and-image-cropper",
+  "updatedAt": "2026-11-16T14:15:00Z",
   "apkUrl": "https://raw.githubusercontent.com/FashionStyleGrupo3/app_movil_fashionstyle/main/instalador/fashionstyle-release.apk",
-  "notes": "Lanzamiento oficial v1.6.1: Paridad total Web vs Mobile. Modal de cancelación de órdenes en 2 pasos con ajuste de materiales usados ({materiales_usados: [{materia_prima_id, cantidad_usada}]}), barra de búsqueda y filtros de estado por chips en Órdenes de producción, y acciones directas de ciclo de vida (Iniciar, Pausar, Reanudar, Completar, Editar, Cancelar, Eliminar). Vista interactiva y modal de Fórmulas por Prenda con cálculo dinámico de desperdicio, consumo real y costo estimado de materiales por prenda (Screenshot 3). Nuevos módulos: Centro de Ayuda (/admin/ayuda) con 12 guías operativas, Bandeja de Mensajes y PQRS (/admin/mensajes) con respuestas por correo electrónico, y Formulario Oficial de Contacto y PQRS público (/contacto) con radicación y consulta de estado en tiempo real. Rediseño editorial integrado sobre fondo #F7F4EF con 0 desbordamientos."
+  "notes": "Lanzamiento oficial v1.6.2 (Build 17): Rediseño de Perfil Compacto con franja de identidad sartorial (avatar cuadrado #111111 56x56, badge de cámara terracota #B85338), barra de pestañas edge-to-edge de 3 columnas (Mis datos | Mis pedidos | Favoritos) con pestaña activa sólida #111111 y fondo #EFECE6. Bento Grid 3×2 con 6 accesos (Información, Correo, Contraseña, Panel admin / Ayuda PQRS, Cerrar sesión, Eliminar datos en #C92A2A) y subpaneles con campos en 2 columnas (Teléfono | Ciudad). Barra superior simplificada mostrando únicamente FASHIONSTYLE a la izquierda. Dock inferior edge-to-edge de 5 pestañas (Inicio, Catálogo, Favoritos, Carrito con badge, Perfil) con bloque invertido claro #F7F4EF en la pestaña activa. Editor y recortador interactivo de imágenes nativo Flutter 1:1 con zoom, rotación y encuadre sin plugins nativos."
 }
